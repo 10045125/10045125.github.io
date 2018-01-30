@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+<meta name="description" content="最近一直在着手处理文件下载相关的东西，介于没有足够的精力重头开始写，github发现一个文件下载库，其设计还是非常不错的，这里就简要的分析下其结构构成。非常感谢这位小伙伴的开源精神，作者的Jacksgong github,博客Jacksgong blog 框架的模块构成一个下载框架主要需要包含以下几个模块： 网络请求和文件流模块 消息回调机制 跨进程间通信模块 信息存储模块 异常处理模块  以下是">
+<meta property="og:type" content="article">
+<meta property="og:title" content="开源库FileDownloader的简要原理分析">
+<meta property="og:url" content="http://yoursite.com/2016/06/21/开源库FileDownloader的简要原理分析/index.html">
+<meta property="og:site_name" content="伍中联(Vanda)的博客">
+<meta property="og:description" content="最近一直在着手处理文件下载相关的东西，介于没有足够的精力重头开始写，github发现一个文件下载库，其设计还是非常不错的，这里就简要的分析下其结构构成。非常感谢这位小伙伴的开源精神，作者的Jacksgong github,博客Jacksgong blog 框架的模块构成一个下载框架主要需要包含以下几个模块： 网络请求和文件流模块 消息回调机制 跨进程间通信模块 信息存储模块 异常处理模块  以下是">
+<meta property="og:image" content="http://yoursite.com/2016/06/21/开源库FileDownloader的简要原理分析/img/FileDownloader1.png">
+<meta property="og:image" content="http://yoursite.com/2016/06/21/开源库FileDownloader的简要原理分析/img/FileDownloader2.png">
+<meta property="og:updated_time" content="2016-06-21T10:25:15.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="开源库FileDownloader的简要原理分析">
+<meta name="twitter:description" content="最近一直在着手处理文件下载相关的东西，介于没有足够的精力重头开始写，github发现一个文件下载库，其设计还是非常不错的，这里就简要的分析下其结构构成。非常感谢这位小伙伴的开源精神，作者的Jacksgong github,博客Jacksgong blog 框架的模块构成一个下载框架主要需要包含以下几个模块： 网络请求和文件流模块 消息回调机制 跨进程间通信模块 信息存储模块 异常处理模块  以下是">
+<meta name="twitter:image" content="http://yoursite.com/2016/06/21/开源库FileDownloader的简要原理分析/img/FileDownloader1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/06/21/开源库FileDownloader的简要原理分析/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+  <title>开源库FileDownloader的简要原理分析 | 伍中联(Vanda)的博客</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">伍中联(Vanda)的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">当一切理所当然就没有你什么事了 当你说：“这个好麻烦，那么不要犹豫，主动出击”</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives<span class="badge">18</span>
+              </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/06/21/开源库FileDownloader的简要原理分析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="伍中联">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="伍中联(Vanda)的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">开源库FileDownloader的简要原理分析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-06-21T17:34:42+08:00">2016-06-21</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近一直在着手处理文件下载相关的东西，介于没有足够的精力重头开始写，github发现一个文件下载库，其设计还是非常不错的，这里就简要的分析下其结构构成。非常感谢这位小伙伴的开源精神，作者的<a href="https://github.com/lingochamp/FileDownloader" target="_blank" rel="noopener">Jacksgong github</a>,博客<a href="http://blog.dreamtobe.cn" target="_blank" rel="noopener">Jacksgong blog</a></p>
+<h2 id="框架的模块构成"><a href="#框架的模块构成" class="headerlink" title="框架的模块构成"></a>框架的模块构成</h2><h4 id="一个下载框架主要需要包含以下几个模块："><a href="#一个下载框架主要需要包含以下几个模块：" class="headerlink" title="一个下载框架主要需要包含以下几个模块："></a>一个下载框架主要需要包含以下几个模块：</h4><ol>
+<li>网络请求和文件流模块</li>
+<li>消息回调机制</li>
+<li>跨进程间通信模块</li>
+<li>信息存储模块</li>
+<li>异常处理模块</li>
+</ol>
+<p>以下是我对下载框架的一个类图结构分析，这部分主要涉及的是独立进程中文件下载需要处理的任务 和 提供远程接口端的类图，暂时没有涉及上层逻辑结构。</p>
+<img src="/2016/06/21/开源库FileDownloader的简要原理分析/img/FileDownloader1.png">
+<p>首先跨进程间的通信方式是采用：</p>
+<ol>
+<li>通过Binder来实现远程调用(IPC)：这种方式是Android的最大特色之一，让你调用远程Service的接口，就像调用本地对象一样，实现非常灵活，写起来也相对复杂。</li>
+<li>在FileDownloadService里面handler（IFileDownloadServiceHandler）持有实现一个IFileDownloadIPCService.Stub接口的Binder，并且在onBind()中返回此Binder对象</li>
+<li>同时在实现IFileDownloadServiceHandler接口的FDServiceSeparateHandler类中拥有了文件下载的远程消息的回调，同时在这个handler中封装了对文件下载管理操作类FileDownloadMgr，远程接口IFileDownloadIPCService中的实现都交由FileDownloadMgr来实现和管理，Service所有操作都委托交由FDServiceSeparateHandler来处理，FDServiceSeparateHandler也实现了MessageReceiver来处理进程间的消息回调，其真正处理回调处理是由IFileDownloadIPCCallback远程接口来实现。</li>
+<li>文件的下载中拥有文件下载的线程池FileDownloadThreadPool，线程池中的单个子单元是由一个Runnable构成，在FileDownloadRunnable中有下载文件的相关信息以及相关的操作，在这里我们可以看出，在执行Runnable的线程中是单个的，Runnable中涉及网络请求和数据流的传输都在Runnable中完成，文件的读写操作是堵塞的，Runnable中的文件下载的相关状态信息是通过MessageSnapshotFlow.getImpl().inflow(MessageSnapshotTaker.take(status, model, this))发出的，消息发出交由FDServiceSeparateHandler的receive(MessageSnapshot snapShot),随之RemoteCallbackList<ifiledownloadipccallback> callbackList将发起进程间回调通信，来完成通知下载状态的更新，通过以上的步骤来完成Service与其他进程的通信。</ifiledownloadipccallback></li>
+<li>文件的下载状态都会记录到指定的数据库中，以便支持完善的下载进度和断点续传功能。</li>
+</ol>
+<p>Service代理以及和Service所在进程的通信：</p>
+<ol>
+<li>FileDownloadServiceProxy实现了IFileDownloadServiceProxy接口，其接口真正的实现是由FileDownloadServiceUIGuard来处理，在FileDownloadServiceUIGuard中提供了进程间通信需要的CALLBACK和INTERFACE</li>
+<li>BaseFileServiceUIGuard抽象类中实现了ServiceConnection，在onServiceConnected中完成registerCallback，将registerCallback实现交给子类FileDownloadServiceUIGuard，在onServiceConnected中返回了IBinder</li>
+<li>通过IFileDownloadIPCService.Stub.asInterface取得远程接口对象，之后通过这个获取的远程接口实现注册相关的操作，同时通过这个远程的接口实现进程间的通信。</li>
+<li>在FileDownloadServiceUIGuard中提供了远程接口注册时需要的IFileDownloadIPCService.Stub接口的Binder。</li>
+<li>FileDownloadServiceUIGuard继承了BaseFileServiceUIGuard，所以FileDownloadServiceUIGuard必须实现FileDownloadServiceProxy接口。同时在BaseFileServiceUIGuard中已经拥有IFileDownloadIPCService的远程接口，<br>所以FileDownloadServiceProxy接口实现是通过获得的远程接口去实现的，同时这个就是我们说的跨进程通信的方式。</li>
+<li>那么现在还有一个比较重要的点，现在怎样把文件下载进度信息交给其他进程呢？不难发现我们注册了一个CallBack的Binder。client端与server不在一个进程，server是无法得知client解注册时传入的回调接口是哪一个（client调用解注册时，是通过binder传输到server端，所以解注册时的回调接口是新创建的，而不是注册时的回调接口）。为了解决这个问题，android提供了RemoteCallbackList这个类来专门管理remote回调的注册与解注册。</li>
+<li>通过上述分析，client和Service通信以及Service和client的通信，client和Service通信通过onServiceConnected中返回的IBinder，进而取得远程接口，实现client和Service通信。Service和client通信通过RemoteCallbackList，通过client获取的远程接口，同时通过这个远程接口回调注册，实现Service与client的通信。</li>
+<li>经过上述的分析，我们已经能够知道所有的连接通信逻辑都已经由FileDownloadServiceProxy委托代理。</li>
+</ol>
+<h2 id="上层逻辑类图结构逻辑分析"><a href="#上层逻辑类图结构逻辑分析" class="headerlink" title="上层逻辑类图结构逻辑分析"></a>上层逻辑类图结构逻辑分析</h2><p>上层的结构逻辑主要是对远程结构代理的封装，由外部组装必要的数据以及外部等待下载状态的更新。类图结构如下：</p>
+<img src="/2016/06/21/开源库FileDownloader的简要原理分析/img/FileDownloader2.png">
+<p>client的结构构成：</p>
+<ol>
+<li>每一个下载任务对应一个单独的FileDownloadTask，其和Service的跨进程通信通过FileDownloadServiceProxy进行关联</li>
+<li>Service和client的下载状态的回调是通过MessageReceiver接口来实现的，其正确的流程是Service进程中的Runnable下载文件状态   -&gt;  MessageSnapshotFlow.getImpl().inflow()(Service进程)   -&gt; FDServiceSeparateHandler(实现了MessageReceiver接口)   -&gt; FDServiceSeparateHandler的receive()调用RemoteCallbackList<ifiledownloadipccallback> callbackList来完成Service和client的通信。</ifiledownloadipccallback></li>
+<li>FileDownloader是统一收敛、数据组装、状态查询的直接外部入口类，其内部核心处理还是通过FileDownloadTask来构建任务、FileDownloadServiceProxy来处理跨进程数据通信。</li>
+</ol>
+<p>通过以上的分析介绍，我们能够知道，其下载其实主要就是通信模块的构建，也就是我们常说的外壳，外壳保证了通信逻辑，我们先构建出来通信外壳模块，将网络连接和文件下载抽象独立出来。外壳保证通信的准确性，下载内核保证了数据的准确性。<br>同时通过对以上框架的分析，我们需要做到将下载核抽象出来，这样能够更灵活的配置下载核，同时也给下载核更多的发挥空间。</p>
+<p>简单的创建demo任务：</p>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">final BaseDownloadTask task = FileDownloader.getImpl<span class="params">()</span><span class="string">.create</span><span class="params">(url)</span></span><br><span class="line">        <span class="string">.setPath</span><span class="params">(path)</span></span><br><span class="line">        <span class="string">.setCallbackProgressTimes</span><span class="params">(100)</span></span><br><span class="line">        <span class="string">.setListener</span><span class="params">(taskDownloadListener)</span>;</span><br></pre></td></tr></table></figure>
+<p>这样就完成了一个任务下载，任务的状态信息回调在监听中处理就OK了。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/06/18/如何把一件事情做好/" rel="next" title="如何把一件事情做好">
+                <i class="fa fa-chevron-left"></i> 如何把一件事情做好
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/06/24/Android-Studio-no-debuggable-application/" rel="prev" title="Android Studio no debuggable application">
+                Android Studio no debuggable application <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="伍中联" />
+            
+              <p class="site-author-name" itemprop="name">伍中联</p>
+              <p class="site-description motion-element" itemprop="description">珍惜在生命中遇到的每一个人</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">18</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#框架的模块构成"><span class="nav-number">1.</span> <span class="nav-text">框架的模块构成</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#一个下载框架主要需要包含以下几个模块："><span class="nav-number">1.0.1.</span> <span class="nav-text">一个下载框架主要需要包含以下几个模块：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#上层逻辑类图结构逻辑分析"><span class="nav-number">2.</span> <span class="nav-text">上层逻辑类图结构逻辑分析</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">伍中联</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Muse</a> v</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v="></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v="></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v="></script>
+<script type="text/javascript" src="/js/src/post-details.js?v="></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v="></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

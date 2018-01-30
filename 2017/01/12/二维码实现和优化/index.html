@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+<meta name="description" content="由于项目需要，我对接二维码模块，经过自己的优化，目前效果还不错，网上给出的方案大多数都是复制过来的，没有经过深度思考。所以我决定纪录下来自己优化的地方，供以后自己参考。 项目地址github-vanda-伍中联-QrCode 二维码模块   二维码这块经过了初步的封装处理，没有Activity，没有Fragment，只有View，最终使用二维码的形式如下： 12345678910111213141">
+<meta property="og:type" content="article">
+<meta property="og:title" content="二维码实现和优化">
+<meta property="og:url" content="http://yoursite.com/2017/01/12/二维码实现和优化/index.html">
+<meta property="og:site_name" content="伍中联(Vanda)的博客">
+<meta property="og:description" content="由于项目需要，我对接二维码模块，经过自己的优化，目前效果还不错，网上给出的方案大多数都是复制过来的，没有经过深度思考。所以我决定纪录下来自己优化的地方，供以后自己参考。 项目地址github-vanda-伍中联-QrCode 二维码模块   二维码这块经过了初步的封装处理，没有Activity，没有Fragment，只有View，最终使用二维码的形式如下： 12345678910111213141">
+<meta property="og:image" content="http://yoursite.com/2017/01/12/二维码实现和优化/img/out.jpg">
+<meta property="og:updated_time" content="2017-01-13T10:26:53.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="二维码实现和优化">
+<meta name="twitter:description" content="由于项目需要，我对接二维码模块，经过自己的优化，目前效果还不错，网上给出的方案大多数都是复制过来的，没有经过深度思考。所以我决定纪录下来自己优化的地方，供以后自己参考。 项目地址github-vanda-伍中联-QrCode 二维码模块   二维码这块经过了初步的封装处理，没有Activity，没有Fragment，只有View，最终使用二维码的形式如下： 12345678910111213141">
+<meta name="twitter:image" content="http://yoursite.com/2017/01/12/二维码实现和优化/img/out.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/01/12/二维码实现和优化/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+  <title>二维码实现和优化 | 伍中联(Vanda)的博客</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">伍中联(Vanda)的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">当一切理所当然就没有你什么事了 当你说：“这个好麻烦，那么不要犹豫，主动出击”</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives<span class="badge">18</span>
+              </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/12/二维码实现和优化/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="伍中联">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="伍中联(Vanda)的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">二维码实现和优化</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-12T14:42:03+08:00">2017-01-12</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>由于项目需要，我对接二维码模块，经过自己的优化，目前效果还不错，网上给出的方案大多数都是复制过来的，没有经过深度思考。所以我决定纪录下来自己优化的地方，供以后自己参考。</p>
+<h4 id="项目地址"><a href="#项目地址" class="headerlink" title="项目地址"></a>项目地址</h4><p><a href="https://github.com/10045125/QrCode" target="_blank" rel="noopener">github-vanda-伍中联-QrCode</a></p>
+<h4 id="二维码模块"><a href="#二维码模块" class="headerlink" title="二维码模块"></a>二维码模块</h4><p>   二维码这块经过了初步的封装处理，没有Activity，没有Fragment，只有View，最终使用二维码的形式如下：</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> QrCodeView mQrCodeView;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">protected</span> <span class="function"><span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line"></span><br><span class="line">    mQrCodeView = <span class="keyword">new</span> QrCodeView(<span class="keyword">this</span>, <span class="keyword">null</span>);</span><br><span class="line">    mQrCodeView.registerResultCallback(<span class="keyword">this</span>);</span><br><span class="line">    mQrCodeView.setText(getString(R.string.qrcode_desc));</span><br><span class="line"></span><br><span class="line">    setContentView(mQrCodeView);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">onPause</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.onPause();</span><br><span class="line">    <span class="keyword">if</span> (mQrCodeView != <span class="keyword">null</span>) &#123;</span><br><span class="line">        mQrCodeView.onPause();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">onResume</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.onResume();</span><br><span class="line">    <span class="keyword">if</span> (mQrCodeView != <span class="keyword">null</span>) &#123;</span><br><span class="line">        mQrCodeView.onResume();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">onDestroy</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.onDestroy();</span><br><span class="line">    <span class="keyword">if</span> (mQrCodeView != <span class="keyword">null</span>) &#123;</span><br><span class="line">        mQrCodeView.onDestroy();</span><br><span class="line">        mQrCodeView = <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">onResultCallback</span><span class="params">(Result result)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (result != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (mQrCodeView != <span class="keyword">null</span>) &#123;</span><br><span class="line">            mQrCodeView.onPause();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">new</span> android.support.v7.app.AlertDialog.Builder(<span class="keyword">this</span>).setTitle(result.getText())</span><br><span class="line">                .setCancelable(<span class="keyword">true</span>)</span><br><span class="line">                .setOnDismissListener(<span class="keyword">new</span> DialogInterface.OnDismissListener() &#123;</span><br><span class="line">                    <span class="meta">@Override</span></span><br><span class="line">                    <span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">onDismiss</span><span class="params">(DialogInterface dialogInterface)</span> </span>&#123;</span><br><span class="line">                        <span class="keyword">if</span> (mQrCodeView != <span class="keyword">null</span>) &#123;</span><br><span class="line">                            mQrCodeView.onResume();</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;).create().show();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol>
+<li>二维码使用了zxing库，我保留了二维码和条形码的和一些常用的格式</li>
+<li>大多数项目要求是竖屏进行扫描，本优化是针对竖屏下的优化</li>
+</ol>
+<h4 id="相机的拍摄图像的原始数据图像"><a href="#相机的拍摄图像的原始数据图像" class="headerlink" title="相机的拍摄图像的原始数据图像"></a>相机的拍摄图像的原始数据图像</h4><p>相机回调的原始数据图像是横着的。回调代码如下：</p>
+<figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> onPreviewFrame(<span class="built_in">byte</span>[] data, Camera <span class="built_in">camera</span>) &#123;</span><br><span class="line">    Point cameraResolution = configManager.getCameraResolution();</span><br><span class="line">    <span class="keyword">if</span> (!useOneShotPreviewCallback) &#123;</span><br><span class="line">        <span class="built_in">camera</span>.setPreviewCallback(<span class="keyword">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (previewHandler != <span class="keyword">null</span>) &#123;</span><br><span class="line">        Message message = previewHandler.obtainMessage(previewMessage, cameraResolution.x,</span><br><span class="line">                cameraResolution.y, data);</span><br><span class="line">        message.sendToTarget();</span><br><span class="line">        previewHandler = <span class="keyword">null</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        Log.d(TAG, <span class="string">"Got preview callback, but no handler for it"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>byte[] data这个是预览图中的相机的原始数据，这个数据是比较大的，原始图像如下：</p>
+<img src="/2017/01/12/二维码实现和优化/img/out.jpg">
+<p>这个是原始图像，这个图像是横着的，然后我们需要对这张图片做出相应的处理。</p>
+<h4 id="如何处理相机获取来的图片"><a href="#如何处理相机获取来的图片" class="headerlink" title="如何处理相机获取来的图片"></a>如何处理相机获取来的图片</h4><p>我Google了很多关于二维码竖屏下的实现方案，给出网上一大片的实现方案（这种方案没有仔细思考，也反映了国内程序员们的急躁）：</p>
+<ol>
+<li>图片是横着的，那么就需要将相机图像摆正</li>
+<li>显示在手机屏幕上摆正只是相机显示，最终回调的图片数据还是横着的，所以还需要转换图像为竖屏的（这个数据量是比较大的）</li>
+<li>根据二维码框对应手机屏幕位置找到图片相对位置</li>
+<li>找到对应的位置进行裁剪</li>
+<li>交给解码库解码</li>
+</ol>
+<p>我针对以上的点做出代码上的说明：</p>
+<ol>
+<li>图片是横着的，那么就需要将相机图像摆正，需要找到正确的相机方向，这段代码就是找到相机方向</li>
+</ol>
+<figure class="highlight lasso"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Reads, one time, values from the camera that are needed by the app.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="literal">void</span> initFromCameraParameters(OpenCamera camera) &#123;</span><br><span class="line">  Camera.Parameters parameters = camera.getCamera().getParameters();</span><br><span class="line">  WindowManager manager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);</span><br><span class="line">  Display display = manager.getDefaultDisplay();</span><br><span class="line"> </span><br><span class="line">  int displayRotation = display.getRotation();</span><br><span class="line">  int cwRotationFromNaturalToDisplay;</span><br><span class="line">  switch (displayRotation) &#123;</span><br><span class="line">    <span class="keyword">case</span> Surface.ROTATION_0:</span><br><span class="line">      cwRotationFromNaturalToDisplay = <span class="number">0</span>;</span><br><span class="line">      break;</span><br><span class="line">    <span class="keyword">case</span> Surface.ROTATION_90:</span><br><span class="line">      cwRotationFromNaturalToDisplay = <span class="number">90</span>;</span><br><span class="line">      break;</span><br><span class="line">    <span class="keyword">case</span> Surface.ROTATION_180:</span><br><span class="line">      cwRotationFromNaturalToDisplay = <span class="number">180</span>;</span><br><span class="line">      break;</span><br><span class="line">    <span class="keyword">case</span> Surface.ROTATION_270:</span><br><span class="line">      cwRotationFromNaturalToDisplay = <span class="number">270</span>;</span><br><span class="line">      break;</span><br><span class="line">    default:</span><br><span class="line">      <span class="comment">// Have seen this return incorrect values like -90</span></span><br><span class="line">      <span class="keyword">if</span> (displayRotation % <span class="number">90</span> == <span class="number">0</span>) &#123;</span><br><span class="line">        cwRotationFromNaturalToDisplay = (<span class="number">360</span> + displayRotation) % <span class="number">360</span>;</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        throw <span class="literal">new</span> IllegalArgumentException(<span class="string">"Bad rotation: "</span> + displayRotation);</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">Log</span>.i(<span class="built_in">TAG</span>, <span class="string">"Display at: "</span> + cwRotationFromNaturalToDisplay);</span><br><span class="line"> </span><br><span class="line">  int cwRotationFromNaturalToCamera = camera.getOrientation();</span><br><span class="line">  <span class="keyword">Log</span>.i(<span class="built_in">TAG</span>, <span class="string">"Camera at: "</span> + cwRotationFromNaturalToCamera);</span><br><span class="line"> </span><br><span class="line">  <span class="comment">// Still not 100% sure about this. But acts like we need to flip this:</span></span><br><span class="line">  <span class="keyword">if</span> (camera.getFacing() == CameraFacing.FRONT) &#123;</span><br><span class="line">    cwRotationFromNaturalToCamera = (<span class="number">360</span> - cwRotationFromNaturalToCamera) % <span class="number">360</span>;</span><br><span class="line">    <span class="keyword">Log</span>.i(<span class="built_in">TAG</span>, <span class="string">"Front camera overriden to: "</span> + cwRotationFromNaturalToCamera);</span><br><span class="line">  &#125;</span><br><span class="line"> </span><br><span class="line">  <span class="comment">/*</span></span><br><span class="line"><span class="comment">  SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);</span></span><br><span class="line"><span class="comment">  String overrideRotationString;</span></span><br><span class="line"><span class="comment">  if (camera.getFacing() == CameraFacing.FRONT) &#123;</span></span><br><span class="line"><span class="comment">    overrideRotationString = prefs.getString(Config.KEY_FORCE_CAMERA_ORIENTATION_FRONT, null);</span></span><br><span class="line"><span class="comment">  &#125; else &#123;</span></span><br><span class="line"><span class="comment">    overrideRotationString = prefs.getString(Config.KEY_FORCE_CAMERA_ORIENTATION, null);</span></span><br><span class="line"><span class="comment">  &#125;</span></span><br><span class="line"><span class="comment">  if (overrideRotationString != null &amp;&amp; !"-".equals(overrideRotationString)) &#123;</span></span><br><span class="line"><span class="comment">    Log.i(TAG, "Overriding camera manually to " + overrideRotationString);</span></span><br><span class="line"><span class="comment">    cwRotationFromNaturalToCamera = Integer.parseInt(overrideRotationString);</span></span><br><span class="line"><span class="comment">  &#125;</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line"> </span><br><span class="line">  cwRotationFromDisplayToCamera =</span><br><span class="line">      (<span class="number">360</span> + cwRotationFromNaturalToCamera - cwRotationFromNaturalToDisplay) % <span class="number">360</span>;</span><br><span class="line">  <span class="keyword">Log</span>.i(<span class="built_in">TAG</span>, <span class="string">"Final display orientation: "</span> + cwRotationFromDisplayToCamera);</span><br><span class="line">  <span class="keyword">if</span> (camera.getFacing() == CameraFacing.FRONT) &#123;</span><br><span class="line">    <span class="keyword">Log</span>.i(<span class="built_in">TAG</span>, <span class="string">"Compensating rotation for front camera"</span>);</span><br><span class="line">    cwNeededRotation = (<span class="number">360</span> - cwRotationFromDisplayToCamera) % <span class="number">360</span>;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    cwNeededRotation = cwRotationFromDisplayToCamera;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">Log</span>.i(<span class="built_in">TAG</span>, <span class="string">"Clockwise rotation from display to camera: "</span> + cwNeededRotation);</span><br><span class="line"> </span><br><span class="line">  Point theScreenResolution = <span class="literal">new</span> Point();</span><br><span class="line">  display.getSize(theScreenResolution);</span><br><span class="line">  screenResolution = theScreenResolution;</span><br><span class="line">  <span class="keyword">Log</span>.i(<span class="built_in">TAG</span>, <span class="string">"Screen resolution in current orientation: "</span> + screenResolution);</span><br><span class="line">  cameraResolution = CameraConfigurationUtils.findBestPreviewSizeValue(parameters, screenResolution);</span><br><span class="line">  <span class="keyword">Log</span>.i(<span class="built_in">TAG</span>, <span class="string">"Camera resolution: "</span> + cameraResolution);</span><br><span class="line">  bestPreviewSize = CameraConfigurationUtils.findBestPreviewSizeValue(parameters, screenResolution);</span><br><span class="line">  <span class="keyword">Log</span>.i(<span class="built_in">TAG</span>, <span class="string">"Best available preview size: "</span> + bestPreviewSize);</span><br><span class="line"> </span><br><span class="line">  <span class="built_in">boolean</span> isScreenPortrait = screenResolution.x &lt; screenResolution.y;</span><br><span class="line">  <span class="built_in">boolean</span> isPreviewSizePortrait = bestPreviewSize.x &lt; bestPreviewSize.y;</span><br><span class="line"> </span><br><span class="line">  <span class="keyword">if</span> (isScreenPortrait == isPreviewSizePortrait) &#123;</span><br><span class="line">    previewSizeOnScreen = bestPreviewSize;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    previewSizeOnScreen = <span class="literal">new</span> Point(bestPreviewSize.y, bestPreviewSize.x);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">Log</span>.i(<span class="built_in">TAG</span>, <span class="string">"Preview size on screen: "</span> + previewSizeOnScreen);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>设置相机的参数</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">void setDesiredCameraParameters(OpenCamera camera, <span class="keyword">boolean </span>safeMode) &#123;</span><br><span class="line">  Camera theCamera = camera.getCamera()<span class="comment">;</span></span><br><span class="line">  Camera.Parameters parameters = theCamera.getParameters()<span class="comment">;</span></span><br><span class="line"> </span><br><span class="line">  Log.d(TAG, <span class="string">"Setting preview size: "</span> + cameraResolution)<span class="comment">;</span></span><br><span class="line">  parameters.setPreviewSize(cameraResolution.x, cameraResolution.y)<span class="comment">;</span></span><br><span class="line">  setFlash(parameters)<span class="comment">;</span></span><br><span class="line">  setZoom(parameters)<span class="comment">;</span></span><br><span class="line">  theCamera.setDisplayOrientation(cwNeededRotation)<span class="comment">;</span></span><br><span class="line">  theCamera.setParameters(parameters)<span class="comment">;</span></span><br><span class="line"> </span><br><span class="line">  Camera.Size afterSize = parameters.getPreviewSize()<span class="comment">;</span></span><br><span class="line">  if (afterSize != null &amp;&amp; (<span class="keyword">bestPreviewSize.x </span>!= afterSize.width <span class="title">||</span> <span class="keyword">bestPreviewSize.y </span>!= afterSize.height)) &#123;</span><br><span class="line">    Log.w(TAG, <span class="string">"Camera said it supported preview size "</span> + <span class="keyword">bestPreviewSize.x </span>+ <span class="string">'x'</span> + <span class="keyword">bestPreviewSize.y </span>+</span><br><span class="line">        <span class="string">", but after setting it, preview size is "</span> + afterSize.width + <span class="string">'x'</span> + afterSize.height)<span class="comment">;</span></span><br><span class="line">    <span class="keyword">bestPreviewSize.x </span>= afterSize.width<span class="comment">;</span></span><br><span class="line">    <span class="keyword">bestPreviewSize.y </span>= afterSize.height<span class="comment">;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样就能够正确的显示相机拍摄的图片。</p>
+<ol>
+<li>显示在手机屏幕上摆正只是相机显示，最终回调的图片数据还是横着的，所以还需要转换图像为竖屏的（这个数据量是比较大的），这个在竖屏中绝大都是进行数据转换（横屏图像数据转换成竖屏），代码如下:</li>
+</ol>
+<figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">   * Decode the data within the viewfinder rectangle, and time how long it took. For efficiency,</span></span><br><span class="line"><span class="comment">   * reuse the same reader objects from one decode to the next.</span></span><br><span class="line"><span class="comment">   *</span></span><br><span class="line"><span class="comment">   * @param data   The YUV preview frame.</span></span><br><span class="line"><span class="comment">   * @param width  The width of the preview frame.</span></span><br><span class="line"><span class="comment">   * @param height The height of the preview frame.</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">void</span> decode(<span class="built_in">byte</span>[] data, <span class="built_in">int</span> <span class="built_in">width</span>, <span class="built_in">int</span> <span class="built_in">height</span>) &#123;</span><br><span class="line">    <span class="keyword">long</span> start = System.currentTimeMillis();</span><br><span class="line">    Result rawResult = <span class="keyword">null</span>;</span><br><span class="line">    Handler handler = mIScanCallback.getScanHandler();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line"> </span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">null</span> == mRotatedData) &#123;</span><br><span class="line">        mRotatedData = <span class="keyword">new</span> <span class="built_in">byte</span>[<span class="built_in">width</span> * <span class="built_in">height</span>];</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (mRotatedData.length &lt; <span class="built_in">width</span> * <span class="built_in">height</span>) &#123;</span><br><span class="line">          mRotatedData = <span class="keyword">new</span> <span class="built_in">byte</span>[<span class="built_in">width</span> * <span class="built_in">height</span>];</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      Arrays.<span class="built_in">fill</span>(mRotatedData, (<span class="built_in">byte</span>) <span class="number">0</span>);</span><br><span class="line">      <span class="keyword">for</span> (<span class="built_in">int</span> y = <span class="number">0</span>; y &lt; <span class="built_in">height</span>; y++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="built_in">int</span> x = <span class="number">0</span>; x &lt; <span class="built_in">width</span>; x++) &#123;</span><br><span class="line">          <span class="keyword">if</span> (x + y * <span class="built_in">width</span> &gt;= data.length) &#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">          &#125;</span><br><span class="line">          mRotatedData[x * <span class="built_in">height</span> + <span class="built_in">height</span> - y - <span class="number">1</span>] = data[x + y * <span class="built_in">width</span>];</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="built_in">int</span> tmp = <span class="built_in">width</span>; <span class="comment">// Here we are swapping, that's the difference to #11</span></span><br><span class="line">      <span class="built_in">width</span> = <span class="built_in">height</span>;</span><br><span class="line">      <span class="built_in">height</span> = tmp;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> byte[] data的数据长度在3110400，长度百万级别，那么将图片数据转换成竖屏需要大概在56ms （三星S6+）。</p>
+<ol>
+<li>根据二维码框对应手机屏幕位置找到图片相对位置，通过以上步骤，我们将图片竖直了，接下来就是需要进行进行坐标映射，通过屏幕的扫描框映射到图片的具体框选坐标，然后裁剪数据:</li>
+</ol>
+
+<p>相对坐标代码:</p>
+<figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Like &#123;@link #getFramingRect&#125; but coordinates are in terms of the preview frame,</span></span><br><span class="line"><span class="comment">     * not UI / screen.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * @return &#123;@link Rect&#125; expressing barcode scan area in terms of the preview size</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">synchronized</span> Rect getFramingRectInPreview() &#123;</span><br><span class="line">        <span class="keyword">if</span> (framingRectInPreview == <span class="keyword">null</span>) &#123;</span><br><span class="line">            Rect framingRect = getFramingRect();</span><br><span class="line">            <span class="keyword">if</span> (framingRect == <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            Rect <span class="built_in">rect</span> = <span class="keyword">new</span> Rect(framingRect);</span><br><span class="line">            Point cameraResolution = configManager.getCameraResolution();</span><br><span class="line">            Point screenResolution = configManager.getScreenResolution();</span><br><span class="line">            <span class="keyword">if</span> (cameraResolution == <span class="keyword">null</span> || screenResolution == <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="comment">// Called early, before init even finished</span></span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="built_in">rect</span>.left = <span class="built_in">rect</span>.left * cameraResolution.y / screenResolution.x;</span><br><span class="line">            <span class="built_in">rect</span>.right = <span class="built_in">rect</span>.right * cameraResolution.y / screenResolution.x;</span><br><span class="line">            <span class="built_in">rect</span>.top = <span class="built_in">rect</span>.top * cameraResolution.x / screenResolution.y;</span><br><span class="line">            <span class="built_in">rect</span>.bottom = <span class="built_in">rect</span>.bottom * cameraResolution.x / screenResolution.y;</span><br><span class="line"> </span><br><span class="line">            framingRectInPreview = <span class="built_in">rect</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> framingRectInPreview;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>上面的代码是计算图片二维码框的位置，然后进行裁剪。</p>
+<h4 id="针对上面步骤的优化"><a href="#针对上面步骤的优化" class="headerlink" title="针对上面步骤的优化"></a>针对上面步骤的优化</h4><p>总结下面几点：</p>
+<ol>
+<li>图片横着先不进行数据转换</li>
+<li>将手机屏幕的扫码框先进行横着图片的坐标映射</li>
+<li>主动裁剪出数据区域</li>
+<li>将二维码区域数据裁剪</li>
+</ol>
+<p>针对第一点，代码如下：</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Decode the data within the viewfinder rectangle, and time how long it took. For efficiency,</span></span><br><span class="line"><span class="comment">     * reuse the same reader objects from one decode to the next.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> data   The YUV preview frame.</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> width  The width of the preview frame.</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> height The height of the preview frame.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">void</span> <span class="title">decode</span><span class="params">(<span class="keyword">byte</span>[] data, <span class="keyword">int</span> width, <span class="keyword">int</span> height)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">long</span> start = System.currentTimeMillis();</span><br><span class="line">        Result rawResult = <span class="keyword">null</span>;</span><br><span class="line">        Handler <span class="keyword">handler</span> = mIScanCallback.getScanHandler();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            PlanarYUVLuminanceSource source = mIScanCallback.buildLuminanceSource(data, width, height);</span><br><span class="line">            <span class="keyword">if</span> (source != <span class="keyword">null</span>) &#123;</span><br><span class="line">                BinaryBitmap bitmap = <span class="keyword">new</span> BinaryBitmap(<span class="keyword">new</span> GlobalHistogramBinarizer(source));<span class="comment">//</span></span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    rawResult = multiFormatReader.decodeWithState(bitmap);</span><br><span class="line">                &#125; <span class="keyword">catch</span> (ReaderException re) &#123;</span><br><span class="line">                    <span class="comment">// continue</span></span><br><span class="line">                &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                    multiFormatReader.reset();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"> </span><br><span class="line">            <span class="keyword">if</span> (rawResult != <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="comment">// Don't log the barcode contents for security.</span></span><br><span class="line">                <span class="keyword">long</span> end = System.currentTimeMillis();</span><br><span class="line">                Log.d(TAG, <span class="string">"Found barcode in "</span> + (end - start) + <span class="string">" ms"</span>);</span><br><span class="line">                <span class="keyword">if</span> (<span class="keyword">handler</span> != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    Message message = Message.obtain(<span class="keyword">handler</span>, DECODE_SUCCEEDED, rawResult);</span><br><span class="line">                    <span class="comment">//为了提高扫码速度,去除这里的生成bitmap的操作</span></span><br><span class="line"><span class="comment">//                    Bundle bundle = new Bundle();</span></span><br><span class="line"><span class="comment">//                    bundleThumbnail(source, bundle);</span></span><br><span class="line"><span class="comment">//                    message.setData(bundle);</span></span><br><span class="line">                    message.sendToTarget();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">if</span> (<span class="keyword">handler</span> != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    Message message = Message.obtain(<span class="keyword">handler</span>, DECODE_FAILED);</span><br><span class="line">                    message.sendToTarget();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ArrayIndexOutOfBoundsException e) &#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">handler</span> != <span class="keyword">null</span>) &#123;</span><br><span class="line">                Message message = Message.obtain(<span class="keyword">handler</span>, DECODE_FAILED);</span><br><span class="line">                message.sendToTarget();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<ol>
+<li>映射横屏下的扫码框的坐标，代码如下：</li>
+</ol>
+<figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Like &#123;@link #getFramingRect&#125; but coordinates are in terms of the preview frame,</span></span><br><span class="line"><span class="comment"> * not UI / screen.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @return &#123;@link Rect&#125; expressing barcode scan area in terms of the preview size</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">synchronized</span> Rect getFramingRectInPreview() &#123;</span><br><span class="line">    <span class="keyword">if</span> (framingRectInPreview == <span class="keyword">null</span>) &#123;</span><br><span class="line">        Rect framingRect = getFramingRect();</span><br><span class="line">        <span class="keyword">if</span> (framingRect == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        Rect <span class="built_in">rect</span> = <span class="keyword">new</span> Rect(framingRect);</span><br><span class="line">        Point cameraResolution = configManager.getCameraResolution();</span><br><span class="line">        Point screenResolution = configManager.getScreenResolution();</span><br><span class="line">        <span class="keyword">if</span> (cameraResolution == <span class="keyword">null</span> || screenResolution == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">// Called early, before init even finished</span></span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        <span class="built_in">int</span> left, top, right, bottom;</span><br><span class="line"> </span><br><span class="line">        <span class="comment">//坐标转换, 我们二维码扫描是竖屏,图像是横屏,所以需要计算二维码所处的相对坐标</span></span><br><span class="line">        left = <span class="built_in">rect</span>.top * cameraResolution.x / screenResolution.y;</span><br><span class="line">        top = <span class="built_in">rect</span>.left * cameraResolution.y / screenResolution.x;</span><br><span class="line">        right = left + <span class="built_in">rect</span>.<span class="built_in">height</span>() * cameraResolution.x / screenResolution.y;</span><br><span class="line">        bottom = top + <span class="built_in">rect</span>.<span class="built_in">width</span>() * cameraResolution.y / screenResolution.x;</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">        <span class="comment">//对应一些相机在竖屏下需要旋转270 才能够正常图像,但是图像是横屏的,这个图像也是调转的,所以也需要转换</span></span><br><span class="line">        <span class="keyword">if</span> (getCWNeededRotation() == <span class="number">270</span>) &#123;</span><br><span class="line">            <span class="built_in">int</span> <span class="built_in">width</span> = right - left;</span><br><span class="line">            left = cameraResolution.x - left - <span class="built_in">width</span>;</span><br><span class="line">            right = left + <span class="built_in">width</span>;</span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        <span class="built_in">rect</span>.left = left;</span><br><span class="line">        <span class="built_in">rect</span>.top = top;</span><br><span class="line">        <span class="built_in">rect</span>.right = right;</span><br><span class="line">        <span class="built_in">rect</span>.bottom = bottom;</span><br><span class="line"> </span><br><span class="line">        framingRectInPreview = <span class="built_in">rect</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> framingRectInPreview;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol>
+<li>裁剪映射图片扫码框的数据区域，代码如下：</li>
+</ol>
+<figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="built_in">byte</span>[] mOriginData;</span><br><span class="line"><span class="keyword">private</span> <span class="built_in">byte</span>[] mRotatedData;</span><br><span class="line"> </span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * A factory method to build the appropriate LuminanceSource object based on the format</span></span><br><span class="line"><span class="comment"> * of the preview buffers, as described by Camera.Parameters.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @param data   A preview frame.</span></span><br><span class="line"><span class="comment"> * @param width  The width of the image.</span></span><br><span class="line"><span class="comment"> * @param height The height of the image.</span></span><br><span class="line"><span class="comment"> * @return A PlanarYUVLuminanceSource instance.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> PlanarYUVLuminanceSource buildLuminanceSource(<span class="built_in">byte</span>[] data, <span class="built_in">int</span> <span class="built_in">width</span>, <span class="built_in">int</span> <span class="built_in">height</span>) &#123;</span><br><span class="line">    Rect <span class="built_in">rect</span> = getFramingRectInPreview();</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">rect</span> == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">int</span> previewH = <span class="built_in">rect</span>.<span class="built_in">height</span>();</span><br><span class="line">    <span class="built_in">int</span> previewW = <span class="built_in">rect</span>.<span class="built_in">width</span>();</span><br><span class="line">    <span class="built_in">int</span> <span class="built_in">size</span> = previewH * previewW;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">null</span> == mOriginData) &#123;</span><br><span class="line">        mOriginData = <span class="keyword">new</span> <span class="built_in">byte</span>[<span class="built_in">size</span>];</span><br><span class="line">        mRotatedData = <span class="keyword">new</span> <span class="built_in">byte</span>[<span class="built_in">size</span>];</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (mOriginData.length &lt; <span class="built_in">size</span>) &#123;</span><br><span class="line">            mOriginData = <span class="keyword">new</span> <span class="built_in">byte</span>[<span class="built_in">size</span>];</span><br><span class="line">            mRotatedData = <span class="keyword">new</span> <span class="built_in">byte</span>[<span class="built_in">size</span>];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">int</span> inputOffset = <span class="built_in">rect</span>.top * <span class="built_in">width</span> + <span class="built_in">rect</span>.left;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// If the width matches the full width of the underlying data, perform a single copy.</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">width</span> == previewW) &#123;</span><br><span class="line">        System.arraycopy(data, inputOffset, mOriginData, <span class="number">0</span>, <span class="built_in">size</span>);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// Otherwise copy one cropped row at a time.</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="built_in">int</span> y = <span class="number">0</span>; y &lt; previewH; y++) &#123;</span><br><span class="line">        <span class="built_in">int</span> outputOffset = y * previewW;</span><br><span class="line">        System.arraycopy(data, inputOffset, mOriginData, outputOffset, previewW);</span><br><span class="line">        inputOffset += <span class="built_in">width</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">for</span> (<span class="built_in">int</span> y = <span class="number">0</span>; y &lt; previewH; y++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="built_in">int</span> x = <span class="number">0</span>; x &lt; previewW; x++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (x + y * previewW &gt;= mOriginData.length) &#123;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            mRotatedData[x * previewH + previewH - y - <span class="number">1</span>] = mOriginData[x + y * previewW];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">int</span> tmp = previewW; <span class="comment">// Here we are swapping, that's the difference to #11</span></span><br><span class="line">    previewW = previewH;</span><br><span class="line">    previewH = tmp;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// Go ahead and assume it's YUV rather than die.</span></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> PlanarYUVLuminanceSource(mRotatedData, previewW, previewH, <span class="number">0</span>, <span class="number">0</span>,</span><br><span class="line">            previewW, previewH, <span class="keyword">false</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个步骤是，先裁剪出横屏的二维码区域数据，然后在旋转90度，数据交换的大小为419904，处理时间在6ms (三星S6+)，这里扫码框是相对比较大的，是屏幕宽度的0.6，扫码框越小越快。</p>
+<h4 id="其他点的优化"><a href="#其他点的优化" class="headerlink" title="其他点的优化"></a>其他点的优化</h4><p>二维码的对焦速度也影响扫码速度，生成bitmap也需要时间。针对这2点，我也做出了一些优化：</p>
+<ol>
+<li>相比之前，官方是使用一个AsyncTask,然后使用线程Sleep的方式来控制对焦时间，AsyncTask本身是一个线程池，显然是比较浪费也不优雅的方式；修改方案是服用本身存在的CaptureHandler，在开始生成预览图（requestPreviewFrame(decodeThread.getHandler(), DECODE)）之前发起对焦。</li>
+<li>识别成功后，会生出一个bitmap，这个较耗大概18ms</li>
+</ol>
+<p>针对上面2点，做出代码上的解释：</p>
+<figure class="highlight lasso"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//对焦成功后的回调，和下次对焦的消息，这样完全不需要官方给出的AsyncTask，来对焦</span></span><br><span class="line"><span class="keyword">public</span> <span class="literal">void</span> onAutoFocus(<span class="built_in">boolean</span> success, Camera camera) &#123;</span><br><span class="line">    <span class="keyword">if</span> (autoFocusHandler != <span class="built_in">null</span>) &#123;</span><br><span class="line">        Message message = autoFocusHandler.obtainMessage(autoFocusMessage, success);</span><br><span class="line">        autoFocusHandler.sendMessageDelayed(message, AUTOFOCUS_INTERVAL_MS);</span><br><span class="line">        autoFocusHandler = <span class="built_in">null</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">Log</span>.d(<span class="built_in">TAG</span>, <span class="string">"Got auto-focus callback, but no handler for it"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>不生成bitmap</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (rawResult != <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="comment">// Don't log the barcode contents for security.</span></span><br><span class="line">                <span class="keyword">long</span> end = System.currentTimeMillis();</span><br><span class="line">                Log.d(TAG, <span class="string">"Found barcode in "</span> + (end - start) + <span class="string">" ms"</span>);</span><br><span class="line">                <span class="keyword">if</span> (<span class="keyword">handler</span> != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    Message message = Message.obtain(<span class="keyword">handler</span>, DECODE_SUCCEEDED, rawResult);</span><br><span class="line">                    <span class="comment">//为了提高扫码速度,去除这里的生成bitmap的操作</span></span><br><span class="line"><span class="comment">//                    Bundle bundle = new Bundle();</span></span><br><span class="line"><span class="comment">//                    bundleThumbnail(source, bundle);</span></span><br><span class="line"><span class="comment">//                    message.setData(bundle);</span></span><br><span class="line">                    message.sendToTarget();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">if</span> (<span class="keyword">handler</span> != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    Message message = Message.obtain(<span class="keyword">handler</span>, DECODE_FAILED);</span><br><span class="line">                    message.sendToTarget();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>以上就是现阶段的优化，当然还有存在的继续优化的空间。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/06/30/Android内存优化之OOM/" rel="next" title="Android内存优化之OOM">
+                <i class="fa fa-chevron-left"></i> Android内存优化之OOM
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/08/2017我的计划，自我成长/" rel="prev" title="2017我的计划，自我成长">
+                2017我的计划，自我成长 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="伍中联" />
+            
+              <p class="site-author-name" itemprop="name">伍中联</p>
+              <p class="site-description motion-element" itemprop="description">珍惜在生命中遇到的每一个人</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">18</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#项目地址"><span class="nav-number">1.</span> <span class="nav-text">项目地址</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#二维码模块"><span class="nav-number">2.</span> <span class="nav-text">二维码模块</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#相机的拍摄图像的原始数据图像"><span class="nav-number">3.</span> <span class="nav-text">相机的拍摄图像的原始数据图像</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#如何处理相机获取来的图片"><span class="nav-number">4.</span> <span class="nav-text">如何处理相机获取来的图片</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#针对上面步骤的优化"><span class="nav-number">5.</span> <span class="nav-text">针对上面步骤的优化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#其他点的优化"><span class="nav-number">6.</span> <span class="nav-text">其他点的优化</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">伍中联</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Muse</a> v</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v="></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v="></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v="></script>
+<script type="text/javascript" src="/js/src/post-details.js?v="></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v="></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

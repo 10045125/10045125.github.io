@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+<meta name="description" content="下载组件优势 易接入、易用性 扩展性好（网络库扩展、文件IO扩展、调节线程数、众多可选参数） 网络和文件IO优化，体现下载速度较快 读写分离 无任何第三方依赖 通知栏的简易对接 下载组件的执行逻辑  Demo地址http://www.coolapk.com/apk/com.vanda_adm.vanda 开源地址http://gitlab.alibaba-inc.com/uc-mobile-ope">
+<meta property="og:type" content="article">
+<meta property="og:title" content="下载模块功能介绍">
+<meta property="og:url" content="http://yoursite.com/2017/06/09/下载模块功能介绍/index.html">
+<meta property="og:site_name" content="伍中联(Vanda)的博客">
+<meta property="og:description" content="下载组件优势 易接入、易用性 扩展性好（网络库扩展、文件IO扩展、调节线程数、众多可选参数） 网络和文件IO优化，体现下载速度较快 读写分离 无任何第三方依赖 通知栏的简易对接 下载组件的执行逻辑  Demo地址http://www.coolapk.com/apk/com.vanda_adm.vanda 开源地址http://gitlab.alibaba-inc.com/uc-mobile-ope">
+<meta property="og:image" content="http://yoursite.com/2017/06/09/下载模块功能介绍/img/NetIo.png">
+<meta property="og:image" content="http://yoursite.com/2017/06/09/下载模块功能介绍/img/NormalIO.png">
+<meta property="og:image" content="http://yoursite.com/2017/06/09/下载模块功能介绍/img/内存映射.png">
+<meta property="og:image" content="http://yoursite.com/2017/06/09/下载模块功能介绍/img/逻辑内存.png">
+<meta property="og:image" content="http://yoursite.com/2017/06/09/下载模块功能介绍/img/下载流程图.png">
+<meta property="og:updated_time" content="2017-07-05T10:13:31.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="下载模块功能介绍">
+<meta name="twitter:description" content="下载组件优势 易接入、易用性 扩展性好（网络库扩展、文件IO扩展、调节线程数、众多可选参数） 网络和文件IO优化，体现下载速度较快 读写分离 无任何第三方依赖 通知栏的简易对接 下载组件的执行逻辑  Demo地址http://www.coolapk.com/apk/com.vanda_adm.vanda 开源地址http://gitlab.alibaba-inc.com/uc-mobile-ope">
+<meta name="twitter:image" content="http://yoursite.com/2017/06/09/下载模块功能介绍/img/NetIo.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/06/09/下载模块功能介绍/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+  <title>下载模块功能介绍 | 伍中联(Vanda)的博客</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">伍中联(Vanda)的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">当一切理所当然就没有你什么事了 当你说：“这个好麻烦，那么不要犹豫，主动出击”</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives<span class="badge">18</span>
+              </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/09/下载模块功能介绍/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="伍中联">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="伍中联(Vanda)的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">下载模块功能介绍</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-06-09T23:38:25+08:00">2017-06-09</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="下载组件优势"><a href="#下载组件优势" class="headerlink" title="下载组件优势"></a>下载组件优势</h4><ol>
+<li>易接入、易用性</li>
+<li>扩展性好（网络库扩展、文件IO扩展、调节线程数、众多可选参数）</li>
+<li>网络和文件IO优化，体现下载速度较快</li>
+<li>读写分离</li>
+<li>无任何第三方依赖</li>
+<li>通知栏的简易对接</li>
+<li>下载组件的执行逻辑</li>
+</ol>
+<h4 id="Demo地址"><a href="#Demo地址" class="headerlink" title="Demo地址"></a>Demo地址</h4><p><a href="http://www.coolapk.com/apk/com.vanda_adm.vanda" target="_blank" rel="noopener">http://www.coolapk.com/apk/com.vanda_adm.vanda</a></p>
+<h4 id="开源地址"><a href="#开源地址" class="headerlink" title="开源地址"></a>开源地址</h4><p><a href="http://gitlab.alibaba-inc.com/uc-mobile-open/QuarkDownloader" target="_blank" rel="noopener">http://gitlab.alibaba-inc.com/uc-mobile-open/QuarkDownloader</a></p>
+<h4 id="易接入"><a href="#易接入" class="headerlink" title="易接入"></a>易接入</h4><h6 id="如何接入"><a href="#如何接入" class="headerlink" title="如何接入"></a>如何接入</h6><p>在QuarkDownloader设计的时候，就易用性、低的接入成本经过了考虑，我们先看看App如何接入QuarkDownloader。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">VandaApplication</span> <span class="keyword">extends</span> <span class="title">Application</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    public void onCreate() &#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate();</span><br><span class="line"><span class="type">String</span> defaultDownloadPath = <span class="type">PathConfig</span>.getDownloadRootPath();</span><br><span class="line"><span class="type">QuarkDownloader</span>.init(<span class="type">VandaApplication</span>.<span class="keyword">this</span>, defaultDownloadPath, <span class="keyword">new</span> <span class="type">OkhttpNetworkConnect</span>.<span class="type">Creator</span>());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里是给配置下载进程所需要的上下文参数，这些初始化是不耗时操作。这样就已经配置好了下载所必要的环境。</p>
+<p>如果不需要外接网络库，则如下：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">QuarkDownloader</span><span class="selector-class">.init</span>(<span class="selector-tag">VandaApplication</span><span class="selector-class">.this</span>, <span class="selector-tag">defaultDownloadPath</span>);</span><br></pre></td></tr></table></figure>
+<p>该方式使用系统内置网络库（URLConnection）</p>
+<h6 id="使用下载组件来下载文件"><a href="#使用下载组件来下载文件" class="headerlink" title="使用下载组件来下载文件"></a>使用下载组件来下载文件</h6><p>启动一个下载任务：</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">void</span> <span class="title">startTask</span><span class="params">(String url, String title)</span> </span>&#123;</span><br><span class="line">             QuarkDownloadRequest request = <span class="keyword">new</span> QuarkDownloadRequest</span><br><span class="line">             .Builder()</span><br><span class="line">             .url(url)</span><br><span class="line">             .title(title)</span><br><span class="line">             .build();</span><br><span class="line"></span><br><span class="line">     QuarkDownloader.getInstance().createTask(request).addOnStateChangeListener(<span class="keyword">new</span> OnStateChangeListener() &#123;</span><br><span class="line">         <span class="meta">@Override</span></span><br><span class="line">         <span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">onStateChange</span><span class="params">(QuarkDownloadTask task, <span class="keyword">int</span> status, <span class="keyword">long</span> sofar, <span class="keyword">long</span> total)</span> </span>&#123;</span><br><span class="line">             <span class="comment">//your code</span></span><br><span class="line">         &#125;</span><br><span class="line">     &#125;).start();</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>这样就建立一个下载任务，你只要在回调中处理你自己的逻辑就OK了。这里的例子只是下载组件最基本的启动方式，下载组件还提供了众多的参数，以及支持众多的场景。</p>
+<h4 id="扩展性好"><a href="#扩展性好" class="headerlink" title="扩展性好"></a>扩展性好</h4><h6 id="网络库扩展、IO扩展"><a href="#网络库扩展、IO扩展" class="headerlink" title="网络库扩展、IO扩展"></a>网络库扩展、IO扩展</h6><p>下载组件能够支持外部网络库接入，这也就说明，下载组件可以支持更多的下载协议，下载组件只关心数据读取、数据的存储。</p>
+<p>下载组件抽象了一组接口，外部可以提供自己的网络库实现，如下代码： </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">   <span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">NetworkConnection</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> NO_RESPONSE_CODE = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 数据的请求方式</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">enum</span> RequestWays &#123;</span><br><span class="line">        POST,</span><br><span class="line">        GET,</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 添加请求头部信息，这个会被添加到网络库中的请求的header中</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> name</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> value</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">addHeader</span><span class="params">(String name, String value)</span></span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 请求头部信息</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    Map&lt;String, List&lt;String&gt;&gt; getRequestHeaderFields();</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 响应头部信息，这个下载组件会获取一些必要的信息</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    Map&lt;String, List&lt;String&gt;&gt; getResponseHeaderFields();</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 获取制定name的value</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> name</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function">String <span class="title">getResponseHeaderField</span><span class="params">(String name)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 执行网络请求</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> IOException</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">execute</span><span class="params">(RequestWays requestWays, Map&lt;String, String&gt; postBody)</span> <span class="keyword">throws</span> IOException</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 获取网络请求的响应code</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> IOException</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">getResponseCode</span><span class="params">()</span> <span class="keyword">throws</span> IOException</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 下载完成或出现异常需要处理的回调</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">ending</span><span class="params">()</span> <span class="keyword">throws</span> Throwable</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 下载组件提供了一组内存映射的输入流，提高文件的IO效率</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> outputStream</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">outputStream</span><span class="params">(OutputStream outputStream)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 读取制定输入流中的字节数的数据</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> byteCount</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">long</span> <span class="title">read</span><span class="params">(<span class="keyword">long</span> byteCount)</span> <span class="keyword">throws</span> IOException</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 将读取的数据写入到磁盘</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> IOException</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">emit</span><span class="params">()</span> <span class="keyword">throws</span> IOException</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 释放文件操作相关</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> IOException</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">release</span><span class="params">()</span> <span class="keyword">throws</span> IOException</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> etag</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> offset</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Deprecated</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">dispatchAddResumeOffset</span><span class="params">(String etag, <span class="keyword">long</span> offset)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 网络输入流</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> IOException</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Deprecated</span></span><br><span class="line">    <span class="function">InputStream <span class="title">getInputStream</span><span class="params">()</span> <span class="keyword">throws</span> IOException</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h6 id="Okhttp实现"><a href="#Okhttp实现" class="headerlink" title="Okhttp实现"></a>Okhttp实现</h6><p>下载组件进行了抽象接口，来实现最大化的定制需求，方便业务自己的需求。为了更为方便的说明问题，我们列举一个使用Okhttp来实现网络库和IO操作的实现类：</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br></pre></td><td class="code"><pre><span class="line">   <span class="class"><span class="keyword">class</span> <span class="title">OkhttpNetworkConnect</span> <span class="keyword">implements</span> <span class="title">NetworkConnection</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Request.Builder mRequestBuilder;</span><br><span class="line">    <span class="keyword">private</span> Call mCall;</span><br><span class="line">    <span class="keyword">private</span> Response mResponse;</span><br><span class="line">    <span class="keyword">private</span> String mUrl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> BufferedSink mSink = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">private</span> BufferedSource mSource = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">private</span> Buffer mBuffer = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">OkhttpNetworkConnect</span><span class="params">(String url)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        mRequestBuilder = <span class="keyword">new</span> Request.Builder();</span><br><span class="line">        <span class="keyword">this</span>.mUrl = url;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">addHeader</span><span class="params">(String name, String value)</span> </span>&#123;</span><br><span class="line">        mRequestBuilder.addHeader(name, value);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">boolean</span> <span class="title">dispatchAddResumeOffset</span><span class="params">(String etag, <span class="keyword">long</span> offset)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function">InputStream <span class="title">getInputStream</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> mResponse.body().byteStream();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> Map&lt;String, List&lt;String&gt;&gt; getRequestHeaderFields() &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> Map&lt;String, List&lt;String&gt;&gt; getResponseHeaderFields() &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function">String <span class="title">getResponseHeaderField</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">return</span> mResponse.<span class="title">header</span><span class="params">(name)</span></span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">execute</span><span class="params">(FileDownloadConnection.RequestWays requestWays, Map&lt;String, String&gt; postBody)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        mRequestBuilder.cacheControl(CacheControl.FORCE_NETWORK);</span><br><span class="line"></span><br><span class="line">        FormBody.Builder builder = <span class="keyword">new</span> FormBody.Builder();</span><br><span class="line">        RequestBody requestBody = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (requestWays == RequestWays.POST &amp;&amp; postBody != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">for</span> (Map.Entry&lt;String, String&gt; entry : postBody.entrySet()) &#123;</span><br><span class="line">                builder.addEncoded(entry.getKey(), entry.getValue());</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            requestBody = builder.build();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        mRequestBuilder.cacheControl(CacheControl.FORCE_NETWORK);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// start download----------------</span></span><br><span class="line">        <span class="comment">// Step 3, init request</span></span><br><span class="line">        <span class="keyword">final</span> Request request = requestWays == RequestWays.POST ? mRequestBuilder.url(mUrl).post(requestBody).build() : mRequestBuilder.url(mUrl).<span class="keyword">get</span>().build();</span><br><span class="line">        mCall = OkHttpProxy.getInstance().newCall(request);</span><br><span class="line">        mResponse = mCall.execute();</span><br><span class="line">        mSource = mResponse.body().source();</span><br><span class="line"></span><br><span class="line">        Log.d(<span class="string">"vanda"</span>, <span class="string">"head = "</span> + mResponse.headers().toString() + <span class="string">"  mSource = "</span> + mSource);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">int</span> <span class="title">getResponseCode</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">return</span> mResponse.<span class="title">code</span><span class="params">()</span></span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">ending</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (mResponse != <span class="keyword">null</span>) &#123;</span><br><span class="line">            mResponse.close();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">outputStream</span><span class="params">(OutputStream outputStream)</span> </span>&#123;</span><br><span class="line">        mSink = Okio.buffer(Okio.sink(outputStream));</span><br><span class="line">        mBuffer = mSink.buffer();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">long</span> <span class="title">read</span><span class="params">(<span class="keyword">long</span> byteCount)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">return</span> mSource.<span class="title">read</span><span class="params">(mBuffer, byteCount)</span></span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">emit</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        mSink.emit();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">release</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">         <span class="keyword">if</span> (mSource != <span class="keyword">null</span>) &#123;</span><br><span class="line">             mSource.close();</span><br><span class="line">         &#125;</span><br><span class="line"></span><br><span class="line">         <span class="keyword">if</span> (mSink != <span class="keyword">null</span>) &#123;</span><br><span class="line">             mSink.close();</span><br><span class="line">         &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Creator</span> <span class="keyword">implements</span> <span class="title">NetworkConnectionCreator</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">Creator</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> <span class="function">NetworkConnection <span class="title">create</span><span class="params">(String originUrl)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> OkhttpNetworkConnect(originUrl);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>   如上代码就实现了Okhttp网络库的接入，接口实现也比较简单。我们注意到网络库涉及到网络IO这块，一些网络库在网络库IO有自己的实现，典型的例子是Okhttp使用了自身的Okio，所以在网络IO上我们把操作权交给了业务方，这样能够获取更为高效的网络IO性能。在文件IO上我们提供了内部已经计算好文件range和seek的OutputStream，业务方可以对其进行包装或者直接使用都能够获取更为高效的文件IO，至于为什么高效后面我会说到。</p>
+<h4 id="网络IO读取策略"><a href="#网络IO读取策略" class="headerlink" title="网络IO读取策略"></a>网络IO读取策略</h4><p>一般来说我们利用空间和换取时间的策略，来提高网络IO的使用率，也就是说，我们使用内存空间来提高网络IO效率。如下图：</p>
+<img src="/2017/06/09/下载模块功能介绍/img/NetIo.png">
+<p>如上图，我们使用读取segment，一个segment有一个固定大小，下载组件中抽离了Okio的核心逻辑，组合成QuarkOkio，每次进行emit数据时必须满足上述条件，使用segment来存储数据，这样有3个好处：</p>
+<ol>
+<li>每次读取segment时可以提供任务进度回调，而这个时候并没有进行文件IO操作，我们把数据保存在内存中</li>
+<li>segment是一个双向链式结构，并且提供SegmentPool来缓存segment，避免系统GC和申请byte时的zero-fill。，这些数据块使用链表进行管理，这可以仅通过移动“指针”就进行数据的管理，而不用真正去处理数据，而且对扩容来说也十分方便。</li>
+<li>它对数据进行了分块处理，这样在大数据IO的时候可以以块为单位进行IO，这可以提高IO的吞吐率。</li>
+</ol>
+<p>同时我们下载组件提供了多线程下载机制，结合QuarkOkio数据缓存机制，能够最大程度利用网络IO，从而使网络IO最大化。</p>
+<h4 id="文件IO策略"><a href="#文件IO策略" class="headerlink" title="文件IO策略"></a>文件IO策略</h4><h5 id="内置众多文件IO方式，可以扩展"><a href="#内置众多文件IO方式，可以扩展" class="headerlink" title="内置众多文件IO方式，可以扩展"></a>内置众多文件IO方式，可以扩展</h5><p>QuarkDownloader组件比对过Java里面的文件IO性能，我们先列举性能最优的IO，MappedByteBuffer，下载组件中有一个IO类IOChannel，这个类中继承了OutputStream，利用MappedByteBuffer来完成文件的IO，现在我们来说说这个和普通的IO有和不同。</p>
+<h6 id="简单介绍下传统IO的方式"><a href="#简单介绍下传统IO的方式" class="headerlink" title="简单介绍下传统IO的方式"></a>简单介绍下传统IO的方式</h6><p>IO，就是数据不停地搬入搬出缓冲区而已（使用了缓冲区）。比如，用户程序发起读操作，导致“ syscall read ”系统调用，就会把数据搬入到buffer中。用户发起写操作，导致 “syscall write ”系统调用，将会把buffer中的数据搬出去(发送到网络中或者写入到磁盘文件)</p>
+<p>普通的IO处理的流程图：</p>
+<img src="/2017/06/09/下载模块功能介绍/img/NormalIO.png">
+<ol>
+<li>将数据从磁盘读数据到内核缓冲区，由DMA来完成</li>
+<li>然后内核将内核缓冲区的数据拷贝到用户空间的用户进程</li>
+<li>这样完成了数据的读</li>
+</ol>
+<p>一般Java应用程序读取数据代码如下：</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">byte</span>[] b = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">4096</span>];</span><br><span class="line"><span class="keyword">long</span> len;</span><br><span class="line"><span class="built_in">while</span>((len = inputStream.<span class="built_in">read</span>(b))&gt;=<span class="number">0</span>) &#123;        </span><br><span class="line">        </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当执行到read()方法时，底层执行了很多操作的：</p>
+<ol>
+<li>内核给磁盘控制器发指令：我要读磁盘上的某块磁盘块上的数据。</li>
+<li>在DMA的控制下，把磁盘上的数据读入到内核缓冲区。</li>
+<li>内核把数据从内核缓冲区拷贝到用户缓冲区。</li>
+</ol>
+<p>从上面几步我们可以分析出：</p>
+<ol>
+<li>就操作系统而言，JVM只是一个用户进程，处于用户态空间中。而处于用户态空间的进程是不能直接操作底层硬件的。而IO操作就需要操作底层的硬件，比如磁盘。因此，IO操作必须得借助内核的帮助才能完成(中断，trap)，即：会有用户态到内核态的切换。</li>
+<li>对于磁盘块的读取而言，每次访问磁盘读数据时，并不是读任意大小的数据的，而是每次读一个磁盘块或者若干个磁盘块(这是因为访问磁盘操作代价是很大的，而且我们也相信局部性原理) 因此，就需要有一个“中间缓冲区”–即内核缓冲区。先把数据从磁盘读到内核缓冲区中，然后再把数据从内核缓冲区搬到用户缓冲区。</li>
+</ol>
+<h6 id="内存映射"><a href="#内存映射" class="headerlink" title="内存映射"></a>内存映射</h6><p>   内存映射IO，也即JAVA NIO中提到的内存映射文件或者说 直接内存，示例图如下：</p>
+<img src="/2017/06/09/下载模块功能介绍/img/内存映射.png">
+<p>从上图可以看出：内核空间的 buffer 与 用户空间的 buffer 都映射到同一块 物理内存区域。</p>
+<p>它的主要特点如下：</p>
+<ol>
+<li><p>对文件的操作不需要再发read 或者 write 系统调用了</p>
+</li>
+<li><p>当用户进程访问“内存映射文件”地址时，自动产生缺页错误，然后由底层的OS负责将磁盘上的数据送到内存。</p>
+</li>
+</ol>
+<p>这就是是JAVA NIO中提到的内存映射缓冲区（Memory-Mapped-Buffer）它类似于JAVA NIO中的直接缓冲区(Directed Buffer)。MemoryMappedBuffer可以通过java.nio.channels.FileChannel.java(通道)的 map方法创建。</p>
+<p>使用内存映射缓冲区来操作文件，它比普通的IO操作读文件要快得多。甚至比使用文件通道(FileChannel)操作文件 还要快。因为，使用内存映射缓冲区操作文件时，没有显示的系统调用(read,write)，而且OS还会自动缓存一些文件页(memory page)</p>
+<img src="/2017/06/09/下载模块功能介绍/img/逻辑内存.png">
+<p>既然建立内存映射没有进行实际的数据拷贝，那么进程又怎么能最终直接通过内存操作访问到硬盘上的文件呢？那就要看内存映射之后的几个相关的过程了。</p>
+<p>mmap()会返回一个指针ptr，它指向进程逻辑地址空间中的一个地址，这样以后，进程无需再调用read或write对文件进行读写，而只需要通过ptr就能够操作文件。但是ptr所指向的是一个逻辑地址，要操作其中的数据，必须通过MMU将逻辑地址转换成物理地址。</p>
+<p>前面讲过，建立内存映射并没有实际拷贝数据，这时，MMU在地址映射表中是无法找到与ptr相对应的物理地址的，也就是MMU失败，将产生一个缺页中断，缺页中断的中断响应函数会在swap中寻找相对应的页面，如果找不到（也就是该文件从来没有被读入内存的情况），则会通过mmap()建立的映射关系，从硬盘上将文件读取到物理内存中。</p>
+<p>如果在拷贝数据时，发现物理内存不够用，则会通过虚拟内存机制（swap）将暂时不用的物理页面交换到硬盘上。</p>
+<p>总结来说，内存映射文件是将硬盘上文件的位置与进程逻辑地址空间中一块大小相同的区域之间一一对应， 建立内存映射由mmap()系统调用将文件直接映射到用户空间，mmap()中没有进行数据拷贝，真正的数据拷贝是在缺页中断处理时进行的，mmap()会返回一个指针ptr，它指向进程逻辑地址空间中的一个地址，要操作其中的数据时即第一次访问ptr指向的内存区域，必须通过MMU将逻辑地址转换成物理地址，MMU在地址映射表中是无法找到与ptr相对应的物理地址的，也就是MMU失败，将产生一个缺页中断，缺页中断的中断响应函数会通过mmap()建立的映射关系，从硬盘上将文件读取到物理内存中，这个过程只进行了一次数据拷贝。因此，内存映射的效率要比read/write调用效率高。</p>
+<p>通过以上的 网络IO 和 文件IO 的策略，加上我们多线程并发处理，在下载速度上能够有一个较快的下载速度，尤其是在处理高速网络下载能力。</p>
+<h4 id="读写分离"><a href="#读写分离" class="headerlink" title="读写分离"></a>读写分离</h4><p>QuarkDownloader实现了读写分离，同时提供了可选方式。全局一个线程来完成文件的写入。为了结合外部网络库的自身网络IO情况，内部保留了网络库的网络IO和文件IO的结合方式，典型的就是Okhttp的Okio</p>
+<h4 id="无任何第三方依赖"><a href="#无任何第三方依赖" class="headerlink" title="无任何第三方依赖"></a>无任何第三方依赖</h4><p>QuarkDownloader下载组件剔除了所有的依赖，目前下载组件没有任何第三方依赖，当然我们需要JDK在1.4以上。</p>
+<h4 id="通知栏接入和自定义"><a href="#通知栏接入和自定义" class="headerlink" title="通知栏接入和自定义"></a>通知栏接入和自定义</h4><p>QuarkDownloader提供了通知栏的高度自定义化接口，同时支持任务是否要显示在通知栏，在下载组件内部有静默任务和非静默任务，非静默任务通过注册的通知栏接口产生回调。我们来看看如何实现自己的通知栏。</p>
+<p>QuarkDownloader抽象了一个通知栏通用接口：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">OnShowNotification</span> </span>&#123;</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 暂停或者移除任务时，处理通知栏</span></span><br><span class="line"><span class="comment">         * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="function"><span class="keyword">boolean</span> <span class="title">pauseOrRemove</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * </span></span><br><span class="line"><span class="comment">         * 显示通知栏和更新通知栏</span></span><br><span class="line"><span class="comment">         * </span></span><br><span class="line"><span class="comment">         * <span class="doctag">@param</span> status              </span></span><br><span class="line"><span class="comment">         * <span class="doctag">@param</span> baseDownloadTask</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">show</span><span class="params">(<span class="keyword">final</span> <span class="keyword">int</span> status, <span class="keyword">final</span> BaseDownloadTask baseDownloadTask)</span></span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 取消通知栏</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">cancel</span><span class="params">()</span></span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>非静默任务会根据接口的实现来回调通知栏。</p>
+<h6 id="如何接入通知栏"><a href="#如何接入通知栏" class="headerlink" title="如何接入通知栏"></a>如何接入通知栏</h6><p>我们提供一组自定义的通知栏显示：</p>
+<figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> class DownloadNotificationManager implements QuarkDownloadNotificationManager.OnShowNotification &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="built_in">int</span> DOWNLOAD_NOTIFICATION_ID = <span class="number">0x1213</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">String</span> PATTERN = <span class="string">"mm':'ss"</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> ONE_HOUR = <span class="number">60</span> * <span class="number">60</span> * <span class="number">1000</span>; </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> TIME_INTERVAL = <span class="number">5</span> * <span class="number">1000</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">String</span> OPEN_TYPE = <span class="string">"open_type"</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">String</span> OPEN_TYPE_ENTER_DOWNLOAD_INTERFACE = <span class="string">"enter_download_interface"</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">String</span> FORMAT_M = <span class="string">"%#.1fM/s"</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">String</span> FORMAT_K = <span class="string">"%dK/s"</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">String</span> FORMAT_NOTIFICATION_CONTENT = <span class="string">"%s%s%s%s/%s%s%s%s%s"</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">String</span> FORMAT_SPLITE = <span class="string">"  |  "</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">String</span> FORMAT_PERCENT = <span class="string">"%"</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">String</span> STRING_ONE_HOUR = <span class="string">"&gt;1 hour"</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">String</span> STRING_UNKNOWN = <span class="string">"..."</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">String</span> STRING_POINT = <span class="string">". "</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> SimpleDateFormat mStringDateFormat;</span><br><span class="line">    <span class="keyword">private</span> Date mDate;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">long</span> mCurDownloadId = <span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">long</span> mCurDownloadTime = <span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="built_in">int</span> mDownloadingCount = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    NotificationCompat.Builder mBuilder;</span><br><span class="line">    <span class="keyword">private</span> ArrayList&lt;Long&gt; mListId = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> DownloadNotificationManager() &#123;</span><br><span class="line">        mStringDateFormat = <span class="keyword">new</span> SimpleDateFormat(PATTERN);</span><br><span class="line">        mDate = <span class="keyword">new</span> Date();</span><br><span class="line"></span><br><span class="line">        Intent[] intents = <span class="keyword">new</span> Intent[<span class="number">4</span>];</span><br><span class="line">        intents[<span class="number">0</span>] = <span class="keyword">new</span> Intent(ContextManager.getApplicationContext(), MainActivity.class);</span><br><span class="line">        intents[<span class="number">0</span>].putExtra(OPEN_TYPE, OPEN_TYPE_ENTER_DOWNLOAD_INTERFACE);</span><br><span class="line">        PendingIntent pendingIntent[] = <span class="keyword">new</span> PendingIntent[<span class="number">4</span>];</span><br><span class="line">        pendingIntent[<span class="number">0</span>] = PendingIntent.getActivity(ContextManager.getApplicationContext(), <span class="number">0</span>, intents[<span class="number">0</span>], PendingIntent.FLAG_UPDATE_CURRENT);</span><br><span class="line"></span><br><span class="line">        mBuilder = <span class="keyword">new</span> NotificationCompat.</span><br><span class="line">                Builder(FileDownloadHelper.getAppContext());</span><br><span class="line"></span><br><span class="line">        mBuilder.setOngoing(<span class="keyword">true</span>)</span><br><span class="line">                .setLights(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>) <span class="comment">//不需要显示灯光</span></span><br><span class="line">                .setPriority(NotificationCompat.PRIORITY_MAX)</span><br><span class="line">                .setContentIntent(pendingIntent[<span class="number">0</span>])</span><br><span class="line">                .setWhen(<span class="number">0</span>)</span><br><span class="line">                .setAutoCancel(<span class="keyword">true</span>)</span><br><span class="line">                .setSmallIcon(R.drawable.small_icon)</span><br><span class="line">                .setLargeIcon(BitmapFactory.decodeResource(ContextManager.getApplicationContext().getResources(), R.drawable.ic_logo));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> NotificationManager manager;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> NotificationManager getManager() &#123;</span><br><span class="line">        <span class="keyword">if</span> (manager == <span class="keyword">null</span>) &#123;</span><br><span class="line">            manager = (NotificationManager) FileDownloadHelper.getAppContext().</span><br><span class="line">                    getSystemService(Context.NOTIFICATION_SERVICE);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> manager;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">long</span> mTime = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">long</span> INTERVAL = <span class="number">1000</span>;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> show(<span class="keyword">final</span> <span class="built_in">int</span> status, <span class="keyword">final</span> BaseDownloadTask baseDownloadTask) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!SystemUtils.isOpenNotification || (SystemUtils.isFg &amp;&amp; !SystemUtils.isShowNotificationMainUi)) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">long</span> end = System.currentTimeMillis();</span><br><span class="line">        <span class="keyword">long</span> interval = end - mTime;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (interval &lt; INTERVAL &amp;&amp; status == QuarkDownloadTask.STATUS_PROGRESS) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        mTime = end;</span><br><span class="line">        ThreadManager.post(ThreadManager.THREAD_BACKGROUND, <span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            <span class="keyword">public</span> <span class="keyword">void</span> run() &#123;</span><br><span class="line">                showInBackgroundThread(status, baseDownloadTask);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">void</span> showInBackgroundThread(<span class="built_in">int</span> status, BaseDownloadTask baseDownloadTask) &#123;</span><br><span class="line">        <span class="keyword">if</span> (baseDownloadTask == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (status != FileDownloadStatus.completed &amp;&amp; status != FileDownloadStatus.error &amp;&amp; status != FileDownloadStatus.paused) &#123;</span><br><span class="line">            <span class="keyword">if</span> (mCurDownloadId == <span class="number">-1</span>) &#123;</span><br><span class="line">                mCurDownloadTime = System.currentTimeMillis();</span><br><span class="line">                mCurDownloadId = baseDownloadTask.getId();</span><br><span class="line">                mListId.<span class="built_in">add</span>(mCurDownloadId);</span><br><span class="line">                mDownloadingCount = QuarkDownloader.getInstance().getDownloadingTaskCount().length;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (mListId.contains((<span class="keyword">long</span>) baseDownloadTask.getId()) &amp;&amp; mCurDownloadId != baseDownloadTask.getId() &amp;&amp; ((System.currentTimeMillis() - mCurDownloadTime) &lt; TIME_INTERVAL)) &#123;</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (mCurDownloadId != baseDownloadTask.getId() &amp;&amp; (System.currentTimeMillis() - mCurDownloadTime) &gt;= TIME_INTERVAL) &#123;</span><br><span class="line">                mCurDownloadTime = System.currentTimeMillis();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        mCurDownloadId = baseDownloadTask.getId();</span><br><span class="line">        <span class="keyword">if</span> (!mListId.contains(mCurDownloadId)) &#123;</span><br><span class="line">            mListId.<span class="built_in">add</span>(mCurDownloadId);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">switch</span> (status) &#123;</span><br><span class="line">            <span class="keyword">case</span> FileDownloadStatus.pending:</span><br><span class="line">                mDownloadingCount = QuarkDownloader.getInstance().getDownloadingTaskCount().length;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> FileDownloadStatus.started:</span><br><span class="line">                mDownloadingCount = QuarkDownloader.getInstance().getDownloadingTaskCount().length;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> FileDownloadStatus.progress:</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> FileDownloadStatus.retry:</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> FileDownloadStatus.error:</span><br><span class="line">                <span class="keyword">if</span> (mListId.contains(mCurDownloadId)) &#123;</span><br><span class="line">                    mListId.remove(mCurDownloadId);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> FileDownloadStatus.paused:</span><br><span class="line">                <span class="keyword">if</span> (mListId.contains(mCurDownloadId)) &#123;</span><br><span class="line">                    mListId.remove(mCurDownloadId);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> FileDownloadStatus.completed:</span><br><span class="line">                <span class="keyword">if</span> (mListId.contains(mCurDownloadId)) &#123;</span><br><span class="line">                    mListId.remove(mCurDownloadId);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> FileDownloadStatus.warn:</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (mListId.<span class="built_in">size</span>() != mDownloadingCount) &#123;</span><br><span class="line">            mDownloadingCount = QuarkDownloader.getInstance().getDownloadingTaskCount().length;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">String</span> speed;</span><br><span class="line">        <span class="keyword">long</span> sp = baseDownloadTask.getSpeed();</span><br><span class="line">        <span class="keyword">if</span> (sp &gt; <span class="number">1024</span>) &#123;</span><br><span class="line">            speed = <span class="keyword">String</span>.format(Locale.CHINESE, FORMAT_M, (<span class="built_in">float</span>) sp / (<span class="built_in">float</span>) <span class="number">1024</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            speed = <span class="keyword">String</span>.format(Locale.CHINESE, FORMAT_K, sp);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">long</span> sofar = baseDownloadTask.getLargeFileSoFarBytes();</span><br><span class="line">        <span class="keyword">long</span> total = baseDownloadTask.getLargeFileTotalBytes();</span><br><span class="line"></span><br><span class="line">        <span class="built_in">int</span> progress = total &lt;= <span class="number">0</span> ? <span class="number">0</span> : (<span class="built_in">int</span>) ((sofar / (<span class="built_in">float</span>) total) * <span class="number">100</span>);</span><br><span class="line">        <span class="keyword">String</span> title;</span><br><span class="line">        <span class="keyword">String</span> content;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (((status == FileDownloadStatus.completed &amp;&amp; QuarkDownloader.getInstance().isIdle()) || status == FileDownloadStatus.error || status == FileDownloadStatus.paused) &amp;&amp; mListId.<span class="built_in">size</span>() == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="built_in">int</span>[] completeAndPauseCount = QuarkDownloader.getInstance().getCompleteAndPauseCount();</span><br><span class="line">            title = FileDownloadHelper.getAppContext().getString(R.string.app_name) + <span class="string">" "</span> + FileDownloadHelper.getAppContext().getString(R.string.download);</span><br><span class="line">            content = (completeAndPauseCount[<span class="number">1</span>] &gt; <span class="number">0</span> ? FileDownloadHelper.getAppContext().getString(R.string.download_notification_task) + <span class="string">" "</span> + completeAndPauseCount[<span class="number">1</span>] + FORMAT_SPLITE : <span class="string">""</span>) + FileDownloadHelper.getAppContext().getString(R.string.download_notification_complete) + <span class="string">" "</span> + completeAndPauseCount[<span class="number">0</span>];</span><br><span class="line">            mDownloadingCount = <span class="number">0</span>;</span><br><span class="line">            mBuilder.setOngoing(<span class="keyword">false</span>);</span><br><span class="line">            mBuilder.setProgress(<span class="number">0</span>, <span class="number">0</span>, <span class="keyword">false</span>);</span><br><span class="line">            notify(title, content, <span class="keyword">false</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="built_in">int</span> index = mDownloadingCount &gt; <span class="number">1</span> ? getIndex(mListId, baseDownloadTask.getId()) : <span class="number">-1</span>;</span><br><span class="line">            title = (index &gt; <span class="number">0</span> ? index + STRING_POINT : <span class="string">""</span>) + baseDownloadTask.getFilename();</span><br><span class="line">            <span class="keyword">long</span> timeLeft = sp &lt;= <span class="number">0</span> ? (total - sofar) : (total - sofar) / sp;</span><br><span class="line">            mDate.setTime(timeLeft);</span><br><span class="line">            <span class="keyword">String</span> timeTips = timeLeft &gt;= ONE_HOUR ? STRING_ONE_HOUR : mStringDateFormat.format(mDate);</span><br><span class="line">            content = <span class="keyword">String</span>.format(FORMAT_NOTIFICATION_CONTENT, total &lt;= <span class="number">0</span> ? STRING_UNKNOWN : progress + <span class="string">""</span>, FORMAT_PERCENT, FORMAT_SPLITE, QuarkFileUtlis.formatSize(sofar), QuarkFileUtlis.formatSize(total), FORMAT_SPLITE, speed, FORMAT_SPLITE, total &lt;= <span class="number">0</span> ? STRING_UNKNOWN : timeTips);</span><br><span class="line">            mBuilder.setOngoing(<span class="keyword">true</span>);</span><br><span class="line">            mBuilder.setProgress(<span class="number">1000</span>, (<span class="built_in">int</span>) ((sofar / (<span class="built_in">float</span>) total) * <span class="number">1000</span>), total &lt;= <span class="number">0</span>);</span><br><span class="line">            notify(title, content, <span class="keyword">true</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="built_in">int</span> getIndex(List&lt;Long&gt; list, <span class="built_in">int</span> id) &#123;</span><br><span class="line">        <span class="keyword">if</span> (list == <span class="keyword">null</span> || list.<span class="built_in">size</span>() == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> (<span class="built_in">int</span> i = <span class="number">0</span>; i &lt; list.<span class="built_in">size</span>(); i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (list.<span class="built_in">get</span>(i) == id) &#123;</span><br><span class="line">                <span class="keyword">return</span> i + <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    <span class="keyword">public</span> <span class="built_in">boolean</span> pauseOrRemove() &#123;</span><br><span class="line">        ThreadManager.post(ThreadManager.THREAD_BACKGROUND, <span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            <span class="keyword">public</span> <span class="keyword">void</span> run() &#123;</span><br><span class="line">                pauseInBackgroundThread();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">void</span> pauseInBackgroundThread() &#123;</span><br><span class="line">        <span class="keyword">if</span> (mListId == <span class="keyword">null</span> || mListId.<span class="built_in">size</span>() == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="built_in">int</span>[] completeAndPauseCount = QuarkDownloader.getInstance().getCompleteAndPauseCount();</span><br><span class="line">            <span class="keyword">String</span> title = FileDownloadHelper.getAppContext().getString(R.string.app_name) + <span class="string">" "</span> + FileDownloadHelper.getAppContext().getString(R.string.download);</span><br><span class="line">            <span class="keyword">String</span> content = (completeAndPauseCount[<span class="number">1</span>] &gt; <span class="number">0</span> ? FileDownloadHelper.getAppContext().getString(R.string.download_notification_task) + <span class="string">" "</span> + completeAndPauseCount[<span class="number">1</span>] + <span class="string">" | "</span> : <span class="string">""</span>) + FileDownloadHelper.getAppContext().getString(R.string.download_notification_complete) + <span class="string">" "</span> + completeAndPauseCount[<span class="number">0</span>];</span><br><span class="line">            mDownloadingCount = <span class="number">0</span>;</span><br><span class="line">            mBuilder.setOngoing(<span class="keyword">false</span>);</span><br><span class="line">            mBuilder.setProgress(<span class="number">0</span>, <span class="number">0</span>, <span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (completeAndPauseCount[<span class="number">0</span>] == <span class="number">0</span> &amp;&amp; completeAndPauseCount[<span class="number">1</span>] == <span class="number">0</span>) &#123;</span><br><span class="line">                cancel();</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                notify(title, content, <span class="keyword">false</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">void</span> notify(<span class="keyword">String</span> title, <span class="keyword">String</span> content, <span class="built_in">boolean</span> isShowFileDownloadProcess) &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.N) &#123;</span><br><span class="line">                mBuilder.setContentTitle(content)</span><br><span class="line">                        .setSubText(title);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                mBuilder.setContentTitle(title)</span><br><span class="line">                        .setContentText(content);</span><br><span class="line">            &#125;</span><br><span class="line">            mBuilder.setNumber(mDownloadingCount);</span><br><span class="line">            Notification notification = mBuilder.getNotification();</span><br><span class="line">            <span class="built_in">int</span> smallIconId = ContextManager.getApplicationContext().getResources().getIdentifier(<span class="string">"right_icon"</span>, <span class="string">"id"</span>, android.R.class.getPackage().getName());</span><br><span class="line">            <span class="keyword">if</span> (smallIconId != <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="keyword">if</span> (notification.contentView != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    notification.contentView.setViewVisibility(smallIconId, View.INVISIBLE);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.JELLY_BEAN) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (notification.bigContentView != <span class="keyword">null</span>) &#123;</span><br><span class="line">                        notification.bigContentView.setViewVisibility(smallIconId, View.INVISIBLE);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (isShowFileDownloadProcess) &#123;</span><br><span class="line">                QuarkDownloader.getInstance().notifyNotification(DOWNLOAD_NOTIFICATION_ID, notification);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                getManager().notify(DOWNLOAD_NOTIFICATION_ID, notification);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> cancel() &#123;</span><br><span class="line">        ThreadManager.removeRunnable(mCancleRunnable);</span><br><span class="line">        ThreadManager.post(ThreadManager.THREAD_BACKGROUND, mCancleRunnable);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Runnable mCancleRunnable = <span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">        @Override</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">void</span> run() &#123;</span><br><span class="line">            getManager().cancel(DOWNLOAD_NOTIFICATION_ID);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里的实现，业务方可以根据自己的业务需求自己来做出实现，这样非常灵活，QuarkDownloader只是把通知栏的抽象起来，提供给外部统一的处理入口。</p>
+<p>接下来，我们只要初始化这个实现，就能够轻松的实现通知栏：</p>
+<figure class="highlight pony"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">DownloadNotificationManager</span> mDownloadNotificationManager = <span class="function"><span class="keyword">new</span> <span class="title">DownloadNotificationManager</span>();</span></span><br><span class="line"><span class="function">                <span class="title">QuarkDownloadNotificationManager</span>.<span class="title">getInstance</span>().<span class="title">setOnShowNotification</span>(mDownloadNotificationManager);</span></span><br></pre></td></tr></table></figure>
+<p>那么这样你的应用就拥有自己的通知栏。</p>
+<h4 id="下载组件的执行逻辑"><a href="#下载组件的执行逻辑" class="headerlink" title="下载组件的执行逻辑"></a>下载组件的执行逻辑</h4><p>这里我画了下下载组件的大致流程图：</p>
+<img src="/2017/06/09/下载模块功能介绍/img/下载流程图.png">
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/06/04/下载模块使用文件内存映射来提供IO效率/" rel="next" title="下载模块使用文件内存映射来提供IO效率">
+                <i class="fa fa-chevron-left"></i> 下载模块使用文件内存映射来提供IO效率
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/05/薛业乔-作品/" rel="prev" title="薛业乔-作品">
+                薛业乔-作品 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="伍中联" />
+            
+              <p class="site-author-name" itemprop="name">伍中联</p>
+              <p class="site-description motion-element" itemprop="description">珍惜在生命中遇到的每一个人</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">18</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#下载组件优势"><span class="nav-number">1.</span> <span class="nav-text">下载组件优势</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Demo地址"><span class="nav-number">2.</span> <span class="nav-text">Demo地址</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#开源地址"><span class="nav-number">3.</span> <span class="nav-text">开源地址</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#易接入"><span class="nav-number">4.</span> <span class="nav-text">易接入</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#如何接入"><span class="nav-number">4.0.1.</span> <span class="nav-text">如何接入</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#使用下载组件来下载文件"><span class="nav-number">4.0.2.</span> <span class="nav-text">使用下载组件来下载文件</span></a></li></ol></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#扩展性好"><span class="nav-number">5.</span> <span class="nav-text">扩展性好</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#网络库扩展、IO扩展"><span class="nav-number">5.0.1.</span> <span class="nav-text">网络库扩展、IO扩展</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#Okhttp实现"><span class="nav-number">5.0.2.</span> <span class="nav-text">Okhttp实现</span></a></li></ol></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#网络IO读取策略"><span class="nav-number">6.</span> <span class="nav-text">网络IO读取策略</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#文件IO策略"><span class="nav-number">7.</span> <span class="nav-text">文件IO策略</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#内置众多文件IO方式，可以扩展"><span class="nav-number">7.1.</span> <span class="nav-text">内置众多文件IO方式，可以扩展</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#简单介绍下传统IO的方式"><span class="nav-number">7.1.1.</span> <span class="nav-text">简单介绍下传统IO的方式</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#内存映射"><span class="nav-number">7.1.2.</span> <span class="nav-text">内存映射</span></a></li></ol></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#读写分离"><span class="nav-number">8.</span> <span class="nav-text">读写分离</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#无任何第三方依赖"><span class="nav-number">9.</span> <span class="nav-text">无任何第三方依赖</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#通知栏接入和自定义"><span class="nav-number">10.</span> <span class="nav-text">通知栏接入和自定义</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#如何接入通知栏"><span class="nav-number">10.0.1.</span> <span class="nav-text">如何接入通知栏</span></a></li></ol></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#下载组件的执行逻辑"><span class="nav-number">11.</span> <span class="nav-text">下载组件的执行逻辑</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">伍中联</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Muse</a> v</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v="></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v="></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v="></script>
+<script type="text/javascript" src="/js/src/post-details.js?v="></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v="></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
