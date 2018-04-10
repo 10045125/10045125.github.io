@@ -225,7 +225,7 @@
         
         <li class="menu-item menu-item-archives">
           <a href="/archives/" rel="section">
-            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives<span class="badge">19</span>
+            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives<span class="badge">20</span>
               </a>
         </li>
       
@@ -254,6 +254,135 @@
           <div id="content" class="content">
             
   <section id="posts" class="posts-expand">
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/17/通过Service拉起进程，同时开始Service的全过程分析学习/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="伍中联">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="伍中联(Vanda)的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/03/17/通过Service拉起进程，同时开始Service的全过程分析学习/" itemprop="url">通过Service拉起进程，同时开始Service的全过程分析学习</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-17T15:27:26+08:00">2017-03-17</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          背景我们通过提供一个对外部的Service拉起相关的进程和服务，这样能够确保我们有一个进程能够一直在后台，从而进行相关的后台操作。那么通过Service去启动所在进程都做了哪些事情，我们做个深入的分析和探讨。
+使用场景一般来说，我们在Activity中开启一个服务的代码如下
+123456789101112try &#123;    Intent intent = new Intent();    if (Build.VERSION.SDK_INT &gt;= 12)        intent.addFlags(0x00000020); // Intent.FLAG_INCLUDE_STOPPED_PACKAGES    intent.setAction("com.vanda.intent.action.FRIEND");    intent.setClassName("com.vanda", "com.vanda.bridge");    intent.putExtra("source", getPackageName());    startService(intent);&#12
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/03/17/通过Service拉起进程，同时开始Service的全过程分析学习/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
     
       
 
@@ -1514,7 +1643,7 @@ Android应用的进程都是从一个叫做Zygote的进程fork出来的。Zygote
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">19</span>
+                    <span class="site-state-item-count">20</span>
                     <span class="site-state-item-name">posts</span>
                   </a>
                 </div>
