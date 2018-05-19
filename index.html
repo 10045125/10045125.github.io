@@ -344,9 +344,10 @@
    1最近在完成一个类型信息流产品，涉及到很多type类型
    技术支撑   
    1在技术层面上，通过RecyclerView的ViewHolder，抽象业务逻辑，结合不同的type来注册不同的ViewHolder，然后各自ViewHolder处理对应样式的逻辑和业务
-抽象业务
+抽象业务主要有两部分，一部分是支持多type本身的Adapter的抽象，一部分是由数据驱动列表的数据解析，同时包含后端的数据构建。
 
-          
+数据原型：12345678910111213141516171819202122232425262728293031&#123;	"data": &#123;		"list": [			&#123;				"cardType": "cardType_1",				"description": "",				"pic": "",				"title": "",				"id": "14499",				"count": "1"			&#125;,			&#123;				"cardType": "cardType_2",				"video": "
+          ...
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2018/05/18/使用RecyclerView实现多tpye抽象需求/#more" rel="contents">

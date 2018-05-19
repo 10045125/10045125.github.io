@@ -103,17 +103,17 @@
   <meta name="keywords" content="Hexo, NexT" />
 
 
-<meta name="description" content="多Type需求   产品原型       1最近在完成一个类型信息流产品，涉及到很多type类型    技术支撑       1在技术层面上，通过RecyclerView的ViewHolder，抽象业务逻辑，结合不同的type来注册不同的ViewHolder，然后各自ViewHolder处理对应样式的逻辑和业务 抽象业务">
+<meta name="description" content="多Type需求   产品原型       1最近在完成一个类型信息流产品，涉及到很多type类型    技术支撑       1在技术层面上，通过RecyclerView的ViewHolder，抽象业务逻辑，结合不同的type来注册不同的ViewHolder，然后各自ViewHolder处理对应样式的逻辑和业务 抽象业务主要有两部分，一部分是支持多type本身的Adapter的抽象，一部分是由数据">
 <meta property="og:type" content="article">
 <meta property="og:title" content="使用RecyclerView实现多type抽象需求">
 <meta property="og:url" content="http://yoursite.com/2018/05/18/使用RecyclerView实现多tpye抽象需求/index.html">
 <meta property="og:site_name" content="伍中联(Vanda)的博客">
-<meta property="og:description" content="多Type需求   产品原型       1最近在完成一个类型信息流产品，涉及到很多type类型    技术支撑       1在技术层面上，通过RecyclerView的ViewHolder，抽象业务逻辑，结合不同的type来注册不同的ViewHolder，然后各自ViewHolder处理对应样式的逻辑和业务 抽象业务">
+<meta property="og:description" content="多Type需求   产品原型       1最近在完成一个类型信息流产品，涉及到很多type类型    技术支撑       1在技术层面上，通过RecyclerView的ViewHolder，抽象业务逻辑，结合不同的type来注册不同的ViewHolder，然后各自ViewHolder处理对应样式的逻辑和业务 抽象业务主要有两部分，一部分是支持多type本身的Adapter的抽象，一部分是由数据">
 <meta property="og:image" content="http://yoursite.com/2018/05/18/使用RecyclerView实现多tpye抽象需求/img/mulitiAdapter.png">
-<meta property="og:updated_time" content="2018-05-19T14:31:18.609Z">
+<meta property="og:updated_time" content="2018-05-19T15:52:02.589Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用RecyclerView实现多type抽象需求">
-<meta name="twitter:description" content="多Type需求   产品原型       1最近在完成一个类型信息流产品，涉及到很多type类型    技术支撑       1在技术层面上，通过RecyclerView的ViewHolder，抽象业务逻辑，结合不同的type来注册不同的ViewHolder，然后各自ViewHolder处理对应样式的逻辑和业务 抽象业务">
+<meta name="twitter:description" content="多Type需求   产品原型       1最近在完成一个类型信息流产品，涉及到很多type类型    技术支撑       1在技术层面上，通过RecyclerView的ViewHolder，抽象业务逻辑，结合不同的type来注册不同的ViewHolder，然后各自ViewHolder处理对应样式的逻辑和业务 抽象业务主要有两部分，一部分是支持多type本身的Adapter的抽象，一部分是由数据">
 <meta name="twitter:image" content="http://yoursite.com/2018/05/18/使用RecyclerView实现多tpye抽象需求/img/mulitiAdapter.png">
 
 
@@ -342,7 +342,14 @@
    <figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">最近在完成一个类型信息流产品，涉及到很多<span class="keyword">type</span>类型</span><br></pre></td></tr></table></figure>
 <p>   技术支撑<br>   <br></p>
    <figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">在技术层面上，通过<span class="type">RecyclerView</span>的<span class="type">ViewHolder</span>，抽象业务逻辑，结合不同的<span class="keyword">type</span>来注册不同的<span class="type">ViewHolder</span>，然后各自<span class="type">ViewHolder</span>处理对应样式的逻辑和业务</span><br></pre></td></tr></table></figure>
-<h4 id="抽象业务"><a href="#抽象业务" class="headerlink" title="抽象业务"></a>抽象业务</h4><img src="/2018/05/18/使用RecyclerView实现多tpye抽象需求/img/mulitiAdapter.png">
+<h4 id="抽象业务"><a href="#抽象业务" class="headerlink" title="抽象业务"></a>抽象业务</h4><p>主要有两部分，一部分是支持多type本身的Adapter的抽象，一部分是由数据驱动列表的数据解析，同时包含后端的数据构建。</p>
+<img src="/2018/05/18/使用RecyclerView实现多tpye抽象需求/img/mulitiAdapter.png">
+<p>数据原型：<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">	<span class="attr">"data"</span>: &#123;</span><br><span class="line">		<span class="attr">"list"</span>: [</span><br><span class="line">			&#123;</span><br><span class="line">				<span class="attr">"cardType"</span>: <span class="string">"cardType_1"</span>,</span><br><span class="line">				<span class="attr">"description"</span>: <span class="string">""</span>,</span><br><span class="line">				<span class="attr">"pic"</span>: <span class="string">""</span>,</span><br><span class="line">				<span class="attr">"title"</span>: <span class="string">""</span>,</span><br><span class="line">				<span class="attr">"id"</span>: <span class="string">"14499"</span>,</span><br><span class="line">				<span class="attr">"count"</span>: <span class="string">"1"</span></span><br><span class="line">			&#125;,</span><br><span class="line">			&#123;</span><br><span class="line">				<span class="attr">"cardType"</span>: <span class="string">"cardType_2"</span>,</span><br><span class="line">				<span class="attr">"video"</span>: <span class="string">""</span>,</span><br><span class="line">				<span class="attr">"videoUrl"</span>: <span class="string">""</span>,</span><br><span class="line">				<span class="attr">"musicList"</span>: [</span><br><span class="line">				],</span><br><span class="line">				<span class="attr">"price"</span>: <span class="string">""</span>,</span><br><span class="line">				<span class="attr">"salePrice"</span>: <span class="string">"120"</span></span><br><span class="line">			&#125;,</span><br><span class="line">			&#123;</span><br><span class="line">				<span class="attr">"cardType"</span>: <span class="string">"cardType_3"</span>,</span><br><span class="line">				<span class="attr">"advertising"</span>: <span class="string">""</span>,</span><br><span class="line">				<span class="attr">"advertisingTitle"</span>: <span class="string">""</span>,</span><br><span class="line">				<span class="attr">"advertisingUrl"</span>: [</span><br><span class="line">				],</span><br><span class="line">				<span class="attr">"advertisingPrice"</span>: <span class="string">""</span></span><br><span class="line">			&#125;</span><br><span class="line">		]</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>典型的信息流中包含的cardtype样式会有很多种，每种都会相应的对应一种数据，然后把不同的数据生成一个json的列表，每个item是不同的对象和字段，这样我们很难使用json工具来反射这个list，所以需要自己去解析list元素所属卡片的数据格式。</p>
+<h4 id="Adapter抽象"><a href="#Adapter抽象" class="headerlink" title="Adapter抽象"></a>Adapter抽象</h4><p>正常的写法是，我们需要自己去继承Adapter，然后编写一个对应的ViewHolder，然后写逻辑，这样代码耦合度高，往往需要写很多代码，包括处理业务逻辑。</p>
+<p>抽象思想：</p>
+<figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">一个列表中包含了不同的类型的卡片，每个卡片对应自己的数据对象，每个卡片都需要绑定自己的数据对象和逻辑，也就是说ViewHolder + <span class="keyword">Data</span>.<span class="keyword">class</span> 组成一个个体</span><br></pre></td></tr></table></figure>
+<p>上图中已经标注出相应的模式。</p>
 
       
     </div>
@@ -493,7 +500,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#多Type需求"><span class="nav-number">1.</span> <span class="nav-text">多Type需求</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#抽象业务"><span class="nav-number">2.</span> <span class="nav-text">抽象业务</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#多Type需求"><span class="nav-number">1.</span> <span class="nav-text">多Type需求</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#抽象业务"><span class="nav-number">2.</span> <span class="nav-text">抽象业务</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Adapter抽象"><span class="nav-number">3.</span> <span class="nav-text">Adapter抽象</span></a></li></ol></div>
             
 
           </div>
