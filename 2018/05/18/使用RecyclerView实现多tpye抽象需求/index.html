@@ -110,7 +110,7 @@
 <meta property="og:site_name" content="伍中联(Vanda)的博客">
 <meta property="og:description" content="多Type需求   产品原型       1最近在完成一个类型信息流产品，涉及到很多type类型    技术支撑       1在技术层面上，通过RecyclerView的ViewHolder，抽象业务逻辑，结合不同的type来注册不同的ViewHolder，然后各自ViewHolder处理对应样式的逻辑和业务 抽象业务主要有两部分，一部分是支持多type本身的Adapter的抽象，一部分是由数据">
 <meta property="og:image" content="http://yoursite.com/2018/05/18/使用RecyclerView实现多tpye抽象需求/img/mulitiAdapter.png">
-<meta property="og:updated_time" content="2018-05-19T15:52:02.589Z">
+<meta property="og:updated_time" content="2018-05-19T16:22:58.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用RecyclerView实现多type抽象需求">
 <meta name="twitter:description" content="多Type需求   产品原型       1最近在完成一个类型信息流产品，涉及到很多type类型    技术支撑       1在技术层面上，通过RecyclerView的ViewHolder，抽象业务逻辑，结合不同的type来注册不同的ViewHolder，然后各自ViewHolder处理对应样式的逻辑和业务 抽象业务主要有两部分，一部分是支持多type本身的Adapter的抽象，一部分是由数据">
@@ -227,7 +227,7 @@
         
         <li class="menu-item menu-item-archives">
           <a href="/archives/" rel="section">
-            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives<span class="badge">25</span>
+            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives<span class="badge">26</span>
               </a>
         </li>
       
@@ -350,6 +350,9 @@
 <p>抽象思想：</p>
 <figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">一个列表中包含了不同的类型的卡片，每个卡片对应自己的数据对象，每个卡片都需要绑定自己的数据对象和逻辑，也就是说ViewHolder + <span class="keyword">Data</span>.<span class="keyword">class</span> 组成一个个体</span><br></pre></td></tr></table></figure>
 <p>上图中已经标注出相应的模式。</p>
+<h4 id="理想中的使用方式"><a href="#理想中的使用方式" class="headerlink" title="理想中的使用方式"></a>理想中的使用方式</h4><figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">GridLayoutManager layoutManager = <span class="keyword">new</span> GridLayoutManager(getContext(), SPAN_COUNT);</span><br><span class="line">layoutManager.setSpanSizeLookup(<span class="keyword">new</span> GridLayoutManager.SpanSizeLookup() &#123;</span><br><span class="line">    @Override</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> getSpanSize(<span class="keyword">int</span> <span class="built_in">position</span>) &#123;</span><br><span class="line">        <span class="built_in">if</span> (items.<span class="built_in">size</span>() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            Object object = items.<span class="built_in">get</span>(<span class="built_in">position</span>);</span><br><span class="line">            <span class="built_in">return</span> (object instanceof MusicData ? SPAN_COUNT : <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">mRecyclerView.setLayoutManager(layoutManager);</span><br><span class="line"></span><br><span class="line">adapter = <span class="keyword">new</span> MultiAdapter();</span><br><span class="line">adapter.<span class="keyword">register</span>(MusicData.class, <span class="keyword">new</span> MusicViewBinder());</span><br><span class="line">adapter.<span class="keyword">register</span>(VideoData.class, <span class="keyword">new</span> VideoViewBinder());</span><br><span class="line">adapter.<span class="keyword">register</span>(MovVideoData.class, <span class="keyword">new</span> MovViewBinder());</span><br><span class="line">adapter.setItems(items);</span><br><span class="line">mRecyclerView.setAdapter(adapter);</span><br></pre></td></tr></table></figure>
+<p>数据解析模块：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
       
     </div>
@@ -383,6 +386,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/08/26/QuarkDownloader-读写分离设置原型/" rel="prev" title="QuarkDownloader 读写分离原型">
+                QuarkDownloader 读写分离原型 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -460,7 +467,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">25</span>
+                    <span class="site-state-item-count">26</span>
                     <span class="site-state-item-name">posts</span>
                   </a>
                 </div>
@@ -500,7 +507,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#多Type需求"><span class="nav-number">1.</span> <span class="nav-text">多Type需求</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#抽象业务"><span class="nav-number">2.</span> <span class="nav-text">抽象业务</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Adapter抽象"><span class="nav-number">3.</span> <span class="nav-text">Adapter抽象</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#多Type需求"><span class="nav-number">1.</span> <span class="nav-text">多Type需求</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#抽象业务"><span class="nav-number">2.</span> <span class="nav-text">抽象业务</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Adapter抽象"><span class="nav-number">3.</span> <span class="nav-text">Adapter抽象</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#理想中的使用方式"><span class="nav-number">4.</span> <span class="nav-text">理想中的使用方式</span></a></li></ol></div>
             
 
           </div>
