@@ -103,26 +103,23 @@
   <meta name="keywords" content="Hexo, NexT" />
 
 
-<meta name="description" content="多谢大家的支持，本软件长期维护，如果你觉得好用，或者有更好的意见和建议，欢迎告知。 开发一款软件需要时间和精力，你的小小心意是我继续的动力，谢谢你们！ 支付宝捐赠 （长按保存图片）： 微信捐赠 （长按保存图片）：">
+<meta name="description" content="总结下在kotlin常使用的一些东西和含义 val与var12val 是常量var 是变量 ？我们经常能够遇到这个，kotlin提供了很好的编译检查功能，其中 ？ 有一些常用的地方 1private var name: String? = null 这个表示 变量 name 能够为空值 12val video = Video.create()video?.play() 这个说明如果video 不为">
 <meta property="og:type" content="article">
-<meta property="og:title" content="多谢大家的支持">
-<meta property="og:url" content="http://yoursite.com/2017/04/09/多谢大家的支持/index.html">
+<meta property="og:title" content="Kotlin 常见的一些符号作用">
+<meta property="og:url" content="http://yoursite.com/2018/09/26/Kotlin-常见的一些符号作用/index.html">
 <meta property="og:site_name" content="伍中联(Vanda)的博客">
-<meta property="og:description" content="多谢大家的支持，本软件长期维护，如果你觉得好用，或者有更好的意见和建议，欢迎告知。 开发一款软件需要时间和精力，你的小小心意是我继续的动力，谢谢你们！ 支付宝捐赠 （长按保存图片）： 微信捐赠 （长按保存图片）：">
-<meta property="og:image" content="http://yoursite.com/2017/04/09/多谢大家的支持/img/zhifubao.png">
-<meta property="og:image" content="http://yoursite.com/2017/04/09/多谢大家的支持/img/wechat.png">
-<meta property="og:updated_time" content="2017-04-09T14:34:15.000Z">
+<meta property="og:description" content="总结下在kotlin常使用的一些东西和含义 val与var12val 是常量var 是变量 ？我们经常能够遇到这个，kotlin提供了很好的编译检查功能，其中 ？ 有一些常用的地方 1private var name: String? = null 这个表示 变量 name 能够为空值 12val video = Video.create()video?.play() 这个说明如果video 不为">
+<meta property="og:updated_time" content="2018-09-27T10:04:31.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="多谢大家的支持">
-<meta name="twitter:description" content="多谢大家的支持，本软件长期维护，如果你觉得好用，或者有更好的意见和建议，欢迎告知。 开发一款软件需要时间和精力，你的小小心意是我继续的动力，谢谢你们！ 支付宝捐赠 （长按保存图片）： 微信捐赠 （长按保存图片）：">
-<meta name="twitter:image" content="http://yoursite.com/2017/04/09/多谢大家的支持/img/zhifubao.png">
+<meta name="twitter:title" content="Kotlin 常见的一些符号作用">
+<meta name="twitter:description" content="总结下在kotlin常使用的一些东西和含义 val与var12val 是常量var 是变量 ？我们经常能够遇到这个，kotlin提供了很好的编译检查功能，其中 ？ 有一些常用的地方 1private var name: String? = null 这个表示 变量 name 能够为空值 12val video = Video.create()video?.play() 这个说明如果video 不为">
 
 
 
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2017/04/09/多谢大家的支持/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/09/26/Kotlin-常见的一些符号作用/"/>
 
 
 
@@ -131,7 +128,7 @@
     sidebar: "",
   };
 </script>
-  <title>多谢大家的支持 | 伍中联(Vanda)的博客</title>
+  <title>Kotlin 常见的一些符号作用 | 伍中联(Vanda)的博客</title>
   
 
 
@@ -273,7 +270,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/09/多谢大家的支持/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/26/Kotlin-常见的一些符号作用/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="伍中联">
@@ -290,7 +287,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">多谢大家的支持</h1>
+          <h1 class="post-title" itemprop="name headline">Kotlin 常见的一些符号作用</h1>
         
 
         <div class="post-meta">
@@ -302,7 +299,7 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-09T21:32:16+08:00">2017-04-09</time>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-09-26T15:56:53+08:00">2018-09-26</time>
             
 
             
@@ -339,10 +336,33 @@
       
 
       
-        <p>多谢大家的支持，本软件长期维护，如果你觉得好用，或者有更好的意见和建议，欢迎告知。</p>
-<p>开发一款软件需要时间和精力，你的小小心意是我继续的动力，谢谢你们！</p>
-<h4 id="支付宝捐赠-（长按保存图片）："><a href="#支付宝捐赠-（长按保存图片）：" class="headerlink" title="支付宝捐赠 （长按保存图片）："></a>支付宝捐赠 （长按保存图片）：</h4><img src="/2017/04/09/多谢大家的支持/img/zhifubao.png">
-<h4 id="微信捐赠-（长按保存图片）："><a href="#微信捐赠-（长按保存图片）：" class="headerlink" title="微信捐赠 （长按保存图片）："></a>微信捐赠 （长按保存图片）：</h4><img src="/2017/04/09/多谢大家的支持/img/wechat.png">
+        <p>总结下在kotlin常使用的一些东西和含义</p>
+<h4 id="val与var"><a href="#val与var" class="headerlink" title="val与var"></a>val与var</h4><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> 是常量</span><br><span class="line"><span class="keyword">var</span> 是变量</span><br></pre></td></tr></table></figure>
+<h4 id="？"><a href="#？" class="headerlink" title="？"></a>？</h4><p>我们经常能够遇到这个，kotlin提供了很好的编译检查功能，其中 ？ 有一些常用的地方</p>
+<figure class="highlight delphi"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">var</span> <span class="keyword">name</span>: <span class="keyword">String</span>? = null</span><br></pre></td></tr></table></figure>
+<p>这个表示 变量 name 能够为空值</p>
+<figure class="highlight gcode"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">val video = Video.create<span class="comment">()</span></span><br><span class="line">video?.play<span class="comment">()</span></span><br></pre></td></tr></table></figure>
+<p>这个说明如果video 不为空，那么就会调用play方法</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">name</span><span class="params">(name:<span class="type">String</span>?)</span></span> &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里面告诉使用者，name有可能是一个空值</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">name</span><span class="params">(name:<span class="type">String</span>?)</span></span>：String? &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里面告诉使用者，name方法返回可能是一个空值</p>
+<h4 id=""><a href="#" class="headerlink" title="!!"></a>!!</h4><p>使用的过程中也经常遇到</p>
+<figure class="highlight erlang-repl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">val video = Video.create()</span><br><span class="line">video!!.play()</span><br></pre></td></tr></table></figure>
+<p>我们可以写 video!! ，这会返回一个非空的video b 值 或者如果 video 为空，就会抛出一个 NPE 异常</p>
+<h4 id="-1"><a href="#-1" class="headerlink" title="::"></a>::</h4><figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">startActivity</span>(Intent(this<span class="variable">@KotlinActivity</span>, <span class="attribute">MainActivity</span>::class.java))</span><br></pre></td></tr></table></figure>
+<p>得到类的Class对象</p>
+<h4 id="-2"><a href="#-2" class="headerlink" title="?:"></a>?:</h4><p>一般存在2中写法，</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">val <span class="selector-tag">a</span>: Int = <span class="keyword">if</span> (<span class="selector-tag">b</span> != null) <span class="selector-tag">b</span><span class="selector-class">.length</span> <span class="keyword">else</span> -<span class="number">1</span></span><br></pre></td></tr></table></figure>
+<p>在kotlin中 条件表达式具备返回值，上面的写法我们可以用Elvis操作符（?:）来简写</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">val <span class="string">a:</span> Int = b?.length ?: <span class="number">-1</span></span><br></pre></td></tr></table></figure>
+<p>这样是不是简单了很多呢</p>
+<h4 id="与"><a href="#与" class="headerlink" title="== 与 ==="></a>== 与 ===</h4><p>==       判断值是否相等。<br>===      判断值及引用是否完全相等。</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> num = <span class="number">128</span></span><br><span class="line"><span class="keyword">val</span> a:<span class="built_in">Int</span>? = num</span><br><span class="line"><span class="keyword">val</span> b:<span class="built_in">Int</span>? = num</span><br><span class="line">println(<span class="string">"a == b   = <span class="subst">$&#123;a == b&#125;</span> \n a === b = <span class="subst">$&#123;a === b&#125;</span>"</span>)</span><br></pre></td></tr></table></figure>
+<p>a == b   = true<br>a === b  = false</p>
+<p>a 和 b 都是一个常量，引用的地址当然是不一样的</p>
+<h4 id="-3"><a href="#-3" class="headerlink" title="_"></a>_</h4><p>这个一般是选择忽略返回值</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">data</span> <span class="class"><span class="keyword">class</span> <span class="title">Book</span></span>(<span class="keyword">var</span> id: <span class="built_in">Int</span>, <span class="keyword">var</span> name: String)</span><br><span class="line"><span class="keyword">val</span> book = Book(<span class="number">0</span>, <span class="string">"vanda"</span>)</span><br><span class="line"><span class="keyword">val</span> (id, _) = book</span><br></pre></td></tr></table></figure>
 
       
     </div>
@@ -367,8 +387,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/03/30/下载失败的测试链接地址/" rel="next" title="下载失败的测试链接地址">
-                <i class="fa fa-chevron-left"></i> 下载失败的测试链接地址
+              <a href="/2018/08/26/QuarkDownloader-读写分离设置原型/" rel="next" title="QuarkDownloader 读写分离原型">
+                <i class="fa fa-chevron-left"></i> QuarkDownloader 读写分离原型
               </a>
             
           </div>
@@ -376,10 +396,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/06/04/下载模块使用文件内存映射来提供IO效率/" rel="prev" title="下载模块使用文件内存映射来提供IO效率">
-                下载模块使用文件内存映射来提供IO效率 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -497,7 +513,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#支付宝捐赠-（长按保存图片）："><span class="nav-number">1.</span> <span class="nav-text">支付宝捐赠 （长按保存图片）：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#微信捐赠-（长按保存图片）："><span class="nav-number">2.</span> <span class="nav-text">微信捐赠 （长按保存图片）：</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#val与var"><span class="nav-number">1.</span> <span class="nav-text">val与var</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#？"><span class="nav-number">2.</span> <span class="nav-text">？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#"><span class="nav-number">3.</span> <span class="nav-text">!!</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#-1"><span class="nav-number">4.</span> <span class="nav-text">::</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#-2"><span class="nav-number">5.</span> <span class="nav-text">?:</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#与"><span class="nav-number">6.</span> <span class="nav-text">== 与 ===</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#-3"><span class="nav-number">7.</span> <span class="nav-text">_</span></a></li></ol></div>
             
 
           </div>
