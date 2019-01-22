@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+<meta name="description" content="##前言 由于项目中需要使用验证QUIC协议，针对目前的QUIC协议的客户端支持，唯一的选择就是Chromium的Net库，所以方便后续的功能定制开发，就花了大部分时间来进行Net模块的编译和开发。 一些坑的感受Chromium作为一个庞大的工程，其文档和工具应该都非常完善，所以需要开发Chromium最好的就是Chromium本身提供的说明文档。 Chromium工程和依赖非常大，我这边去到了2">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Build Chromium Net For Android">
+<meta property="og:url" content="http://yoursite.com/2019/01/22/Build-Chromium-Net-For-Android/index.html">
+<meta property="og:site_name" content="伍中联(Vanda)的博客">
+<meta property="og:description" content="##前言 由于项目中需要使用验证QUIC协议，针对目前的QUIC协议的客户端支持，唯一的选择就是Chromium的Net库，所以方便后续的功能定制开发，就花了大部分时间来进行Net模块的编译和开发。 一些坑的感受Chromium作为一个庞大的工程，其文档和工具应该都非常完善，所以需要开发Chromium最好的就是Chromium本身提供的说明文档。 Chromium工程和依赖非常大，我这边去到了2">
+<meta property="og:updated_time" content="2019-01-22T07:55:45.871Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Build Chromium Net For Android">
+<meta name="twitter:description" content="##前言 由于项目中需要使用验证QUIC协议，针对目前的QUIC协议的客户端支持，唯一的选择就是Chromium的Net库，所以方便后续的功能定制开发，就花了大部分时间来进行Net模块的编译和开发。 一些坑的感受Chromium作为一个庞大的工程，其文档和工具应该都非常完善，所以需要开发Chromium最好的就是Chromium本身提供的说明文档。 Chromium工程和依赖非常大，我这边去到了2">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/01/22/Build-Chromium-Net-For-Android/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+  <title>Build Chromium Net For Android | 伍中联(Vanda)的博客</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">伍中联(Vanda)的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">当一切理所当然就没有你什么事了 当你说：“这个好麻烦，那么不要犹豫，主动出击”</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives<span class="badge">30</span>
+              </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/22/Build-Chromium-Net-For-Android/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="伍中联">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="伍中联(Vanda)的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Build Chromium Net For Android</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-01-22T15:18:20+08:00">2019-01-22</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>##前言</p>
+<p>由于项目中需要使用验证QUIC协议，针对目前的QUIC协议的客户端支持，唯一的选择就是Chromium的Net库，所以方便后续的功能定制开发，就花了大部分时间来进行Net模块的编译和开发。</p>
+<h2 id="一些坑的感受"><a href="#一些坑的感受" class="headerlink" title="一些坑的感受"></a>一些坑的感受</h2><p>Chromium作为一个庞大的工程，其文档和工具应该都非常完善，所以需要开发Chromium最好的就是Chromium本身提供的说明文档。</p>
+<p>Chromium工程和依赖非常大，我这边去到了25GB之多，这还是不包括系统本身的依赖。</p>
+<p>Chromium本身不支持Mac下的编译，所以我选择了使用Ubuntu来进行编译开发</p>
+<h2 id="Chromium"><a href="#Chromium" class="headerlink" title="Chromium"></a>Chromium</h2><p>站点：<a href="https://www.chromium.org/Home" target="_blank" rel="noopener">Chromium</a></p>
+<p>代码搜索功能：<a href="https://cs.chromium.org/" target="_blank" rel="noopener">代码搜索</a></p>
+<p>代码的搜索功能是非常有用的功能，能够快速的找到相关的代码引用，当然如果自己去搭建也是可以的（不过这个估计很麻烦，可以试试VSCode）</p>
+<h2 id="针对Android的代码获取"><a href="#针对Android的代码获取" class="headerlink" title="针对Android的代码获取"></a>针对Android的代码获取</h2><p>这里面有详细的操作流程</p>
+<p><a href="https://chromium.googlesource.com/chromium/src/+/master/docs/android_build_instructions.md" target="_blank" rel="noopener">获取代码</a></p>
+<p>获取代码需要能够访问Google的网络，由于不具备续传，所以断了就GG了。</p>
+<h2 id="Install-depot-tools"><a href="#Install-depot-tools" class="headerlink" title="Install depot_tools"></a>Install depot_tools</h2><p>获取depot_tools repository:</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="keyword">clone</span> <span class="title">https</span>://chromium.googlesource.com/chromium/tools/depot_tools.git</span><br></pre></td></tr></table></figure>
+<p>添加depot_tools到PATH<br><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="builtin-name">export</span> <span class="attribute">PATH</span>=<span class="string">"<span class="variable">$PATH</span>:/path/to/depot_tools"</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="获取代码"><a href="#获取代码" class="headerlink" title="获取代码"></a>获取代码</h2><figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir ~<span class="string">/chromium</span> &amp;&amp; <span class="keyword">cd</span> ~<span class="string">/chromium</span></span><br><span class="line">fetch <span class="params">--no-history</span> android</span><br></pre></td></tr></table></figure>
+<p>这样会快一点，另外这样的是最新的版本，如果需要切换到指定的版本，</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git fetch origin <span class="keyword">tag</span> <span class="title">73</span>.<span class="number">0.3657</span>.<span class="number">0</span></span><br></pre></td></tr></table></figure>
+<p>这个步骤会比较漫长，耐心等待吧。。。</p>
+<p>之后就参考官方的说明就可以了。</p>
+<h2 id="编译Cronet模块"><a href="#编译Cronet模块" class="headerlink" title="编译Cronet模块"></a>编译Cronet模块</h2><p>Chromium 采用 gn + ninja来构建的，通过一些配置选项来支持构建的。<br>如果clone下代码后并且已经安装好依赖后，Cronet模块位于 </p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">src<span class="regexp">/components/</span>cronet</span><br></pre></td></tr></table></figure>
+<p>这个是针对Android和iOS提供了net模块的支持，android文件夹里面有jni模块和Java层的api方法，jni不需要自己手动去编译，Chromium是通过注解来自动生成的。</p>
+<p>需要编译这个也很简单，在这个目录中有一个编译介绍的文档，我这边贴出来, 很详细了吧</p>
+<h1 id="Cronet-build-instructions"><a href="#Cronet-build-instructions" class="headerlink" title="Cronet build instructions"></a>Cronet build instructions</h1><p>[TOC]</p>
+<h2 id="Checking-out-the-code"><a href="#Checking-out-the-code" class="headerlink" title="Checking out the code"></a>Checking out the code</h2><p>Follow all the<br><a href="https://www.chromium.org/developers/how-tos/get-the-code" target="_blank" rel="noopener">Get the Code</a><br>instructions for your target platform up to and including running hooks.</p>
+<h2 id="Building-Cronet-for-development-and-debugging"><a href="#Building-Cronet-for-development-and-debugging" class="headerlink" title="Building Cronet for development and debugging"></a>Building Cronet for development and debugging</h2><p>To build Cronet for development and debugging purposes:</p>
+<p>First, <code>gn</code> is used to create ninja files targeting the intended platform, then<br><code>ninja</code> executes the ninja files to run the build.</p>
+<h3 id="Android-iOS-builds"><a href="#Android-iOS-builds" class="headerlink" title="Android / iOS builds"></a>Android / iOS builds</h3><pre><code class="shell"><span class="meta">$</span><span class="bash"> ./components/cronet/tools/cr_cronet.py gn --out_dir=out/Cronet</span>
+</code></pre>
+<p>If the build host is Linux, Android binaries will be built. If the build host is<br>macOS, iOS binaries will be built.</p>
+<p>Note: these commands clobber output of previously executed gn commands in<br><code>out/Cronet</code>. If <code>--out_dir</code> is left out, the output directory defaults to<br><code>out/Debug</code> for debug builds and <code>out/Release</code> for release builds (see below).</p>
+<p>If <code>--x86</code> option is specified, then a native library is built for Intel x86<br>architecture, and the output directory defaults to <code>out/Debug-x86</code> if<br>unspecified. This can be useful for running on mobile emulators.</p>
+<h3 id="Desktop-builds-targets-the-current-OS"><a href="#Desktop-builds-targets-the-current-OS" class="headerlink" title="Desktop builds (targets the current OS)"></a>Desktop builds (targets the current OS)</h3><p>TODO(caraitto): Specify how to target Chrome OS and Fuchsia.</p>
+<pre><code class="shell">gn gen out/Cronet
+</code></pre>
+<h3 id="Running-the-ninja-files"><a href="#Running-the-ninja-files" class="headerlink" title="Running the ninja files"></a>Running the ninja files</h3><p>Now, use the generated ninja files to execute the build against the<br><code>cronet_package</code> build target:</p>
+<pre><code class="shell"><span class="meta">$</span><span class="bash"> ninja -C out/Cronet cronet_package</span>
+</code></pre>
+<h2 id="Building-Cronet-mobile-for-releases"><a href="#Building-Cronet-mobile-for-releases" class="headerlink" title="Building Cronet mobile for releases"></a>Building Cronet mobile for releases</h2><p>To build Cronet with optimizations and with debug information stripped out:</p>
+<pre><code class="shell"><span class="meta">$</span><span class="bash"> ./components/cronet/tools/cr_cronet.py gn --release</span>
+<span class="meta">$</span><span class="bash"> ninja -C out/Release cronet_package</span>
+</code></pre>
+<p>Note: these commands clobber output of previously executed gn commands in<br><code>out/Release</code>.</p>
+<h2 id="Building-for-other-architectures"><a href="#Building-for-other-architectures" class="headerlink" title="Building for other architectures"></a>Building for other architectures</h2><p>By default ARMv7 32-bit executables are generated. To generate executables<br>targeting other architectures modify <a href="tools/cr_cronet.py">cr_cronet.py</a>‘s<br><code>gn_args</code> variable to include:</p>
+<ul>
+<li>For ARMv8 64-bit: <code>target_cpu=&quot;arm64&quot;</code></li>
+<li>For x86 32-bit: <code>target_cpu=&quot;x86&quot;</code></li>
+<li>For x86 64-bit: <code>target_cpu=&quot;x64&quot;</code></li>
+</ul>
+<p>Alternatively you can run <code>gn args {out_dir}</code> and modify arguments in the editor<br>that comes up. This has advantage of not changing <code>cr_cronet.py</code>.</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/13/半年来的一些总结/" rel="next" title="半年来的一些总结">
+                <i class="fa fa-chevron-left"></i> 半年来的一些总结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="伍中联" />
+            
+              <p class="site-author-name" itemprop="name">伍中联</p>
+              <p class="site-description motion-element" itemprop="description">珍惜在生命中遇到的每一个人</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">30</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一些坑的感受"><span class="nav-number">1.</span> <span class="nav-text">一些坑的感受</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Chromium"><span class="nav-number">2.</span> <span class="nav-text">Chromium</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#针对Android的代码获取"><span class="nav-number">3.</span> <span class="nav-text">针对Android的代码获取</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Install-depot-tools"><span class="nav-number">4.</span> <span class="nav-text">Install depot_tools</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#获取代码"><span class="nav-number">5.</span> <span class="nav-text">获取代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编译Cronet模块"><span class="nav-number">6.</span> <span class="nav-text">编译Cronet模块</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Cronet-build-instructions"><span class="nav-number"></span> <span class="nav-text">Cronet build instructions</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Checking-out-the-code"><span class="nav-number">1.</span> <span class="nav-text">Checking out the code</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Building-Cronet-for-development-and-debugging"><span class="nav-number">2.</span> <span class="nav-text">Building Cronet for development and debugging</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Android-iOS-builds"><span class="nav-number">2.1.</span> <span class="nav-text">Android / iOS builds</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Desktop-builds-targets-the-current-OS"><span class="nav-number">2.2.</span> <span class="nav-text">Desktop builds (targets the current OS)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Running-the-ninja-files"><span class="nav-number">2.3.</span> <span class="nav-text">Running the ninja files</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Building-Cronet-mobile-for-releases"><span class="nav-number">3.</span> <span class="nav-text">Building Cronet mobile for releases</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Building-for-other-architectures"><span class="nav-number">4.</span> <span class="nav-text">Building for other architectures</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">伍中联</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Gemini</a> v</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v="></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v="></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v="></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v="></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v="></script>
+<script type="text/javascript" src="/js/src/post-details.js?v="></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v="></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
