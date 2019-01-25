@@ -103,19 +103,22 @@
   <meta name="keywords" content="Hexo, NexT" />
 
 
-<meta name="description" content="常规下载 &amp;amp; 读写分离常见的文件下载手段其中一项是读写分离，也就是说利用空间换时间的方式来增加效率。 常规下载一般来说，常见的文件下载方式如下：  这种文件的下载方式也是我们常见的简单的文件下载，其中存在一些不足，  单线程进行文件的下载 网络IO和文件IO处于同一线程中，进行网络数据读取时，文件IO就处于block状态，进行文件IO时网络IO处于block状态，时间利用不高效 下载状态的">
+<meta name="description" content="VandaDownloader开源基于独立设计的浏览器下载原型的特性，重新设计、重构代码结构，使用Kotlin重新编写，开源地址： VandaDownloader 简易流程图  Demo 常规下载 &amp;amp; 读写分离常见的文件下载手段其中一项是读写分离，也就是说利用空间换时间的方式来增加效率。 常规下载一般来说，常见的文件下载方式如下：  这种文件的下载方式也是我们常见的简单的文件下载，其中存在">
 <meta property="og:type" content="article">
 <meta property="og:title" content="QuarkDownloader 读写分离原型">
 <meta property="og:url" content="http://yoursite.com/2018/08/26/QuarkDownloader-读写分离设置原型/index.html">
 <meta property="og:site_name" content="伍中联(Vanda)的博客">
-<meta property="og:description" content="常规下载 &amp;amp; 读写分离常见的文件下载手段其中一项是读写分离，也就是说利用空间换时间的方式来增加效率。 常规下载一般来说，常见的文件下载方式如下：  这种文件的下载方式也是我们常见的简单的文件下载，其中存在一些不足，  单线程进行文件的下载 网络IO和文件IO处于同一线程中，进行网络数据读取时，文件IO就处于block状态，进行文件IO时网络IO处于block状态，时间利用不高效 下载状态的">
+<meta property="og:description" content="VandaDownloader开源基于独立设计的浏览器下载原型的特性，重新设计、重构代码结构，使用Kotlin重新编写，开源地址： VandaDownloader 简易流程图  Demo 常规下载 &amp;amp; 读写分离常见的文件下载手段其中一项是读写分离，也就是说利用空间换时间的方式来增加效率。 常规下载一般来说，常见的文件下载方式如下：  这种文件的下载方式也是我们常见的简单的文件下载，其中存在">
+<meta property="og:image" content="http://yoursite.com/2018/08/26/QuarkDownloader-读写分离设置原型/img/callback.png">
+<meta property="og:image" content="http://yoursite.com/2018/08/26/QuarkDownloader-读写分离设置原型/img/download.png">
+<meta property="og:image" content="http://yoursite.com/2018/08/26/QuarkDownloader-读写分离设置原型/img/demo.jpg">
 <meta property="og:image" content="http://yoursite.com/2018/08/26/QuarkDownloader-读写分离设置原型/img/常规下载.png">
 <meta property="og:image" content="http://yoursite.com/2018/08/26/QuarkDownloader-读写分离设置原型/img/读写分离.png">
-<meta property="og:updated_time" content="2018-08-26T10:26:51.000Z">
+<meta property="og:updated_time" content="2019-01-25T09:49:37.605Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="QuarkDownloader 读写分离原型">
-<meta name="twitter:description" content="常规下载 &amp;amp; 读写分离常见的文件下载手段其中一项是读写分离，也就是说利用空间换时间的方式来增加效率。 常规下载一般来说，常见的文件下载方式如下：  这种文件的下载方式也是我们常见的简单的文件下载，其中存在一些不足，  单线程进行文件的下载 网络IO和文件IO处于同一线程中，进行网络数据读取时，文件IO就处于block状态，进行文件IO时网络IO处于block状态，时间利用不高效 下载状态的">
-<meta name="twitter:image" content="http://yoursite.com/2018/08/26/QuarkDownloader-读写分离设置原型/img/常规下载.png">
+<meta name="twitter:description" content="VandaDownloader开源基于独立设计的浏览器下载原型的特性，重新设计、重构代码结构，使用Kotlin重新编写，开源地址： VandaDownloader 简易流程图  Demo 常规下载 &amp;amp; 读写分离常见的文件下载手段其中一项是读写分离，也就是说利用空间换时间的方式来增加效率。 常规下载一般来说，常见的文件下载方式如下：  这种文件的下载方式也是我们常见的简单的文件下载，其中存在">
+<meta name="twitter:image" content="http://yoursite.com/2018/08/26/QuarkDownloader-读写分离设置原型/img/callback.png">
 
 
 
@@ -339,7 +342,12 @@
       
 
       
-        <h4 id="常规下载-amp-读写分离"><a href="#常规下载-amp-读写分离" class="headerlink" title="常规下载 &amp; 读写分离"></a>常规下载 &amp; 读写分离</h4><p>常见的文件下载手段其中一项是读写分离，也就是说利用空间换时间的方式来增加效率。</p>
+        <h4 id="VandaDownloader开源"><a href="#VandaDownloader开源" class="headerlink" title="VandaDownloader开源"></a>VandaDownloader开源</h4><p>基于独立设计的浏览器下载原型的特性，重新设计、重构代码结构，使用Kotlin重新编写，开源地址：</p>
+<p><a href="https://github.com/10045125/VandaDownloader" target="_blank" rel="noopener">VandaDownloader</a></p>
+<h4 id="简易流程图"><a href="#简易流程图" class="headerlink" title="简易流程图"></a>简易流程图</h4><img src="/2018/08/26/QuarkDownloader-读写分离设置原型/img/callback.png">
+<img src="/2018/08/26/QuarkDownloader-读写分离设置原型/img/download.png">
+<h4 id="Demo"><a href="#Demo" class="headerlink" title="Demo"></a>Demo</h4><img src="/2018/08/26/QuarkDownloader-读写分离设置原型/img/demo.jpg">
+<h4 id="常规下载-amp-读写分离"><a href="#常规下载-amp-读写分离" class="headerlink" title="常规下载 &amp; 读写分离"></a>常规下载 &amp; 读写分离</h4><p>常见的文件下载手段其中一项是读写分离，也就是说利用空间换时间的方式来增加效率。</p>
 <h5 id="常规下载"><a href="#常规下载" class="headerlink" title="常规下载"></a>常规下载</h5><p>一般来说，常见的文件下载方式如下：</p>
 <img src="/2018/08/26/QuarkDownloader-读写分离设置原型/img/常规下载.png">
 <p>这种文件的下载方式也是我们常见的简单的文件下载，其中存在一些不足，</p>
@@ -510,7 +518,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#常规下载-amp-读写分离"><span class="nav-number">1.</span> <span class="nav-text">常规下载 &amp; 读写分离</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#常规下载"><span class="nav-number">1.1.</span> <span class="nav-text">常规下载</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#读写分离"><span class="nav-number">1.2.</span> <span class="nav-text">读写分离</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#VandaDownloader开源"><span class="nav-number">1.</span> <span class="nav-text">VandaDownloader开源</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#简易流程图"><span class="nav-number">2.</span> <span class="nav-text">简易流程图</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Demo"><span class="nav-number">3.</span> <span class="nav-text">Demo</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#常规下载-amp-读写分离"><span class="nav-number">4.</span> <span class="nav-text">常规下载 &amp; 读写分离</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#常规下载"><span class="nav-number">4.1.</span> <span class="nav-text">常规下载</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#读写分离"><span class="nav-number">4.2.</span> <span class="nav-text">读写分离</span></a></li></ol></li></ol></div>
             
 
           </div>
