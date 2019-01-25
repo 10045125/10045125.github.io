@@ -109,7 +109,7 @@
 <meta property="og:url" content="http://yoursite.com/2019/01/22/Build-Chromium-Net-For-Android/index.html">
 <meta property="og:site_name" content="伍中联(Vanda)的博客">
 <meta property="og:description" content="##前言 由于项目中需要使用验证QUIC协议，针对目前的QUIC协议的客户端支持，唯一的选择就是Chromium的Net库，所以方便后续的功能定制开发，就花了大部分时间来进行Net模块的编译和开发。 一些坑的感受Chromium作为一个庞大的工程，其文档和工具应该都非常完善，所以需要开发Chromium最好的就是Chromium本身提供的说明文档。 Chromium工程和依赖非常大，我这边去到了2">
-<meta property="og:updated_time" content="2019-01-22T07:55:45.871Z">
+<meta property="og:updated_time" content="2019-01-25T07:13:08.570Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Build Chromium Net For Android">
 <meta name="twitter:description" content="##前言 由于项目中需要使用验证QUIC协议，针对目前的QUIC协议的客户端支持，唯一的选择就是Chromium的Net库，所以方便后续的功能定制开发，就花了大部分时间来进行Net模块的编译和开发。 一些坑的感受Chromium作为一个庞大的工程，其文档和工具应该都非常完善，所以需要开发Chromium最好的就是Chromium本身提供的说明文档。 Chromium工程和依赖非常大，我这边去到了2">
@@ -225,7 +225,7 @@
         
         <li class="menu-item menu-item-archives">
           <a href="/archives/" rel="section">
-            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives<span class="badge">30</span>
+            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives<span class="badge">31</span>
               </a>
         </li>
       
@@ -343,7 +343,7 @@
 <p>Chromium本身不支持Mac下的编译，所以我选择了使用Ubuntu来进行编译开发</p>
 <h2 id="Chromium"><a href="#Chromium" class="headerlink" title="Chromium"></a>Chromium</h2><p>站点：<a href="https://www.chromium.org/Home" target="_blank" rel="noopener">Chromium</a></p>
 <p>代码搜索功能：<a href="https://cs.chromium.org/" target="_blank" rel="noopener">代码搜索</a></p>
-<p>代码的搜索功能是非常有用的功能，能够快速的找到相关的代码引用，当然如果自己去搭建也是可以的（不过这个估计很麻烦，可以试试VSCode）</p>
+<p>代码的搜索功能是非常有用的功能，能够快速的找到相关的代码引用，当然如果自己去搭建也是可以的（目前我已经编译出Ubuntu的Chromium和Android的Chromium，能够顺利的进行debug，后续文章介绍如果操作）</p>
 <h2 id="针对Android的代码获取"><a href="#针对Android的代码获取" class="headerlink" title="针对Android的代码获取"></a>针对Android的代码获取</h2><p>这里面有详细的操作流程</p>
 <p><a href="https://chromium.googlesource.com/chromium/src/+/master/docs/android_build_instructions.md" target="_blank" rel="noopener">获取代码</a></p>
 <p>获取代码需要能够访问Google的网络，由于不具备续传，所以断了就GG了。</p>
@@ -419,6 +419,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/01/25/Chromium-net-的Cronet如何加入HostResolver/" rel="prev" title="Chromium net 的Cronet如何加入HostResolver">
+                Chromium net 的Cronet如何加入HostResolver <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -496,7 +500,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">30</span>
+                    <span class="site-state-item-count">31</span>
                     <span class="site-state-item-name">posts</span>
                   </a>
                 </div>
