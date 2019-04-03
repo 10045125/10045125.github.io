@@ -225,7 +225,7 @@
         
         <li class="menu-item menu-item-archives">
           <a href="/archives/" rel="section">
-            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives<span class="badge">34</span>
+            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives<span class="badge">36</span>
               </a>
         </li>
       
@@ -254,6 +254,265 @@
           <div id="content" class="content">
             
   <section id="posts" class="posts-expand">
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/02/Message、Handler、MessageQueue、Looper关系/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="伍中联">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="伍中联(Vanda)的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/04/02/Message、Handler、MessageQueue、Looper关系/" itemprop="url">Message、Handler、MessageQueue、Looper关系</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-04-02T11:23:40+08:00">2019-04-02</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          背景最近手头上有一些面试的任务，这个问题就是我比较常问面试者的问题，Android设计这样一个东西，理解源码后才能理解，才能更好的帮助我们进行更高层次的开发。所以就自己整理下，把阅读源码的思路记录下来。
+类图结构
+用一句话概括：
+Handler把Message放入到一个Looper的MessageQueue中，我们用Looper.prepare() 准备一个当前线程的Looper，然后通过Looper.loop()进行消息循环，Looper.loop()方法中会通过MessageQueue.next()来进行消息的获取，如果没有消息就会阻塞
+MessageMessage实现了Parcelable接口，所以Message是可以进行跨进程传输的，但是需要注意obj，这个obj也必须需要实现Parcelable，否则会抛异常。
+12345678910111213141516171819202122232425public void writeToParcel(Parcel dest, int flags) &#123;        if (callback != null) &#123; 
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2019/04/02/Message、Handler、MessageQueue、Looper关系/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/28/QUIC与TCP/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="伍中联">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="伍中联(Vanda)的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/03/28/QUIC与TCP/" itemprop="url">QUIC与TCP</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-03-28T15:23:31+08:00">2019-03-28</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          
+          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2019/03/28/QUIC与TCP/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
     
       
 
@@ -1341,286 +1600,6 @@ val与var12val 是常量var 是变量
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/26/QuarkDownloader-读写分离设置原型/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="伍中联">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="伍中联(Vanda)的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/08/26/QuarkDownloader-读写分离设置原型/" itemprop="url">QuarkDownloader 读写分离原型</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-08-26T17:07:16+08:00">2018-08-26</time>
-            
-
-            
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          VandaDownloader开源基于独立设计的浏览器下载原型的特性，重新设计、重构代码结构，使用Kotlin重新编写，开源地址：
-VandaDownloader
-简易流程图
-
-Demo
-常规下载 &amp; 读写分离常见的文件下载手段其中一项是读写分离，也就是说利用空间换时间的方式来增加效率。
-常规下载一般来说，常见的文件下载方式如下：
-
-这种文件的下载方式也是我们常见的简单的文件下载，其中存在一些不足，
-
-单线程进行文件的下载
-网络IO和文件IO处于同一线程中，进行网络数据读取时，文件IO就处于block状态，进行文件IO时网络IO处于block状态，时间利用不高效
-下载状态的回调也不应该有频繁的线程切换，回调不应该是文件下载线程直接进行回调
-
-读写分离读写分离的大致模型如下：
-
-读写分离的主要目的有几点：
-
-网络IO与文件IO相互不影响，不会block，当前线程负责网络数据的读取，没有文件IO的操作，当前线程网络数据读取就是最高效的
-文件IO全局采用单个线程，避免了系统资源的浪费，同时避免了多个线程同时进行IO是操作系统调度带来的资源竞争。
-每次读取segment时可以提供任务进
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2018/08/26/QuarkDownloader-读写分离设置原型/#more" rel="contents">
-              Read more &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/18/使用RecyclerView实现多tpye抽象需求/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="伍中联">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="伍中联(Vanda)的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/05/18/使用RecyclerView实现多tpye抽象需求/" itemprop="url">使用RecyclerView实现多type抽象需求</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-05-18T23:46:33+08:00">2018-05-18</time>
-            
-
-            
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          多Type需求   产品原型   
-   1最近在完成一个类型信息流产品，涉及到很多type类型
-   技术支撑   
-   1在技术层面上，通过RecyclerView的ViewHolder，抽象业务逻辑，结合不同的type来注册不同的ViewHolder，然后各自ViewHolder处理对应样式的逻辑和业务
-抽象业务主要有两部分，一部分是支持多type本身的Adapter的抽象，一部分是由数据驱动列表的数据解析，同时包含后端的数据构建。
-
-数据原型：12345678910111213141516171819202122232425262728293031&#123;	"data": &#123;		"list": [			&#123;				"cardType": "cardType_1",				"description": "",				"pic": "",				"title": "",				"id": "14499",				"count": "1"			&#125;,			&#123;				"cardType": "cardType_2",				"video": "
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2018/05/18/使用RecyclerView实现多tpye抽象需求/#more" rel="contents">
-              Read more &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1672,7 +1651,7 @@ Demo
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">34</span>
+                    <span class="site-state-item-count">36</span>
                     <span class="site-state-item-name">posts</span>
                   </a>
                 </div>
