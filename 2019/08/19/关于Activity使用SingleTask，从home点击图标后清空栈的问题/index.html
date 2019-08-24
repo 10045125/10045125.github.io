@@ -103,25 +103,25 @@
   <meta name="keywords" content="Hexo, NexT" />
 
 
-<meta name="description" content="广州我职业生涯开始的地方UC我奋斗成长收获的地方感谢你们！  世界这么小，所以微笑面对 新坐标杭州（浙江-杭州-余杭-阿里西溪园区）记录下我在UC的美好时光入职UC，在UC是工作开心、玩也开心。那个时候还玩着dota，跟着彬哥和成哥一起玩dota，然后认识了很多大佬（其实大佬们也爱玩游戏），可能是我游戏玩得比较好（自夸），和大佬们玩我都会默默的买组眼、买好小鸡（毕竟大佬们先发育）^ _ ^。 成">
+<meta name="description" content="问题背景 如果从桌面启动的MainActivity的launchMode=SingleTask，那么当app调用其他的Activity时，用户回到home键回到桌面，再次进入App时，原来的界面会消失，直接显示在来MainActivity所在的页面  Activity的四种运行模式Standard 默认模式，允许多个Activity实例  SingleTop 相比于standard，有新的启动请求">
 <meta property="og:type" content="article">
-<meta property="og:title" content="再见了广州">
-<meta property="og:url" content="http://yoursite.com/2018/02/06/再见了广州/index.html">
+<meta property="og:title" content="关于Activity使用SingleTask，从home点击图标后清空栈的问题">
+<meta property="og:url" content="http://yoursite.com/2019/08/19/关于Activity使用SingleTask，从home点击图标后清空栈的问题/index.html">
 <meta property="og:site_name" content="伍中联(Vanda)的博客">
-<meta property="og:description" content="广州我职业生涯开始的地方UC我奋斗成长收获的地方感谢你们！  世界这么小，所以微笑面对 新坐标杭州（浙江-杭州-余杭-阿里西溪园区）记录下我在UC的美好时光入职UC，在UC是工作开心、玩也开心。那个时候还玩着dota，跟着彬哥和成哥一起玩dota，然后认识了很多大佬（其实大佬们也爱玩游戏），可能是我游戏玩得比较好（自夸），和大佬们玩我都会默默的买组眼、买好小鸡（毕竟大佬们先发育）^ _ ^。 成">
-<meta property="og:image" content="http://yoursite.com/2018/02/06/再见了广州/img/smile.jpg">
-<meta property="og:updated_time" content="2018-02-06T08:07:27.000Z">
+<meta property="og:description" content="问题背景 如果从桌面启动的MainActivity的launchMode=SingleTask，那么当app调用其他的Activity时，用户回到home键回到桌面，再次进入App时，原来的界面会消失，直接显示在来MainActivity所在的页面  Activity的四种运行模式Standard 默认模式，允许多个Activity实例  SingleTop 相比于standard，有新的启动请求">
+<meta property="og:image" content="http://yoursite.com/2019/08/19/关于Activity使用SingleTask，从home点击图标后清空栈的问题/img/SingleTask.png">
+<meta property="og:updated_time" content="2019-08-24T09:56:13.156Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="再见了广州">
-<meta name="twitter:description" content="广州我职业生涯开始的地方UC我奋斗成长收获的地方感谢你们！  世界这么小，所以微笑面对 新坐标杭州（浙江-杭州-余杭-阿里西溪园区）记录下我在UC的美好时光入职UC，在UC是工作开心、玩也开心。那个时候还玩着dota，跟着彬哥和成哥一起玩dota，然后认识了很多大佬（其实大佬们也爱玩游戏），可能是我游戏玩得比较好（自夸），和大佬们玩我都会默默的买组眼、买好小鸡（毕竟大佬们先发育）^ _ ^。 成">
-<meta name="twitter:image" content="http://yoursite.com/2018/02/06/再见了广州/img/smile.jpg">
+<meta name="twitter:title" content="关于Activity使用SingleTask，从home点击图标后清空栈的问题">
+<meta name="twitter:description" content="问题背景 如果从桌面启动的MainActivity的launchMode=SingleTask，那么当app调用其他的Activity时，用户回到home键回到桌面，再次进入App时，原来的界面会消失，直接显示在来MainActivity所在的页面  Activity的四种运行模式Standard 默认模式，允许多个Activity实例  SingleTop 相比于standard，有新的启动请求">
+<meta name="twitter:image" content="http://yoursite.com/2019/08/19/关于Activity使用SingleTask，从home点击图标后清空栈的问题/img/SingleTask.png">
 
 
 
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/02/06/再见了广州/"/>
+  <link rel="canonical" href="http://yoursite.com/2019/08/19/关于Activity使用SingleTask，从home点击图标后清空栈的问题/"/>
 
 
 
@@ -130,7 +130,7 @@
     sidebar: "",
   };
 </script>
-  <title>再见了广州 | 伍中联(Vanda)的博客</title>
+  <title>关于Activity使用SingleTask，从home点击图标后清空栈的问题 | 伍中联(Vanda)的博客</title>
   
 
 
@@ -272,7 +272,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/06/再见了广州/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/19/关于Activity使用SingleTask，从home点击图标后清空栈的问题/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="伍中联">
@@ -289,7 +289,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">再见了广州</h1>
+          <h1 class="post-title" itemprop="name headline">关于Activity使用SingleTask，从home点击图标后清空栈的问题</h1>
         
 
         <div class="post-meta">
@@ -301,7 +301,7 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-02-06T11:35:37+08:00">2018-02-06</time>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-08-19T11:14:54+08:00">2019-08-19</time>
             
 
             
@@ -338,20 +338,34 @@
       
 
       
-        <blockquote>
-<p>广州<br>我职业生涯开始的地方<br>UC<br>我奋斗成长收获的地方<br>感谢你们！</p>
+        <h2 id="问题背景"><a href="#问题背景" class="headerlink" title="问题背景"></a>问题背景</h2><blockquote>
+<p>如果从桌面启动的MainActivity的launchMode=SingleTask，那么当app调用其他的Activity时，用户回到home键回到桌面，再次进入App时，原来的界面会消失，直接显示在来MainActivity所在的页面</p>
 </blockquote>
-<h4 id="世界这么小，所以微笑面对"><a href="#世界这么小，所以微笑面对" class="headerlink" title="世界这么小，所以微笑面对"></a>世界这么小，所以微笑面对</h4><img src="/2018/02/06/再见了广州/img/smile.jpg">
-<h4 id="新坐标"><a href="#新坐标" class="headerlink" title="新坐标"></a>新坐标</h4><h5 id="杭州（浙江-杭州-余杭-阿里西溪园区）"><a href="#杭州（浙江-杭州-余杭-阿里西溪园区）" class="headerlink" title="杭州（浙江-杭州-余杭-阿里西溪园区）"></a>杭州（浙江-杭州-余杭-阿里西溪园区）</h5><h4 id="记录下我在UC的美好时光"><a href="#记录下我在UC的美好时光" class="headerlink" title="记录下我在UC的美好时光"></a>记录下我在UC的美好时光</h4><p>入职UC，在UC是工作开心、玩也开心。<br>那个时候还玩着dota，跟着彬哥和成哥一起玩dota，然后认识了很多大佬（其实大佬们也爱玩游戏），可能是我游戏玩得比较好（自夸），和大佬们玩我都会默默的买组眼、买好小鸡（毕竟大佬们先发育）^ _ ^。</p>
-<p>成哥 — 脾气好技术也溜的man（成哥应该是玩小黑的，老手抖）<br>彬哥 — 集美貌、智慧、才华于一身的老大（嗯，彬哥的全能还是很到位的）</p>
-<p>超哥 — 我们的产品大佬，玩游戏也溜（混沌还是很溜的）<br>花哥 — 游戏中的花哥怼起队友来，哈哈哈（脑补画面），花哥的白牛冲出去就回不来了。</p>
-<p>默哥 — 很佩服默哥处理事情的能力，稳重、得体。反正描述不过来，很厉害的市场营销大佬，默哥的拿手英雄是蚂蚁 (^ ^)</p>
-<p>转眼2年半的时间过去了，从UC到夸克，是付出、成长、收获的</p>
-<h4 id="记录下我在夸克的美好时光"><a href="#记录下我在夸克的美好时光" class="headerlink" title="记录下我在夸克的美好时光"></a>记录下我在夸克的美好时光</h4><p>当得知公司要成立新的项目组的时候，我主动申请过去，我觉得我自己适合这样的场景，同时也能够让自己有一个更好的成长过程。说到夸克，不得不提我的老大志明了。</p>
-<p>我接触过UC系的挺多的App代码架构，大部分都和UC雷同，但夸克改变了，扬长避短，夸克的App质量也非常高。这一切得益于志明老大早期的应用架构设计上的改变，同时增加单元测试，MVP，代码解耦，SDK化上。</p>
-<p>夸克组每个研发都很nice</p>
-<p>志明 — 对代码架构、技术前瞻性、App质量、功能输出很有想法的老大<br>锋锋 — UC公认的UI大神，没有之一<br>惠均 — 美貌于才华的骚气十足的文艺男青年，卧槽，我感觉我在欺骗自己<br>太虚真人 — 可能是真的太虚了吧，哈哈哈，做事条理性很强，不愧是名校毕业的。<br>xiangsheng — 卧槽，字太难打了，负责测试研发这块，还是给夸克带来了很多工作的，毕竟老年人了（哈哈哈）。<br>智艺 — 在我印象中，你就是游戏少年啊啊啊，哈哈哈，一个人负责夸克的这段时间也很溜了。</p>
-<p>不管未来身处何方，记得给自己鼓掌加油，有机会我们杭州见！！！</p>
+<h2 id="Activity的四种运行模式"><a href="#Activity的四种运行模式" class="headerlink" title="Activity的四种运行模式"></a>Activity的四种运行模式</h2><h3 id="Standard"><a href="#Standard" class="headerlink" title="Standard"></a>Standard</h3><ul>
+<li>默认模式，允许多个Activity实例</li>
+</ul>
+<h3 id="SingleTop"><a href="#SingleTop" class="headerlink" title="SingleTop"></a>SingleTop</h3><ul>
+<li>相比于<code>standard</code>，有新的启动请求时，只有在目标<code>Activity</code>处于当前栈顶时，才会调用<code>onNewIntent()</code>而不创建新实例，其他情况都和<code>standard</code>一致</li>
+</ul>
+<h3 id="SingleTask"><a href="#SingleTask" class="headerlink" title="SingleTask"></a>SingleTask</h3><ul>
+<li>设置了<code>singleTask</code>启动模式的<code>Activity</code>，它在启动的时候，会先在系统中查找属性值<code>affinity</code>等于它的属性值<code>taskAffinity</code>的任务存在；如果存在这样的任务，它就会在这个任务中启动，否则就会在新任务中启动。因此，如果我们想要设置了<code>singleTask</code>启动模式的<code>Activity</code>在新的任务中启动，就要为它设置一个独立的<code>taskAffinity</code>属性值。如果设置了<code>singleTask</code>启动模式的<code>Activity</code>不是在新的任务中启动时，它会在已有的任务中查看是否已经存在相应的<code>Activity</code>实例，如果存在，就会把位于这个<code>Activity</code>实例上面的<code>Activity</code>全部结束掉，即最终这个<code>Activity</code>实例会位于任务的堆栈顶端中。</li>
+</ul>
+<h3 id="SingleInstance"><a href="#SingleInstance" class="headerlink" title="SingleInstance"></a>SingleInstance</h3><ul>
+<li>和<code>singleTask</code>相比，不同点在于<code>singleInstance activity</code>所在的<code>task</code>只会有这一个<code>activity</code></li>
+</ul>
+<h2 id="原理分析"><a href="#原理分析" class="headerlink" title="原理分析"></a>原理分析</h2><img src="/2019/08/19/关于Activity使用SingleTask，从home点击图标后清空栈的问题/img/SingleTask.png">
+<p>按照我们应用的启动流程，首先进入的是MainActivity，这个时候再次进入一个其他的Activity，那么我们回到用户桌面，再次进入App，这个流程图大致是：</p>
+<blockquote>
+<p>start MainActivity -&gt; 首页 -&gt; 进入另外一个XActivity，从桌面进入App -&gt; MainActivity</p>
+</blockquote>
+<ul>
+<li>那么这个时候XActivity和MainActivity在同一个任务栈并且XActivity是在MainActivity之上</li>
+<li>当我们再次从桌面进入App的时候，这个时候系统会调用Launch属性的MainActivity，<code>由于MainActivity是SingleTask</code>会进行清除在其之上的Activity，将自己置于栈顶</li>
+</ul>
+<p>所以我们再次进入App后，原先进入的Activity页面不见了而显示了首页，就是因为MainActivity的SingleTask会进行清除其之上的Activity</p>
+<h2 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h2><h3 id="双Activity"><a href="#双Activity" class="headerlink" title="双Activity"></a>双Activity</h3><ul>
+<li>将LaunchActivity用做桥梁的作用，启动后将自己finish，每次启动App的时候LaunchActivity都是处于栈顶，而不是直接startMainActivity</li>
+</ul>
 
       
     </div>
@@ -376,8 +390,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/01/30/2018需要学习的事情/" rel="next" title="2018需要学习的事情">
-                <i class="fa fa-chevron-left"></i> 2018需要学习的事情
+              <a href="/2019/07/10/ADB-Dump-内存，Mat分析/" rel="next" title="ADB Dump 内存，Mat分析">
+                <i class="fa fa-chevron-left"></i> ADB Dump 内存，Mat分析
               </a>
             
           </div>
@@ -385,10 +399,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/02/24/2018-广州到杭州/" rel="prev" title="2018 广州到杭州">
-                2018 广州到杭州 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -506,7 +516,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#世界这么小，所以微笑面对"><span class="nav-number">1.</span> <span class="nav-text">世界这么小，所以微笑面对</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#新坐标"><span class="nav-number">2.</span> <span class="nav-text">新坐标</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#杭州（浙江-杭州-余杭-阿里西溪园区）"><span class="nav-number">2.1.</span> <span class="nav-text">杭州（浙江-杭州-余杭-阿里西溪园区）</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#记录下我在UC的美好时光"><span class="nav-number">3.</span> <span class="nav-text">记录下我在UC的美好时光</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#记录下我在夸克的美好时光"><span class="nav-number">4.</span> <span class="nav-text">记录下我在夸克的美好时光</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#问题背景"><span class="nav-number">1.</span> <span class="nav-text">问题背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Activity的四种运行模式"><span class="nav-number">2.</span> <span class="nav-text">Activity的四种运行模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Standard"><span class="nav-number">2.1.</span> <span class="nav-text">Standard</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SingleTop"><span class="nav-number">2.2.</span> <span class="nav-text">SingleTop</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SingleTask"><span class="nav-number">2.3.</span> <span class="nav-text">SingleTask</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SingleInstance"><span class="nav-number">2.4.</span> <span class="nav-text">SingleInstance</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#原理分析"><span class="nav-number">3.</span> <span class="nav-text">原理分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决办法"><span class="nav-number">4.</span> <span class="nav-text">解决办法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#双Activity"><span class="nav-number">4.1.</span> <span class="nav-text">双Activity</span></a></li></ol></li></ol></div>
             
 
           </div>
