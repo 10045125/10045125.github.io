@@ -110,7 +110,8 @@
 <meta property="og:site_name" content="伍中联(Vanda)的博客">
 <meta property="og:description" content="1. 背景在通过数据分析的过程中，发现我们在统计上无法统计到404的场景，透过数据去查问题，由于我们App使用OkHttp、Cronet的混合，通过动态调度来进行切换，这里主要是记录使用cronet遇到的问题。 2. Cronet使用模型Android Cronet是异步网络库（Java封装层），请求是异步，结果通过回调的方式；但是官方基于异步模型封装了一个同步请求的，接下来我们来介绍这2种方式。">
 <meta property="og:image" content="http://yoursite.com/2019/12/22/Cronet同步模型异步请求分析与完善/img/Cronet异步时序图.png">
-<meta property="og:updated_time" content="2019-12-22T13:10:23.331Z">
+<meta property="og:image" content="http://yoursite.com/2019/12/22/Cronet同步模型异步请求分析与完善/img/Cronet同步时序图.png">
+<meta property="og:updated_time" content="2019-12-22T13:19:19.877Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Cronet同步模型异步请求分析与完善">
 <meta name="twitter:description" content="1. 背景在通过数据分析的过程中，发现我们在统计上无法统计到404的场景，透过数据去查问题，由于我们App使用OkHttp、Cronet的混合，通过动态调度来进行切换，这里主要是记录使用cronet遇到的问题。 2. Cronet使用模型Android Cronet是异步网络库（Java封装层），请求是异步，结果通过回调的方式；但是官方基于异步模型封装了一个同步请求的，接下来我们来介绍这2种方式。">
@@ -366,11 +367,14 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> SUCCEEDED = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> FAILED = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> CANCELED = <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
 <p>如果在这里判断http code来决定是否读取数据，会导致监控数据缺失，所以这处应该要调用release</p>
 <p>或者 close 接口，但cronet 在java层并没有提供。</p>
-<h3 id="2-2-添加close接口"><a href="#2-2-添加close接口" class="headerlink" title="2.2 添加close接口"></a>2.2 添加close接口</h3><p>由于连接、ssl这块如果出现问题，会回调onFail，也会到底层Metric接口中，所有close处理以下2种场景</p>
+<h3 id="2-2-添加close接口"><a href="#2-2-添加close接口" class="headerlink" title="2.2 添加close接口"></a>2.2 添加close接口</h3><p>由于连接、ssl这块如果出现问题，会回调onFail，也会到底层Metric接口中，所有close只需要处理以下2种场景</p>
 <ul>
 <li>http层非成功的响应码（4xx、5xx这些）</li>
 <li>同步请求中，读超时（http code 200）</li>
 </ul>
+<h2 id="3-同步请求"><a href="#3-同步请求" class="headerlink" title="3 同步请求"></a>3 同步请求</h2><p>同步请求是使用UrlHttpConnection的接口来封装的，也就是同步调用的异步网络请求方式。</p>
+<p>比如下载场景的，同步接口调用的时序图：</p>
+<img src="/2019/12/22/Cronet同步模型异步请求分析与完善/img/Cronet同步时序图.png">
 
       
     </div>
@@ -521,7 +525,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-背景"><span class="nav-number">1.</span> <span class="nav-text">1. 背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Cronet使用模型"><span class="nav-number">2.</span> <span class="nav-text">2. Cronet使用模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-异步方式请求Cronet"><span class="nav-number">3.</span> <span class="nav-text">2.1 异步方式请求Cronet</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-添加close接口"><span class="nav-number">4.</span> <span class="nav-text">2.2 添加close接口</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-背景"><span class="nav-number">1.</span> <span class="nav-text">1. 背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Cronet使用模型"><span class="nav-number">2.</span> <span class="nav-text">2. Cronet使用模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-异步方式请求Cronet"><span class="nav-number">3.</span> <span class="nav-text">2.1 异步方式请求Cronet</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-添加close接口"><span class="nav-number">4.</span> <span class="nav-text">2.2 添加close接口</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-同步请求"><span class="nav-number"></span> <span class="nav-text">3 同步请求</span></a></div>
             
 
           </div>
