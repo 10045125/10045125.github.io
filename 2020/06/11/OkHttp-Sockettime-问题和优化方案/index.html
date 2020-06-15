@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+<meta name="description" content="背景OkHttp 在某些场景下，会出现SocketTimeout，然后一段时间内会有大量的超时情况（如果没有设置连接池，5min内(默认设置)），在网络统计的数据中，top的错误统计就是SocketTimeout。 这些问题的原因还需要从h2协议和连接池以及OkHttp的实现说起 OkHttp h2OkHttp 实现h2的协议  连接复用 同一个连接允许多个stream  如下图：   h2是建立">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OkHttp Sockettimeout 问题和优化方案">
+<meta property="og:url" content="http://yoursite.com/2020/06/11/OkHttp-Sockettime-问题和优化方案/index.html">
+<meta property="og:site_name" content="伍中联(Vanda)的博客">
+<meta property="og:description" content="背景OkHttp 在某些场景下，会出现SocketTimeout，然后一段时间内会有大量的超时情况（如果没有设置连接池，5min内(默认设置)），在网络统计的数据中，top的错误统计就是SocketTimeout。 这些问题的原因还需要从h2协议和连接池以及OkHttp的实现说起 OkHttp h2OkHttp 实现h2的协议  连接复用 同一个连接允许多个stream  如下图：   h2是建立">
+<meta property="og:image" content="http://yoursite.com/2020/06/11/OkHttp-Sockettime-问题和优化方案/h1-h2图解.png">
+<meta property="og:updated_time" content="2020-06-15T10:41:24.902Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="OkHttp Sockettimeout 问题和优化方案">
+<meta name="twitter:description" content="背景OkHttp 在某些场景下，会出现SocketTimeout，然后一段时间内会有大量的超时情况（如果没有设置连接池，5min内(默认设置)），在网络统计的数据中，top的错误统计就是SocketTimeout。 这些问题的原因还需要从h2协议和连接池以及OkHttp的实现说起 OkHttp h2OkHttp 实现h2的协议  连接复用 同一个连接允许多个stream  如下图：   h2是建立">
+<meta name="twitter:image" content="http://yoursite.com/2020/06/11/OkHttp-Sockettime-问题和优化方案/h1-h2图解.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/06/11/OkHttp-Sockettime-问题和优化方案/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+  <title>OkHttp Sockettimeout 问题和优化方案 | 伍中联(Vanda)的博客</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">伍中联(Vanda)的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">当一切理所当然就没有你什么事了 当你说：“这个好麻烦，那么不要犹豫，主动出击”</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives<span class="badge">43</span>
+              </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/11/OkHttp-Sockettime-问题和优化方案/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="伍中联">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="伍中联(Vanda)的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">OkHttp Sockettimeout 问题和优化方案</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-06-11T21:42:17+08:00">2020-06-11</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>OkHttp 在某些场景下，会出现SocketTimeout，然后一段时间内会有大量的超时情况（如果没有设置连接池，5min内(默认设置)），在网络统计的数据中，top的错误统计就是SocketTimeout。</p>
+<p>这些问题的原因还需要从h2协议和连接池以及OkHttp的实现说起</p>
+<h3 id="OkHttp-h2"><a href="#OkHttp-h2" class="headerlink" title="OkHttp h2"></a>OkHttp h2</h3><p>OkHttp 实现h2的协议</p>
+<ul>
+<li>连接复用</li>
+<li>同一个连接允许多个stream</li>
+</ul>
+<p>如下图：</p>
+<img src="/2020/06/11/OkHttp-Sockettime-问题和优化方案/h1-h2图解.png">
+<ul>
+<li>h2是建立在tcp上层的，上层的多路stream，tcp拥有的特性，h2协议照样存在（比如对头阻塞等）</li>
+<li>h2多个stream是在同一个连接，如果一个连接的请求数据出现丢包，那边该连接上的所以请求都会进行等待</li>
+</ul>
+<p>如果该条连接上出现超时，换句话说，就是这个连接连接不上Server，但是网络库并不知道，还是将相同的host的请求添加到该连接，那么势必会造成后续加入的请求都是不可用的。</p>
+<h3 id="OkHttp-ConnectionPool"><a href="#OkHttp-ConnectionPool" class="headerlink" title="OkHttp ConnectionPool"></a>OkHttp ConnectionPool</h3><p>连接池</p>
+<ul>
+<li>全局一个核心数为0，最大线程数量无限大的线程池</li>
+<li>缓存连接</li>
+<li>判断当前连接是否可用</li>
+<li>清理连接</li>
+</ul>
+<p>获取连接</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Deque&lt;RealConnection&gt; connections = <span class="keyword">new</span> ArrayDeque&lt;&gt;();</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">   * Returns a recycled connection to &#123;<span class="doctag">@code</span> address&#125;, or null if no such connection exists. The</span></span><br><span class="line"><span class="comment">   * route is null if the address has not yet been routed.</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  <span class="meta">@Nullable</span> <span class="function">RealConnection <span class="title">get</span><span class="params">(Address address, StreamAllocation streamAllocation, Route route)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">assert</span> (Thread.holdsLock(<span class="keyword">this</span>));</span><br><span class="line">    <span class="keyword">for</span> (RealConnection connection : connections) &#123;</span><br><span class="line">      <span class="keyword">if</span> (connection.isEligible(address, route)) &#123;</span><br><span class="line">        streamAllocation.acquire(connection, <span class="keyword">true</span>);</span><br><span class="line">        <span class="keyword">return</span> connection;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>通过get这个方法，我们可以知道</p>
+<ul>
+<li>通过遍历connections，获取RealConnection</li>
+<li>然后通过RealConnection的isEligible方法判断当前的这个连接是否符合要求的，如果符合条件则返回这个连接，否则返回一个null的值</li>
+</ul>
+<p>我们在看看isEligible（RealConnection.java）具体是做了哪些工作：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">  <span class="comment">/** Current streams carried by this connection. */</span></span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">final</span> List&lt;Reference&lt;StreamAllocation&gt;&gt; allocations = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">   * Returns true if this connection can carry a stream allocation to &#123;<span class="doctag">@code</span> address&#125;. If non-null</span></span><br><span class="line"><span class="comment">   * &#123;<span class="doctag">@code</span> route&#125; is the resolved route for a connection.</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isEligible</span><span class="params">(Address address, @Nullable Route route)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// If this connection is not accepting new streams, we're done.</span></span><br><span class="line">    <span class="keyword">if</span> (allocations.size() &gt;= allocationLimit || noNewStreams) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// If the non-host fields of the address don't overlap, we're done.</span></span><br><span class="line">    <span class="keyword">if</span> (!Internal.instance.equalsNonHost(<span class="keyword">this</span>.route.address(), address)) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// If the host exactly matches, we're done: this connection can carry the address.</span></span><br><span class="line">    <span class="keyword">if</span> (address.url().host().equals(<span class="keyword">this</span>.route().address().url().host())) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">true</span>; <span class="comment">// This connection is a perfect match.</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// At this point we don't have a hostname match. But we still be able to carry the request if</span></span><br><span class="line">    <span class="comment">// our connection coalescing requirements are met. See also:</span></span><br><span class="line">    <span class="comment">// https://hpbn.co/optimizing-application-delivery/#eliminate-domain-sharding</span></span><br><span class="line">    <span class="comment">// https://daniel.haxx.se/blog/2016/08/18/http2-connection-coalescing/</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 1. This connection must be HTTP/2.</span></span><br><span class="line">    <span class="keyword">if</span> (http2Connection == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 2. The routes must share an IP address. This requires us to have a DNS address for both</span></span><br><span class="line">    <span class="comment">// hosts, which only happens after route planning. We can't coalesce connections that use a</span></span><br><span class="line">    <span class="comment">// proxy, since proxies don't tell us the origin server's IP address.</span></span><br><span class="line">    <span class="keyword">if</span> (route == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">if</span> (route.proxy().type() != Proxy.Type.DIRECT) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.route.proxy().type() != Proxy.Type.DIRECT) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">if</span> (!<span class="keyword">this</span>.route.socketAddress().equals(route.socketAddress())) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 3. This connection's server certificate's must cover the new host.</span></span><br><span class="line">    <span class="keyword">if</span> (route.address().hostnameVerifier() != OkHostnameVerifier.INSTANCE) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">if</span> (!supportsUrl(address.url())) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 4. Certificate pinning must match the host.</span></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      address.certificatePinner().check(address.url().host(), handshake().peerCertificates());</span><br><span class="line">    &#125; <span class="keyword">catch</span> (SSLPeerUnverifiedException e) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>; <span class="comment">// The caller's address can be carried by this connection.</span></span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>优先判断了以下的条件：</p>
+<ol>
+<li>对于h2协议的连接 allocationLimit 是Integer.MAX_VALUE，所以h2协议的请求allocations.size() &gt;= allocationLimit 一般情况下是false， noNewStreams时设置该Connection是否能够加入新的请求流，如果设置为true，那边该连接设置为不可用，在后续的连接清理时会被清理掉</li>
+<li>判断当前的Connection的Address是否和参数中的Address是一直的值</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">/*Address.java*/</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">equalsNonHost</span><span class="params">(Address that)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">this</span>.dns.equals(that.dns)</span><br><span class="line">      &amp;&amp; <span class="keyword">this</span>.proxyAuthenticator.equals(that.proxyAuthenticator)</span><br><span class="line">      &amp;&amp; <span class="keyword">this</span>.protocols.equals(that.protocols)</span><br><span class="line">      &amp;&amp; <span class="keyword">this</span>.connectionSpecs.equals(that.connectionSpecs)</span><br><span class="line">      &amp;&amp; <span class="keyword">this</span>.proxySelector.equals(that.proxySelector)</span><br><span class="line">      &amp;&amp; equal(<span class="keyword">this</span>.proxy, that.proxy)</span><br><span class="line">      &amp;&amp; equal(<span class="keyword">this</span>.sslSocketFactory, that.sslSocketFactory)</span><br><span class="line">      &amp;&amp; equal(<span class="keyword">this</span>.hostnameVerifier, that.hostnameVerifier)</span><br><span class="line">      &amp;&amp; equal(<span class="keyword">this</span>.certificatePinner, that.certificatePinner)</span><br><span class="line">      &amp;&amp; <span class="keyword">this</span>.url().port() == that.url().port();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol>
+<li>判断当前Connection的host是否是同一个，如果是，结合1、2的条件判断，则这个连接就是复用的Connection</li>
+</ol>
+<p>后续的条件就不详细分析了，可以自己详细看。</p>
+<p>从连接池中获取一个可以复用的连接逻辑并不复杂，但是有几点需要注意，allocationLimit、noNewStreams这两个变量，控制着连接的可用性。</p>
+<p>接下来，我们看下如何使用连接池的连接获取的方法，上层对这个连接做了哪些处理。</p>
+<h3 id="StreamAllocation-使用连接的逻辑"><a href="#StreamAllocation-使用连接的逻辑" class="headerlink" title="StreamAllocation 使用连接的逻辑"></a>StreamAllocation 使用连接的逻辑</h3><p>顾名思义StreamAllocation是叫做流分配。</p>
+<ol>
+<li>创建一个流</li>
+<li>将流分配到一个Connection上</li>
+</ol>
+<p>我们关注点放在如何获取一个Connection上，先看下核心的代码逻辑：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> HttpCodec <span class="title">newStream</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">      OkHttpClient client, Interceptor.Chain chain, <span class="keyword">boolean</span> doExtensiveHealthChecks)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> connectTimeout = chain.connectTimeoutMillis();</span><br><span class="line">    <span class="keyword">int</span> readTimeout = chain.readTimeoutMillis();</span><br><span class="line">    <span class="keyword">int</span> writeTimeout = chain.writeTimeoutMillis();</span><br><span class="line">    <span class="keyword">int</span> pingIntervalMillis = client.pingIntervalMillis();</span><br><span class="line">    <span class="keyword">boolean</span> connectionRetryEnabled = client.retryOnConnectionFailure();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      RealConnection resultConnection = findHealthyConnection(connectTimeout, readTimeout,</span><br><span class="line">          writeTimeout, pingIntervalMillis, connectionRetryEnabled, doExtensiveHealthChecks);</span><br><span class="line">      HttpCodec resultCodec = resultConnection.newCodec(client, chain, <span class="keyword">this</span>);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">synchronized</span> (connectionPool) &#123;</span><br><span class="line">        codec = resultCodec;</span><br><span class="line">        <span class="keyword">return</span> resultCodec;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> RouteException(e);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * Finds a connection and returns it if it is healthy. If it is unhealthy the process is repeated</span></span><br><span class="line"><span class="comment">   * until a healthy connection is found.</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  <span class="function"><span class="keyword">private</span> RealConnection <span class="title">findHealthyConnection</span><span class="params">(<span class="keyword">int</span> connectTimeout, <span class="keyword">int</span> readTimeout,</span></span></span><br><span class="line"><span class="function"><span class="params">      <span class="keyword">int</span> writeTimeout, <span class="keyword">int</span> pingIntervalMillis, <span class="keyword">boolean</span> connectionRetryEnabled,</span></span></span><br><span class="line"><span class="function"><span class="params">      <span class="keyword">boolean</span> doExtensiveHealthChecks)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">      RealConnection candidate = findConnection(connectTimeout, readTimeout, writeTimeout,</span><br><span class="line">          pingIntervalMillis, connectionRetryEnabled);</span><br><span class="line"></span><br><span class="line">      <span class="comment">// If this is a brand new connection, we can skip the extensive health checks.</span></span><br><span class="line">      <span class="keyword">synchronized</span> (connectionPool) &#123;</span><br><span class="line">        <span class="keyword">if</span> (candidate.successCount == <span class="number">0</span>) &#123;</span><br><span class="line">          <span class="keyword">return</span> candidate;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// Do a (potentially slow) check to confirm that the pooled connection is still good. If it</span></span><br><span class="line">      <span class="comment">// isn't, take it out of the pool and start again.</span></span><br><span class="line">      <span class="keyword">if</span> (!candidate.isHealthy(doExtensiveHealthChecks)) &#123;</span><br><span class="line">        noNewStreams();</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">return</span> candidate;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>newStream的方法中调用findHealthyConnection查找一个健康可用的连接。findHealthyConnection通过findConnection来获取了一个候选的 candidate 的RealConnection，然后对这个RealConnection进行可用性检查。</p>
+<ul>
+<li>candidate的successCount为0，这个是一个新创建的连接，这跳过检查</li>
+<li>如果不是新创建的连接，会进行健康检查candidate.isHealthy(doExtensiveHealthChecks)，如果返回false，则调用noNewStreams()将RealConnection的noNewStreams设置为true</li>
+</ul>
+<p>我们重点关注下isHealthy这个方法的判断逻辑，如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">/** Returns true if this connection is ready to host new streams. */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isHealthy</span><span class="params">(<span class="keyword">boolean</span> doExtensiveChecks)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (socket.isClosed() || socket.isInputShutdown() || socket.isOutputShutdown()) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (http2Connection != <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> !http2Connection.isShutdown();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (doExtensiveChecks) &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="keyword">int</span> readTimeout = socket.getSoTimeout();</span><br><span class="line">      <span class="keyword">try</span> &#123;</span><br><span class="line">        socket.setSoTimeout(<span class="number">1</span>);</span><br><span class="line">        <span class="keyword">if</span> (source.exhausted()) &#123;</span><br><span class="line">          <span class="keyword">return</span> <span class="keyword">false</span>; <span class="comment">// Stream is exhausted; socket is closed.</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">      &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        socket.setSoTimeout(readTimeout);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (SocketTimeoutException ignored) &#123;</span><br><span class="line">      <span class="comment">// Read timed out; socket is good.</span></span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">false</span>; <span class="comment">// Couldn't read; socket is closed.</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>外部传的参数是true，那么就会做一个连接的全面检查。</p>
+<ul>
+<li>保存原来的读取超时时间，设置读超时为1ms，判断stream是否exhausted<br>在此处，如果出现SocketTimeoutException，OkHttp则认为该连接是可用的，然而我们线上出现了大量的SocketTimeout的情况，而且在本地的测试环境中也能够遇到经常性的超时，所以我们对这块进行了改造。</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/05/08/LeakCanary原理分析/" rel="next" title="LeakCanary原理分析">
+                <i class="fa fa-chevron-left"></i> LeakCanary原理分析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="伍中联" />
+            
+              <p class="site-author-name" itemprop="name">伍中联</p>
+              <p class="site-description motion-element" itemprop="description">珍惜在生命中遇到的每一个人</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">43</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OkHttp-h2"><span class="nav-number">2.</span> <span class="nav-text">OkHttp h2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OkHttp-ConnectionPool"><span class="nav-number">3.</span> <span class="nav-text">OkHttp ConnectionPool</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#StreamAllocation-使用连接的逻辑"><span class="nav-number">4.</span> <span class="nav-text">StreamAllocation 使用连接的逻辑</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">伍中联</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Gemini</a> v</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v="></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v="></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v="></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v="></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v="></script>
+<script type="text/javascript" src="/js/src/post-details.js?v="></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v="></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
