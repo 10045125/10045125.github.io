@@ -111,7 +111,9 @@
 <meta property="og:description" content="背景个人一直在从事某国际娱乐App的网络优化事项，最初的网络接口的形态相对比较涣散，为了能够更高效、稳定的进行网络优化，我们提出将App的网络进行组件化。经过进一步的讨论，我们提出了以下3个方面：  保持业务上层的使用不变，避免大面积的业务逻辑变动，从而给业务同学带来额外的使用成本 组件化抹平多网络库的上层稳定Api，提供稳定、可扩展的上层Api 在组件化中提供网络优化能力下沉，将网络优化能力在网">
 <meta property="og:image" content="http://yoursite.com/2020/11/25/多网络库组件化sdk/优化前的网络形态.png">
 <meta property="og:image" content="http://yoursite.com/2020/11/25/多网络库组件化sdk/优化后的网络形态.png">
-<meta property="og:updated_time" content="2020-11-24T17:20:44.396Z">
+<meta property="og:image" content="http://yoursite.com/2020/11/25/多网络库组件化sdk/网络请求流程.png">
+<meta property="og:image" content="http://yoursite.com/2020/11/25/多网络库组件化sdk/逻辑结构图.png">
+<meta property="og:updated_time" content="2020-11-24T17:37:08.002Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="多网络库组件化sdk">
 <meta name="twitter:description" content="背景个人一直在从事某国际娱乐App的网络优化事项，最初的网络接口的形态相对比较涣散，为了能够更高效、稳定的进行网络优化，我们提出将App的网络进行组件化。经过进一步的讨论，我们提出了以下3个方面：  保持业务上层的使用不变，避免大面积的业务逻辑变动，从而给业务同学带来额外的使用成本 组件化抹平多网络库的上层稳定Api，提供稳定、可扩展的上层Api 在组件化中提供网络优化能力下沉，将网络优化能力在网">
@@ -361,6 +363,15 @@
 <li>组件化网络中提供了Gson、Json、PB、文件下载（支持续传）、重试、网络库、域名的调度能力，能够进一步的提高容错能力</li>
 </ul>
 <h2 id="目前状态"><a href="#目前状态" class="headerlink" title="目前状态"></a>目前状态</h2><p>目前网络组件已经非常稳定，支撑了目前短链的所有请求。将使用和优化进行分离，业务同学不需要关系当前情况，而只需要简单的了解Api的使用，提高的业务开发对网络的复杂度。</p>
+<h2 id="组件化网络库的架构设计"><a href="#组件化网络库的架构设计" class="headerlink" title="组件化网络库的架构设计"></a>组件化网络库的架构设计</h2><p>我们先看看网络请求的流程结构图：</p>
+<img src="/2020/11/25/多网络库组件化sdk/网络请求流程.png">
+<ul>
+<li>网络请求流程大体分为以上的流程，该流程不涉及具体的网络库中的处理细节，这里注重的是网络组件化的处理（面向业务）</li>
+</ul>
+<h4 id="大致架构的结构图"><a href="#大致架构的结构图" class="headerlink" title="大致架构的结构图"></a>大致架构的结构图</h4><img src="/2020/11/25/多网络库组件化sdk/逻辑结构图.png">
+<ul>
+<li>网络组件化主要是面向业务，提供可扩展的业务能力，同时能够在组件化内完成网络优化细节</li>
+</ul>
 
       
     </div>
@@ -511,7 +522,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#优化前后的网络形态对比"><span class="nav-number">2.</span> <span class="nav-text">优化前后的网络形态对比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#目前状态"><span class="nav-number">3.</span> <span class="nav-text">目前状态</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#优化前后的网络形态对比"><span class="nav-number">2.</span> <span class="nav-text">优化前后的网络形态对比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#目前状态"><span class="nav-number">3.</span> <span class="nav-text">目前状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#组件化网络库的架构设计"><span class="nav-number">4.</span> <span class="nav-text">组件化网络库的架构设计</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#大致架构的结构图"><span class="nav-number">4.0.1.</span> <span class="nav-text">大致架构的结构图</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
