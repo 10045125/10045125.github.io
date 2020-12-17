@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+<meta name="description" content="I帧和IDR帧DR（Instantaneous Decoding Refresh）–即时解码刷新。  I帧与IDR帧的相同点在于：  I和IDR帧都是使用帧内预测的 都是同一个东西而已，在编码和解码中为了方便，要首个I帧和其他I帧区别开，所以才把第一个首个I帧叫IDR，这样就方便控制编码和解码流程   I帧与IDR帧的不同点在于：  IDR帧的作用是立刻刷新，使错误不致传播，从IDR帧开始，重新算">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【音视频开发】视频数据格式、Dash协议的了解">
+<meta property="og:url" content="http://yoursite.com/2020/12/15/【音视频开发】视频数据格式、Dash协议的了解/index.html">
+<meta property="og:site_name" content="伍中联(Vanda)的博客">
+<meta property="og:description" content="I帧和IDR帧DR（Instantaneous Decoding Refresh）–即时解码刷新。  I帧与IDR帧的相同点在于：  I和IDR帧都是使用帧内预测的 都是同一个东西而已，在编码和解码中为了方便，要首个I帧和其他I帧区别开，所以才把第一个首个I帧叫IDR，这样就方便控制编码和解码流程   I帧与IDR帧的不同点在于：  IDR帧的作用是立刻刷新，使错误不致传播，从IDR帧开始，重新算">
+<meta property="og:image" content="http://yoursite.com/2020/12/15/【音视频开发】视频数据格式、Dash协议的了解/img/mp4-farmat.jpeg">
+<meta property="og:image" content="http://yoursite.com/2020/12/15/【音视频开发】视频数据格式、Dash协议的了解/img/FMp4.png">
+<meta property="og:image" content="http://yoursite.com/2020/12/15/【音视频开发】视频数据格式、Dash协议的了解/img/FMP4-fragment.png">
+<meta property="og:image" content="http://yoursite.com/2020/12/15/【音视频开发】视频数据格式、Dash协议的了解/img/Dash-mpd.png">
+<meta property="og:image" content="http://yoursite.com/2020/12/15/【音视频开发】视频数据格式、Dash协议的了解/img/mp4-fmp4-dash.png">
+<meta property="og:image" content="http://yoursite.com/2020/12/15/【音视频开发】视频数据格式、Dash协议的了解/img/Dash-Timeline.png">
+<meta property="og:updated_time" content="2020-12-17T10:33:48.625Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【音视频开发】视频数据格式、Dash协议的了解">
+<meta name="twitter:description" content="I帧和IDR帧DR（Instantaneous Decoding Refresh）–即时解码刷新。  I帧与IDR帧的相同点在于：  I和IDR帧都是使用帧内预测的 都是同一个东西而已，在编码和解码中为了方便，要首个I帧和其他I帧区别开，所以才把第一个首个I帧叫IDR，这样就方便控制编码和解码流程   I帧与IDR帧的不同点在于：  IDR帧的作用是立刻刷新，使错误不致传播，从IDR帧开始，重新算">
+<meta name="twitter:image" content="http://yoursite.com/2020/12/15/【音视频开发】视频数据格式、Dash协议的了解/img/mp4-farmat.jpeg">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/12/15/【音视频开发】视频数据格式、Dash协议的了解/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+  <title>【音视频开发】视频数据格式、Dash协议的了解 | 伍中联(Vanda)的博客</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">伍中联(Vanda)的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">当一切理所当然就没有你什么事了 当你说：“这个好麻烦，那么不要犹豫，主动出击”</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives<span class="badge">45</span>
+              </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/12/15/【音视频开发】视频数据格式、Dash协议的了解/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="伍中联">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="伍中联(Vanda)的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【音视频开发】视频数据格式、Dash协议的了解</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-12-15T00:45:56+08:00">2020-12-15</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="I帧和IDR帧"><a href="#I帧和IDR帧" class="headerlink" title="I帧和IDR帧"></a>I帧和IDR帧</h2><p>DR（Instantaneous Decoding Refresh）–即时解码刷新。</p>
+<ul>
+<li><p>I帧与IDR帧的相同点在于：</p>
+<ul>
+<li>I和IDR帧都是使用帧内预测的</li>
+<li>都是同一个东西而已，在编码和解码中为了方便，要首个I帧和其他I帧区别开，所以才把第一个首个I帧叫IDR，这样就方便控制编码和解码流程</li>
+</ul>
+</li>
+<li><p>I帧与IDR帧的不同点在于：</p>
+<ul>
+<li>IDR帧的作用是立刻刷新，使错误不致传播，从IDR帧开始，重新算一个新的序列开始编码。而I帧不具有随机访问的能力，这个功能是由IDR承担</li>
+<li>IDR会导致DPB（DecodedPictureBuffer 参考帧列表——这是关键所在）清空，而I不会</li>
+<li>IDR图像一定是I图像，但I图像不一定是IDR图像</li>
+<li>一个序列中可以有很多的I图像，I图像之后的图像可以引用I图像之间的图像做运动参考；对于IDR帧来说，在IDR帧之后的所有帧都不能引用任何IDR帧之前的帧的内容，与此相反，对于普通的I-帧来说，位于其之后的B-和P-帧可以引用位于普通I-帧之前的I-帧</li>
+<li>从随机存取的视频流中，播放器永远可以从一个IDR帧播放，因为在它之后没有任何帧引用之前的帧。但是，不能在一个没有IDR帧的视频中从任意点开始播放，因为后面的帧总是会引用前面的帧</li>
+</ul>
+</li>
+</ul>
+<h2 id="MP4-格式"><a href="#MP4-格式" class="headerlink" title="MP4 格式"></a>MP4 格式</h2><img src="/2020/12/15/【音视频开发】视频数据格式、Dash协议的了解/img/mp4-farmat.jpeg">
+<h2 id="FMP4格式"><a href="#FMP4格式" class="headerlink" title="FMP4格式"></a>FMP4格式</h2><img src="/2020/12/15/【音视频开发】视频数据格式、Dash协议的了解/img/FMp4.png">
+<p>在Fragmented MP4文件中都有三个非常关键的 boxes：<code>moov</code>、<code>moof</code>和<code>mdat</code>。</p>
+<ol>
+<li>moov（movie metadata box）<br>和普通MP4文件的‘moov’一样，包含了file-level的metadata信息，用来描述file。</li>
+<li><code>mdat</code>（media data box）<br>和普通MP4文件的<code>mdat</code>一样，用于存放媒体数据，不同的是普通MP4文件只有一个<code>mdat</code> box，而Fragmented MP4文件中，每个fragment都会有一个<code>mdat</code>类型的box。</li>
+<li><code>moof</code>（movie fragment box）<br>该类型的box存放的是fragment-level的metadata信息，用于描述所在的fragment。该类型的box在普通的MP4文件中是不存在的，而在Fragmented MP4文件中，每个fragment都会有一个<code>moof</code>类型的box。</li>
+</ol>
+<p>一个<code>moof</code>和一个<code>mdat</code>组成Fragmented MP4文件的一个fragment，这个fragment包含一个video track或audio track，并且包含足够的metadata以保证这部分数据可以单独解码。Fragment的结构如下所示。</p>
+<img src="/2020/12/15/【音视频开发】视频数据格式、Dash协议的了解/img/FMP4-fragment.png">
+<h2 id="Dash描述文件"><a href="#Dash描述文件" class="headerlink" title="Dash描述文件"></a>Dash描述文件</h2><img src="/2020/12/15/【音视频开发】视频数据格式、Dash协议的了解/img/Dash-mpd.png">
+<ul>
+<li><p>MPD<br>媒体文件的描述文件（manifest），作用类似HLS的m3u8文件。MPD文件以XML格式组织</p>
+</li>
+<li><p>Representation<br>对应一个可选择的输出（alternative）。如，480p video，720p video, 44100采样 audio，22050采样audio，都使用Representation描述。</p>
+</li>
+<li><p>Segment（分片）<br>每个Representation会划分为多个Segment。Segment分为4类，其中，最重要的是：Initialization Segment（每个Representation都包含1个Init Seg），Media Segment（每个Representation的媒体内容包含若干Media Seg）</p>
+</li>
+</ul>
+<h2 id="格式之间的关系"><a href="#格式之间的关系" class="headerlink" title="格式之间的关系"></a>格式之间的关系</h2><img src="/2020/12/15/【音视频开发】视频数据格式、Dash协议的了解/img/mp4-fmp4-dash.png">
+<p>Dash中的数据对应的就是 FMP4 的不同数据块，FMP4每个数据块都能够单独的进行解码</p>
+<h2 id="Dash-FMP4-与-HLS-TS"><a href="#Dash-FMP4-与-HLS-TS" class="headerlink" title="Dash FMP4 与 HLS TS"></a>Dash FMP4 与 HLS TS</h2><h3 id="服务器的cache效率会降低"><a href="#服务器的cache效率会降低" class="headerlink" title="服务器的cache效率会降低"></a>服务器的cache效率会降低</h3><p>实际的streaming应用场景中，往往需要cdn的支持，经常会被client请求的媒体分片就会存在距离client最近的edge server上。对于fmp4 streaming的情况，因为需要的文件更少，cache命中率也就更高。<br>举个例子：可能某一个audio track会和其他各种video track组合，那么就可以将这个audio track放在edge server上，而不用每次都跟origin server去请求。</p>
+<p>相对地，在streaming TS流时，因为每一个音视频组合的都需要以复用文件的形式存储，组合数又非常多，相当于分母大了，edge server就会有很大的几率没有缓存需要的组合而要去向orgin server请求。</p>
+<h3 id="媒体文件存储成本和媒资管理成本增加"><a href="#媒体文件存储成本和媒资管理成本增加" class="headerlink" title="媒体文件存储成本和媒资管理成本增加"></a>媒体文件存储成本和媒资管理成本增加</h3><p>假设server端将video track编码为三个质量级别V1, V2, V3，audio track也被编码为三个质量级别A1, A2, A3，那么如果利用fmp4格式的特性，我们只需要存储这6份媒体文件，player在播放时再自主组合不同质量级别的音视频track即可。</p>
+<p>而对于TS，则不得不提前将3x3=9种不同的音视频复用情况对应的媒体文件都存储到server端，平白无故多出三份文件的存储成本。实际中，因为要考虑到大屏端、小屏端、移动端、桌面端、不同语言、不同字幕等各种情况，使用TS而造成的冗余成本将更加可观。同时，存储文件的增加也意味着媒资管理成本的增加。这也是包括Netflix在内的一些公司选择使用fmp4做streaming格式的原因。</p>
+<h3 id="manifest文件更加复杂"><a href="#manifest文件更加复杂" class="headerlink" title="manifest文件更加复杂"></a>manifest文件更加复杂</h3><p>fmp4格式的特性可以确保每一个单独的媒体分片都是可解密可解码的（当然player需要先从moov box中读到它们的编解码等信息），这意味着server端甚至根本不需要真的存储一大堆分片，player可以直接利用byte range request技术从一个大文件中准确地读出一个分片对应的media data，这也使得对应manifest(mpd)文件可以更加简洁。针对不同语言的音频，都只需要存一个大文件就够了。</p>
+<p>相对地，在streaming TS流时，不得不在manifest（m3u8）文件中把成百上千个ts分片文件全都老老实实地记录下来。</p>
+<h2 id="无缝码流切换"><a href="#无缝码流切换" class="headerlink" title="无缝码流切换"></a>无缝码流切换</h2><p>无缝码流切换实现的关键在于</p>
+<p>当第一个码流播放结束时，也就是发生切换的时间，第二个码流一定要以关键帧开始播放。在streaming TS流时，因为不能保证每一个TS chunk一定以关键帧开始，做码流切换时就意味着要同时download两个码流的相应分片，同时解析两个码流，然后找到关键帧对应的位置，才能切换。同时下载、解析两个码流的媒体内容对网络带宽以及设备性能都形成了挑战。而且有意思的是，如果当前网络环境不佳，player想要切换到低码率码流，结果还要在本来就不好的网络环境下同时进行两个码流的下载，可谓是雪上加霜。</p>
+<p>而在fmp4中，除了保证各个分片一定以IDR帧开始外，还能保证不同码流的分片之间在时间线上是对齐的。而且streaming fmp4流时因为不要求音视频复用存储，也就意味着视频和音频的同步点可以不一样，视频可以全都以GOP边界作为同步点，音频可以都以sync frame作为同步点，这都使得无缝码流切换更简单。</p>
+<ul>
+<li>平滑切换就是一定要切换的时候是以关键帧开始</li>
+</ul>
+<h2 id="Dash的大致流程"><a href="#Dash的大致流程" class="headerlink" title="Dash的大致流程"></a>Dash的大致流程</h2><img src="/2020/12/15/【音视频开发】视频数据格式、Dash协议的了解/img/Dash-Timeline.png">
+<h2 id="C-Dash-移植的方案"><a href="#C-Dash-移植的方案" class="headerlink" title="C++ Dash 移植的方案"></a>C++ Dash 移植的方案</h2><ul>
+<li>ffmpeg dash实现（C语言），一般都会基于ffmpeg的底层数据结构来完成dash的实现</li>
+<li>libdash （C++ 语言）库的时间相对比较老</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/11/25/多网络库组件化sdk/" rel="next" title="多网络库组件化sdk">
+                <i class="fa fa-chevron-left"></i> 多网络库组件化sdk
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="伍中联" />
+            
+              <p class="site-author-name" itemprop="name">伍中联</p>
+              <p class="site-description motion-element" itemprop="description">珍惜在生命中遇到的每一个人</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">45</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#I帧和IDR帧"><span class="nav-number">1.</span> <span class="nav-text">I帧和IDR帧</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MP4-格式"><span class="nav-number">2.</span> <span class="nav-text">MP4 格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#FMP4格式"><span class="nav-number">3.</span> <span class="nav-text">FMP4格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Dash描述文件"><span class="nav-number">4.</span> <span class="nav-text">Dash描述文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#格式之间的关系"><span class="nav-number">5.</span> <span class="nav-text">格式之间的关系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Dash-FMP4-与-HLS-TS"><span class="nav-number">6.</span> <span class="nav-text">Dash FMP4 与 HLS TS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#服务器的cache效率会降低"><span class="nav-number">6.1.</span> <span class="nav-text">服务器的cache效率会降低</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#媒体文件存储成本和媒资管理成本增加"><span class="nav-number">6.2.</span> <span class="nav-text">媒体文件存储成本和媒资管理成本增加</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#manifest文件更加复杂"><span class="nav-number">6.3.</span> <span class="nav-text">manifest文件更加复杂</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#无缝码流切换"><span class="nav-number">7.</span> <span class="nav-text">无缝码流切换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Dash的大致流程"><span class="nav-number">8.</span> <span class="nav-text">Dash的大致流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-Dash-移植的方案"><span class="nav-number">9.</span> <span class="nav-text">C++ Dash 移植的方案</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">伍中联</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Gemini</a> v</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v="></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v="></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v="></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v="></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v="></script>
+<script type="text/javascript" src="/js/src/post-details.js?v="></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v="></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
