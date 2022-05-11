@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.1.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"yoursite.com","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="VandaDownloader开源基于独立设计的浏览器下载原型的特性，重新设计、重构代码结构，使用Kotlin重新编写，开源地址： VandaDownloader 简易流程图  Demo 常规下载 &amp; 读写分离常见的文件下载手段其中一项是读写分离，也就是说利用空间换时间的方式来增加效率。 常规下载一般来说，常见的文件下载方式如下：  这种文件的下载方式也是我们常见的简单的文件下载，其中存在">
+<meta property="og:type" content="article">
+<meta property="og:title" content="QuarkDownloader 读写分离原型">
+<meta property="og:url" content="http://yoursite.com/2018/08/26/QuarkDownloader-%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%E8%AE%BE%E7%BD%AE%E5%8E%9F%E5%9E%8B/index.html">
+<meta property="og:site_name" content="伍中联(Vanda)的博客">
+<meta property="og:description" content="VandaDownloader开源基于独立设计的浏览器下载原型的特性，重新设计、重构代码结构，使用Kotlin重新编写，开源地址： VandaDownloader 简易流程图  Demo 常规下载 &amp; 读写分离常见的文件下载手段其中一项是读写分离，也就是说利用空间换时间的方式来增加效率。 常规下载一般来说，常见的文件下载方式如下：  这种文件的下载方式也是我们常见的简单的文件下载，其中存在">
+<meta property="og:locale">
+<meta property="og:image" content="http://yoursite.com/2018/08/26/QuarkDownloader-%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%E8%AE%BE%E7%BD%AE%E5%8E%9F%E5%9E%8B/img/callback.png">
+<meta property="og:image" content="http://yoursite.com/2018/08/26/QuarkDownloader-%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%E8%AE%BE%E7%BD%AE%E5%8E%9F%E5%9E%8B/img/download.png">
+<meta property="og:image" content="http://yoursite.com/2018/08/26/QuarkDownloader-%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%E8%AE%BE%E7%BD%AE%E5%8E%9F%E5%9E%8B/img/demo.jpg">
+<meta property="og:image" content="http://yoursite.com/2018/08/26/QuarkDownloader-%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%E8%AE%BE%E7%BD%AE%E5%8E%9F%E5%9E%8B/img/%E5%B8%B8%E8%A7%84%E4%B8%8B%E8%BD%BD.png">
+<meta property="og:image" content="http://yoursite.com/2018/08/26/QuarkDownloader-%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%E8%AE%BE%E7%BD%AE%E5%8E%9F%E5%9E%8B/img/%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB.png">
+<meta property="article:published_time" content="2018-08-26T09:07:16.000Z">
+<meta property="article:modified_time" content="2022-05-11T06:24:48.772Z">
+<meta property="article:author" content="伍中联">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2018/08/26/QuarkDownloader-%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%E8%AE%BE%E7%BD%AE%E5%8E%9F%E5%9E%8B/img/callback.png">
+
+
+<link rel="canonical" href="http://yoursite.com/2018/08/26/QuarkDownloader-%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%E8%AE%BE%E7%BD%AE%E5%8E%9F%E5%9E%8B/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"default","comments":true,"permalink":"http://yoursite.com/2018/08/26/QuarkDownloader-%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%E8%AE%BE%E7%BD%AE%E5%8E%9F%E5%9E%8B/","path":"2018/08/26/QuarkDownloader-读写分离设置原型/","title":"QuarkDownloader 读写分离原型"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>QuarkDownloader 读写分离原型 | 伍中联(Vanda)的博客</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">伍中联(Vanda)的博客</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">当一切理所当然就没有你什么事了 当你说：“这个好麻烦，那么不要犹豫，主动出击”</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="user fa-fw"></i>About</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#VandaDownloader%E5%BC%80%E6%BA%90"><span class="nav-number">1.</span> <span class="nav-text">VandaDownloader开源</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AE%80%E6%98%93%E6%B5%81%E7%A8%8B%E5%9B%BE"><span class="nav-number">2.</span> <span class="nav-text">简易流程图</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Demo"><span class="nav-number">3.</span> <span class="nav-text">Demo</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B8%B8%E8%A7%84%E4%B8%8B%E8%BD%BD-amp-%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB"><span class="nav-number">4.</span> <span class="nav-text">常规下载 &amp; 读写分离</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%B8%B8%E8%A7%84%E4%B8%8B%E8%BD%BD"><span class="nav-number">4.1.</span> <span class="nav-text">常规下载</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB"><span class="nav-number">4.2.</span> <span class="nav-text">读写分离</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="伍中联"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">伍中联</p>
+  <div class="site-description" itemprop="description">珍惜在生命中遇到的每一个人</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">46</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/10045125" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;10045125" rel="noopener" target="_blank"><i class="fab zhonglian-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/zhonglian.wzl@gmail.com" title="E-Mail → zhonglian.wzl@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="default">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/26/QuarkDownloader-%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%E8%AE%BE%E7%BD%AE%E5%8E%9F%E5%9E%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="伍中联">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="伍中联(Vanda)的博客">
+      <meta itemprop="description" content="珍惜在生命中遇到的每一个人">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="QuarkDownloader 读写分离原型 | 伍中联(Vanda)的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          QuarkDownloader 读写分离原型
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2018-08-26 17:07:16" itemprop="dateCreated datePublished" datetime="2018-08-26T17:07:16+08:00">2018-08-26</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2022-05-11 14:24:48" itemprop="dateModified" datetime="2022-05-11T14:24:48+08:00">2022-05-11</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h4 id="VandaDownloader开源"><a href="#VandaDownloader开源" class="headerlink" title="VandaDownloader开源"></a>VandaDownloader开源</h4><p>基于独立设计的浏览器下载原型的特性，重新设计、重构代码结构，使用Kotlin重新编写，开源地址：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/10045125/VandaDownloader">VandaDownloader</a></p>
+<h4 id="简易流程图"><a href="#简易流程图" class="headerlink" title="简易流程图"></a>简易流程图</h4><p><img src="/2018/08/26/QuarkDownloader-%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%E8%AE%BE%E7%BD%AE%E5%8E%9F%E5%9E%8B/img/callback.png"></p>
+<p><img src="/2018/08/26/QuarkDownloader-%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%E8%AE%BE%E7%BD%AE%E5%8E%9F%E5%9E%8B/img/download.png"></p>
+<h4 id="Demo"><a href="#Demo" class="headerlink" title="Demo"></a>Demo</h4><p><img src="/2018/08/26/QuarkDownloader-%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%E8%AE%BE%E7%BD%AE%E5%8E%9F%E5%9E%8B/img/demo.jpg"></p>
+<h4 id="常规下载-amp-读写分离"><a href="#常规下载-amp-读写分离" class="headerlink" title="常规下载 &amp; 读写分离"></a>常规下载 &amp; 读写分离</h4><p>常见的文件下载手段其中一项是读写分离，也就是说利用空间换时间的方式来增加效率。</p>
+<h5 id="常规下载"><a href="#常规下载" class="headerlink" title="常规下载"></a>常规下载</h5><p>一般来说，常见的文件下载方式如下：</p>
+<p><img src="/2018/08/26/QuarkDownloader-%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%E8%AE%BE%E7%BD%AE%E5%8E%9F%E5%9E%8B/img/%E5%B8%B8%E8%A7%84%E4%B8%8B%E8%BD%BD.png"></p>
+<p>这种文件的下载方式也是我们常见的简单的文件下载，其中存在一些不足，</p>
+<ol>
+<li>单线程进行文件的下载</li>
+<li>网络IO和文件IO处于同一线程中，进行网络数据读取时，文件IO就处于block状态，进行文件IO时网络IO处于block状态，时间利用不高效</li>
+<li>下载状态的回调也不应该有频繁的线程切换，回调不应该是文件下载线程直接进行回调</li>
+</ol>
+<h5 id="读写分离"><a href="#读写分离" class="headerlink" title="读写分离"></a>读写分离</h5><p>读写分离的大致模型如下：</p>
+<p><img src="/2018/08/26/QuarkDownloader-%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%E8%AE%BE%E7%BD%AE%E5%8E%9F%E5%9E%8B/img/%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB.png"></p>
+<p>读写分离的主要目的有几点：</p>
+<ol>
+<li>网络IO与文件IO相互不影响，不会block，当前线程负责网络数据的读取，没有文件IO的操作，当前线程网络数据读取就是最高效的</li>
+<li>文件IO全局采用单个线程，避免了系统资源的浪费，同时避免了多个线程同时进行IO是操作系统调度带来的资源竞争。</li>
+<li>每次读取segment时可以提供任务进度回调，而这个时候并没有进行文件IO操作，我们把数据保存在内存中<br>segment是一个双向链式结构，并且提供SegmentPool来缓存segment，避免系统GC和申请byte时的zero-fill。，这些数据块使用链表进行管理，这可以仅通过移动“指针”就进行数据的管理，而不用真正去处理数据，而且对扩容来说也十分方便。它对数据进行了分块处理，这样在大数据IO的时候可以以块为单位进行IO，这可以提高IO的吞吐率。</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/05/18/%E4%BD%BF%E7%94%A8RecyclerView%E5%AE%9E%E7%8E%B0%E5%A4%9Atpye%E6%8A%BD%E8%B1%A1%E9%9C%80%E6%B1%82/" rel="prev" title="使用RecyclerView实现多type抽象需求">
+                  <i class="fa fa-chevron-left"></i> 使用RecyclerView实现多type抽象需求
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/09/26/Kotlin-%E5%B8%B8%E8%A7%81%E7%9A%84%E4%B8%80%E4%BA%9B%E7%AC%A6%E5%8F%B7%E4%BD%9C%E7%94%A8/" rel="next" title="Kotlin 常见的一些符号作用">
+                  Kotlin 常见的一些符号作用 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">伍中联</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

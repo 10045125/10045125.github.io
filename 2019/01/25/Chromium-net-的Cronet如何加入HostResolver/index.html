@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.1.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"yoursite.com","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="背景这个是源于项目中为了减少DNS的解析时间，同时又能够使用Chromium的net库。 源码分析Cronet本身是编译了net库，同时提供了一个已经封装好的Java Api，不得不说Google考虑还是很周到的，但Cronet本身提供的Api接口比较少，通过json的配置又不能动态的去更新，所以就需要在dns解析的时候来获取应用层的已经解析的dns列表。 所以，通过java的源码，CronetU">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Chromium net 的Cronet如何加入HostResolver">
+<meta property="og:url" content="http://yoursite.com/2019/01/25/Chromium-net-%E7%9A%84Cronet%E5%A6%82%E4%BD%95%E5%8A%A0%E5%85%A5HostResolver/index.html">
+<meta property="og:site_name" content="伍中联(Vanda)的博客">
+<meta property="og:description" content="背景这个是源于项目中为了减少DNS的解析时间，同时又能够使用Chromium的net库。 源码分析Cronet本身是编译了net库，同时提供了一个已经封装好的Java Api，不得不说Google考虑还是很周到的，但Cronet本身提供的Api接口比较少，通过json的配置又不能动态的去更新，所以就需要在dns解析的时候来获取应用层的已经解析的dns列表。 所以，通过java的源码，CronetU">
+<meta property="og:locale">
+<meta property="article:published_time" content="2019-01-25T07:03:07.000Z">
+<meta property="article:modified_time" content="2019-01-25T09:33:35.000Z">
+<meta property="article:author" content="伍中联">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://yoursite.com/2019/01/25/Chromium-net-%E7%9A%84Cronet%E5%A6%82%E4%BD%95%E5%8A%A0%E5%85%A5HostResolver/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"default","comments":true,"permalink":"http://yoursite.com/2019/01/25/Chromium-net-%E7%9A%84Cronet%E5%A6%82%E4%BD%95%E5%8A%A0%E5%85%A5HostResolver/","path":"2019/01/25/Chromium-net-的Cronet如何加入HostResolver/","title":"Chromium net 的Cronet如何加入HostResolver"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Chromium net 的Cronet如何加入HostResolver | 伍中联(Vanda)的博客</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">伍中联(Vanda)的博客</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">当一切理所当然就没有你什么事了 当你说：“这个好麻烦，那么不要犹豫，主动出击”</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="user fa-fw"></i>About</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90"><span class="nav-number">2.</span> <span class="nav-text">源码分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HostResolver%E5%9F%9F%E5%90%8D%E8%A7%A3%E6%9E%90"><span class="nav-number">3.</span> <span class="nav-text">HostResolver域名解析</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="伍中联"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">伍中联</p>
+  <div class="site-description" itemprop="description">珍惜在生命中遇到的每一个人</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">46</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/10045125" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;10045125" rel="noopener" target="_blank"><i class="fab zhonglian-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/zhonglian.wzl@gmail.com" title="E-Mail → zhonglian.wzl@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="default">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/25/Chromium-net-%E7%9A%84Cronet%E5%A6%82%E4%BD%95%E5%8A%A0%E5%85%A5HostResolver/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="伍中联">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="伍中联(Vanda)的博客">
+      <meta itemprop="description" content="珍惜在生命中遇到的每一个人">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Chromium net 的Cronet如何加入HostResolver | 伍中联(Vanda)的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Chromium net 的Cronet如何加入HostResolver
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2019-01-25 15:03:07 / Modified: 17:33:35" itemprop="dateCreated datePublished" datetime="2019-01-25T15:03:07+08:00">2019-01-25</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>这个是源于项目中为了减少DNS的解析时间，同时又能够使用Chromium的net库。</p>
+<h2 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h2><p>Cronet本身是编译了net库，同时提供了一个已经封装好的Java Api，不得不说Google考虑还是很周到的，但Cronet本身提供的Api接口比较少，通过json的配置又不能动态的去更新，所以就需要在dns解析的时候来获取应用层的已经解析的dns列表。</p>
+<p>所以，通过java的源码，CronetUrlRequestContext.Java</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">@<span class="constructor">UsedByReflection(<span class="string">&quot;CronetEngine.java&quot;</span>)</span></span><br><span class="line">    public <span class="constructor">CronetUrlRequestContext(<span class="params">final</span> CronetEngineBuilderImpl <span class="params">builder</span>)</span> &#123;</span><br><span class="line">        mNetworkQualityEstimatorEnabled = builder.network<span class="constructor">QualityEstimatorEnabled()</span>;</span><br><span class="line">        <span class="module-access"><span class="module"><span class="identifier">CronetLibraryLoader</span>.</span></span>ensure<span class="constructor">Initialized(<span class="params">builder</span>.<span class="params">getContext</span>()</span>, builder);</span><br><span class="line">        <span class="keyword">if</span> (!IntegratedModeState.INTEGRATED_MODE_ENABLED) &#123;</span><br><span class="line">            native<span class="constructor">SetMinLogLevel(<span class="params">getLoggingLevel</span>()</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (builder.http<span class="constructor">CacheMode()</span><span class="operator"> == </span>HttpCacheType.DISK) &#123;</span><br><span class="line">            mInUseStoragePath = builder.storage<span class="constructor">Path()</span>;</span><br><span class="line">            synchronized (sInUseStoragePaths) &#123;</span><br><span class="line">                <span class="keyword">if</span> (!sInUseStoragePaths.add(mInUseStoragePath)) &#123;</span><br><span class="line">                    throw <span class="keyword">new</span> <span class="constructor">IllegalStateException(<span class="string">&quot;Disk cache storage path already in use&quot;</span>)</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            mInUseStoragePath = null;</span><br><span class="line">        &#125;</span><br><span class="line">        synchronized (mLock) &#123;</span><br><span class="line">            mUrlRequestContextAdapter =</span><br><span class="line">                    native<span class="constructor">CreateRequestContextAdapter(<span class="params">createNativeUrlRequestContextConfig</span>(<span class="params">builder</span>)</span>);</span><br><span class="line">            <span class="keyword">if</span> (mUrlRequestContextAdapter<span class="operator"> == </span><span class="number">0</span>) &#123;</span><br><span class="line">                throw <span class="keyword">new</span> <span class="constructor">NullPointerException(<span class="string">&quot;Context Adapter creation failed.&quot;</span>)</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Init native Chromium URLRequestContext on init thread.</span></span><br><span class="line">        <span class="module-access"><span class="module"><span class="identifier">CronetLibraryLoader</span>.</span></span>post<span class="constructor">ToInitThread(<span class="params">new</span> Runnable()</span> &#123;</span><br><span class="line">            @Override</span><br><span class="line">            public void run<span class="literal">()</span> &#123;</span><br><span class="line">                <span class="module-access"><span class="module"><span class="identifier">CronetLibraryLoader</span>.</span></span>ensure<span class="constructor">InitializedOnInitThread()</span>;</span><br><span class="line">                synchronized (mLock) &#123;</span><br><span class="line">                    <span class="comment">// mUrlRequestContextAdapter is guaranteed to exist until</span></span><br><span class="line">                    <span class="comment">// initialization on init and network threads completes and</span></span><br><span class="line">                    <span class="comment">// initNetworkThread is called back on network thread.</span></span><br><span class="line">                    native<span class="constructor">InitRequestContextOnInitThread(<span class="params">mUrlRequestContextAdapter</span>)</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>Api层通过CronetEngineBuilder 来构造所提供的参数，然后设置到Jni层。</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="module-access"><span class="module"><span class="identifier">CronetLibraryLoader</span>.</span></span>ensure<span class="constructor">Initialized(<span class="params">builder</span>.<span class="params">getContext</span>()</span>, builder);</span><br></pre></td></tr></table></figure>
+
+<p>这个先确定库的初始化。 然后在create native 的Config</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">synchronized </span>(mLock) &#123;</span><br><span class="line">           mUrlRequestContextAdapter =</span><br><span class="line">                   nativeCreateRequestContextAdapter(createNativeUrlRequestContextConfig(<span class="keyword">builder));</span></span><br><span class="line"><span class="keyword"></span>           if (mUrlRequestContextAdapter == <span class="number">0</span>) &#123;</span><br><span class="line">               throw new NullPointerException(<span class="string">&quot;Context Adapter creation failed.&quot;</span>);</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">               </span><br><span class="line">       @VisibleForTesting</span><br><span class="line">   public static long createNativeUrlRequestContextConfig(CronetEngineBuilderImpl <span class="keyword">builder) </span>&#123;</span><br><span class="line">       final long urlRequestContextConfig = nativeCreateRequestContextConfig(</span><br><span class="line">               <span class="keyword">builder.getUserAgent(), </span><span class="keyword">builder.storagePath(), </span><span class="keyword">builder.quicEnabled(),</span></span><br><span class="line"><span class="keyword"></span>               <span class="keyword">builder.getDefaultQuicUserAgentId(), </span><span class="keyword">builder.http2Enabled(),</span></span><br><span class="line"><span class="keyword"></span>               <span class="keyword">builder.brotliEnabled(), </span><span class="keyword">builder.cacheDisabled(), </span><span class="keyword">builder.httpCacheMode(),</span></span><br><span class="line"><span class="keyword"></span>               <span class="keyword">builder.httpCacheMaxSize(), </span><span class="keyword">builder.experimentalOptions(),</span></span><br><span class="line"><span class="keyword"></span>               <span class="keyword">builder.mockCertVerifier(), </span><span class="keyword">builder.networkQualityEstimatorEnabled(),</span></span><br><span class="line"><span class="keyword"></span>               <span class="keyword">builder.publicKeyPinningBypassForLocalTrustAnchorsEnabled(),</span></span><br><span class="line"><span class="keyword"></span>               <span class="keyword">builder.threadPriority(Process.THREAD_PRIORITY_BACKGROUND));</span></span><br><span class="line"><span class="keyword"></span>       for (CronetEngineBuilderImpl.QuicHint quicHint : <span class="keyword">builder.quicHints()) </span>&#123;</span><br><span class="line">           nativeAddQuicHint(urlRequestContextConfig, quicHint.mHost, quicHint.mPort,</span><br><span class="line">                   quicHint.mAlternatePort);</span><br><span class="line">       &#125;</span><br><span class="line">       for (CronetEngineBuilderImpl.Pkp pkp : <span class="keyword">builder.publicKeyPins()) </span>&#123;</span><br><span class="line">           nativeAddPkp(urlRequestContextConfig, pkp.mHost, pkp.mHashes, pkp.mIncludeSubdomains,</span><br><span class="line">                   pkp.mExpirationDate.getTime());</span><br><span class="line">       &#125;</span><br><span class="line">       return urlRequestContextConfig;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<p>优先是先创建 nativeCreateRequestContextConfig 创建配置，我们就可以延着这个native<br>调用栈来查看native处理流程，SDK有一行注释代码</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Native methods are implemented in cronet_url_request_context_adapter.cc.</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="type">static</span> native <span class="type">long</span> <span class="title">nativeCreateRequestContextConfig</span><span class="params">(<span class="type">String</span> userAgent,</span></span></span><br><span class="line"><span class="params"><span class="function">            <span class="type">String</span> storagePath, <span class="type">boolean</span> quicEnabled, <span class="type">String</span> quicUserAgentId, <span class="type">boolean</span> http2Enabled,</span></span></span><br><span class="line"><span class="params"><span class="function">            <span class="type">boolean</span> brotliEnabled, <span class="type">boolean</span> disableCache, <span class="type">int</span> httpCacheMode, <span class="type">long</span> httpCacheMaxSize,</span></span></span><br><span class="line"><span class="params"><span class="function">            <span class="type">String</span> experimentalOptions, <span class="type">long</span> mockCertVerifier,</span></span></span><br><span class="line"><span class="params"><span class="function">            <span class="type">boolean</span> enableNetworkQualityEstimator,</span></span></span><br><span class="line"><span class="params"><span class="function">            <span class="type">boolean</span> bypassPublicKeyPinningForLocalTrustAnchors, <span class="type">int</span> networkThreadPriority)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>cronet_url_request_context_adapter.cc 就是入口了，我们查看下这个类，找到如下函数：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Create a URLRequestContextConfig from the given parameters.</span>static jlong <span class="constructor">JNI_CronetUrlRequestContext_CreateRequestContextConfig(    JNIEnv<span class="operator">*</span> <span class="params">env</span>,    <span class="params">const</span> JavaParamRef&lt;<span class="params">jstring</span>&gt;&amp; <span class="params">juser_agent</span>,    <span class="params">const</span> JavaParamRef&lt;<span class="params">jstring</span>&gt;&amp; <span class="params">jstorage_path</span>,    <span class="params">jboolean</span> <span class="params">jquic_enabled</span>,    <span class="params">const</span> JavaParamRef&lt;<span class="params">jstring</span>&gt;&amp; <span class="params">jquic_default_user_agent_id</span>,    <span class="params">jboolean</span> <span class="params">jhttp2_enabled</span>,    <span class="params">jboolean</span> <span class="params">jbrotli_enabled</span>,    <span class="params">jboolean</span> <span class="params">jdisable_cache</span>,    <span class="params">jint</span> <span class="params">jhttp_cache_mode</span>,    <span class="params">jlong</span> <span class="params">jhttp_cache_max_size</span>,    <span class="params">const</span> JavaParamRef&lt;<span class="params">jstring</span>&gt;&amp; <span class="params">jexperimental_quic_connection_options</span>,    <span class="params">jlong</span> <span class="params">jmock_cert_verifier</span>,    <span class="params">jboolean</span> <span class="params">jenable_network_quality_estimator</span>,    <span class="params">jboolean</span> <span class="params">jbypass_public_key_pinning_for_local_trust_anchors</span>,    <span class="params">jint</span> <span class="params">jnetwork_thread_priority</span>)</span> &#123;  return reinterpret_cast&lt;jlong&gt;(<span class="keyword">new</span> <span class="constructor">URLRequestContextConfig(      <span class="params">jquic_enabled</span>,      ConvertNullableJavaStringToUTF8(<span class="params">env</span>, <span class="params">jquic_default_user_agent_id</span>)</span>,      jhttp2_enabled, jbrotli_enabled,      static_cast&lt;URLRequestContextConfig::HttpCacheType&gt;(jhttp_cache_mode),      jhttp_cache_max_size, jdisable_cache,      <span class="constructor">ConvertNullableJavaStringToUTF8(<span class="params">env</span>, <span class="params">jstorage_path</span>)</span>,      <span class="comment">/* accept_languages */</span> std::<span class="built_in">string</span><span class="literal">()</span>,      <span class="constructor">ConvertNullableJavaStringToUTF8(<span class="params">env</span>, <span class="params">juser_agent</span>)</span>,      <span class="constructor">ConvertNullableJavaStringToUTF8(<span class="params">env</span>,                                      <span class="params">jexperimental_quic_connection_options</span>)</span>,      base::<span class="constructor">WrapUnique(          <span class="params">reinterpret_cast</span>&lt;<span class="params">net</span>::CertVerifier<span class="operator">*</span>&gt;(<span class="params">jmock_cert_verifier</span>)</span>),      jenable_network_quality_estimator,      jbypass_public_key_pinning_for_local_trust_anchors,      jnetwork_thread_priority &gt;= -<span class="number">20</span><span class="operator"> &amp;&amp; </span>jnetwork_thread_priority &lt;= <span class="number">19</span>          ? base::Optional&lt;double&gt;(jnetwork_thread_priority)          : base::Optional&lt;double&gt;<span class="literal">()</span>));&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个是一个静态的函数，把Java端的参数传递到到URLRequestContextConfig这个类里面。 在Java层我们注意到这行代码：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">native<span class="constructor">CreateRequestContextAdapter(<span class="params">createNativeUrlRequestContextConfig</span>(<span class="params">builder</span>)</span>);</span><br></pre></td></tr></table></figure>
+
+<p>也就是说创建的配置项会传递给创建出来的CreateRequestContextAdapter类，我们看看jni的CreateRequestContextAdapter类的构造函数：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CronetURLRequestContextAdapter::<span class="constructor">CronetURLRequestContextAdapter(    <span class="params">std</span>::<span class="params">unique_ptr</span>&lt;URLRequestContextConfig&gt; <span class="params">context_config</span>)</span> &#123;  <span class="comment">// Create context and pass ownership of |this| (self) to the context.</span>  std::unique_ptr&lt;CronetURLRequestContextAdapter&gt; self(this);#<span class="keyword">if</span> <span class="constructor">BUILDFLAG(INTEGRATED_MODE)</span>  <span class="comment">// Create CronetURLRequestContext running in integrated network task runner.</span>  context_ =      <span class="keyword">new</span> <span class="constructor">CronetURLRequestContext(<span class="params">std</span>::<span class="params">move</span>(<span class="params">context_config</span>)</span>, std::move(self),                                  <span class="constructor">GetIntegratedModeNetworkTaskRunner()</span>);#<span class="keyword">else</span>  context_ =      <span class="keyword">new</span> <span class="constructor">CronetURLRequestContext(<span class="params">std</span>::<span class="params">move</span>(<span class="params">context_config</span>)</span>, std::move(self));#endif&#125;</span><br></pre></td></tr></table></figure>
+
+<p>从CronetURLRequestContextAdapter的构造函数中我们能过看到参数是URLRequestContextConfig，通过参数创建出CronetURLRequestContext，然后通过context_的上下文来进行Start等操作，所以进行参数解析的是在CronetURLRequestContext中，我们就看看CronetURLRequestContext做了什么事情，入口是构造函数：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CronetURLRequestContext::<span class="constructor">CronetURLRequestContext(    <span class="params">std</span>::<span class="params">unique_ptr</span>&lt;URLRequestContextConfig&gt; <span class="params">context_config</span>,    <span class="params">std</span>::<span class="params">unique_ptr</span>&lt;Callback&gt; <span class="params">callback</span>,    <span class="params">scoped_refptr</span>&lt;<span class="params">base</span>::SingleThreadTaskRunner&gt; <span class="params">network_task_runner</span>)</span>    : default<span class="constructor">_load_flags_(          <span class="params">net</span>::LOAD_NORMAL |          (<span class="params">context_config</span>-&gt;<span class="params">load_disable_cache</span> ? <span class="params">net</span>::LOAD_DISABLE_CACHE : 0)</span>),      network<span class="constructor">_tasks_(          <span class="params">new</span> NetworkTasks(<span class="params">std</span>::<span class="params">move</span>(<span class="params">context_config</span>)</span>, std::move(callback))),      network<span class="constructor">_task_runner_(<span class="params">network_task_runner</span>)</span> &#123;  <span class="keyword">if</span> (!network_task_runner_) &#123;    network_thread_ = std::make_unique&lt;base::Thread&gt;(<span class="string">&quot;network&quot;</span>);    base::Thread::Options options;    options.message_loop_type = base::MessageLoop::TYPE_IO;    network_thread_-&gt;<span class="constructor">StartWithOptions(<span class="params">options</span>)</span>;    network_task_runner_ = network_thread_-&gt;task<span class="constructor">_runner()</span>;  &#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>context_config 作为NetworkTasks的参数，我们看看NetworkTasks，不难发现NetworkTasks中正是进行参数转换的地方</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">void CronetURLRequestContext::NetworkTasks::<span class="constructor">Initialize(    <span class="params">scoped_refptr</span>&lt;<span class="params">base</span>::SingleThreadTaskRunner&gt; <span class="params">network_task_runner</span>,    <span class="params">scoped_refptr</span>&lt;<span class="params">base</span>::SequencedTaskRunner&gt; <span class="params">file_task_runner</span>,    <span class="params">std</span>::<span class="params">unique_ptr</span>&lt;<span class="params">net</span>::ProxyConfigService&gt; <span class="params">proxy_config_service</span>)</span> &#123;  <span class="constructor">DCHECK_CALLED_ON_VALID_THREAD(<span class="params">network_thread_checker_</span>)</span>;  <span class="constructor">DCHECK(!<span class="params">is_context_initialized_</span>)</span>;  std::unique_ptr&lt;URLRequestContextConfig&gt; config(std::move(context_config_));  network_task_runner_ = network_task_runner;  <span class="keyword">if</span> (config-&gt;network_thread_priority)    <span class="constructor">SetNetworkThreadPriorityOnNetworkThread(        <span class="params">config</span>-&gt;<span class="params">network_thread_priority</span>.<span class="params">value</span>()</span>);  base::<span class="constructor">DisallowBlocking()</span>;  net::URLRequestContextBuilder context_builder;  context_builder.set<span class="constructor">_network_delegate(      <span class="params">std</span>::<span class="params">make_unique</span>&lt;BasicNetworkDelegate&gt;()</span>);  context_builder.set<span class="constructor">_net_log(<span class="params">g_net_log</span>.Get()</span>.net<span class="constructor">_log()</span>);  context_builder.set<span class="constructor">_proxy_resolution_service(      <span class="params">cronet</span>::CreateProxyResolutionService(<span class="params">std</span>::<span class="params">move</span>(<span class="params">proxy_config_service</span>)</span>,                                           g_net_log.<span class="constructor">Get()</span>.net<span class="constructor">_log()</span>));  config-&gt;<span class="constructor">ConfigureURLRequestContextBuilder(&amp;<span class="params">context_builder</span>,                                            <span class="params">g_net_log</span>.Get()</span>.net<span class="constructor">_log()</span>);                                            </span><br></pre></td></tr></table></figure>
+
+<p>通过config来构建出 net::URLRequestContextBuilder，我们看看net::URLRequestContextBuilder的组成，其中有一行：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// By default host_resolver is constructed with CreateDefaultResolver.</span>  void set<span class="constructor">_host_resolver(<span class="params">std</span>::<span class="params">unique_ptr</span>&lt;HostResolver&gt; <span class="params">host_resolver</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>到这里我们就知道，其实CronetURLRequestContext 通过URLRequestContextConfig 来构建自己的URLRequestContextBuilder，URLRequestContextBuilder中包含了设置的所有参数。</p>
+<p>在回到我们的问题，我们是要解决自定义dns解析，而Java层没有接口来提供可选的设置项。在Java层可以通过设置ExperimentalOptions来配置不同的参数来开启功能，但这个一旦设置了不能动态更改。在url_request_context_config.cc 的 ParseAndSetExperimentalOptions 中有一段代码如下：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (async_dns_enable<span class="operator"> || </span>stale_dns_enable<span class="operator"> || </span>host_resolver_rules_enable<span class="operator"> ||      </span>disable_ipv6_on_wifi) &#123;    <span class="constructor">CHECK(<span class="params">net_log</span>)</span> &lt;&lt; <span class="string">&quot;All DNS-related experiments require NetLog.&quot;</span>;    std::unique_ptr&lt;net::HostResolver&gt; host_resolver;    <span class="keyword">if</span> (stale_dns_enable) &#123;      <span class="constructor">DCHECK(!<span class="params">disable_ipv6_on_wifi</span>)</span>;      host_resolver.reset(<span class="keyword">new</span> <span class="constructor">StaleHostResolver(          <span class="params">net</span>::HostResolver::CreateDefaultResolverImpl(<span class="params">net_log</span>)</span>,          stale_dns_options));    &#125; <span class="keyword">else</span> &#123;      host_resolver = net::HostResolver::<span class="constructor">CreateDefaultResolver(<span class="params">net_log</span>)</span>;    &#125;    <span class="keyword">if</span> (disable_ipv6_on_wifi)      host_resolver-&gt;<span class="constructor">SetNoIPv6OnWifi(<span class="params">true</span>)</span>;    <span class="keyword">if</span> (async_dns_enable)      host_resolver-&gt;<span class="constructor">SetDnsClientEnabled(<span class="params">true</span>)</span>;    <span class="keyword">if</span> (host_resolver_rules_enable) &#123;      std::unique_ptr&lt;net::MappedHostResolver&gt; remapped<span class="constructor">_resolver(          <span class="params">new</span> <span class="params">net</span>::MappedHostResolver(<span class="params">std</span>::<span class="params">move</span>(<span class="params">host_resolver</span>)</span>));      remapped_resolver-&gt;<span class="constructor">SetRulesFromString(<span class="params">host_resolver_rules_string</span>)</span>;      host_resolver = std::move(remapped_resolver);    &#125;    context_builder-&gt;set<span class="constructor">_host_resolver(<span class="params">std</span>::<span class="params">move</span>(<span class="params">host_resolver</span>)</span>);  &#125;</span><br></pre></td></tr></table></figure>
+
+<p>以上代码的作用就是在开启不同的值时可以提供域名对应的值，但这个只是局限于首次加载配置选项，后面无法更改。</p>
+<h2 id="HostResolver域名解析"><a href="#HostResolver域名解析" class="headerlink" title="HostResolver域名解析"></a>HostResolver域名解析</h2><p>HostResolver是域名解析的服务的接口，我们先看看这个接口做了什么事情。</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">virtual</span> <span class="built_in">int</span> <span class="constructor">Resolve(<span class="params">const</span> RequestInfo&amp; <span class="params">info</span>,                      RequestPriority <span class="params">priority</span>,                      AddressList<span class="operator">*</span> <span class="params">addresses</span>,                      CompletionOnceCallback <span class="params">callback</span>,                      <span class="params">std</span>::<span class="params">unique_ptr</span>&lt;Request&gt;<span class="operator">*</span> <span class="params">out_req</span>,                      <span class="params">const</span> NetLogWithSource&amp; <span class="params">net_log</span>)</span> = <span class="number">0</span>;                                      </span><br></pre></td></tr></table></figure>
+
+<p>这个方法的目的是将解析的ip存储到addresses中，所以，我们就能过在这个地方加入Java端的dns解析</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/01/22/Build-Chromium-Net-For-Android/" rel="prev" title="Build Chromium Net For Android">
+                  <i class="fa fa-chevron-left"></i> Build Chromium Net For Android
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/02/18/TCP%E5%8D%8F%E8%AE%AE%E7%9A%84%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E5%92%8C%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B/" rel="next" title="TCP协议的三次握手和四次挥手">
+                  TCP协议的三次握手和四次挥手 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">伍中联</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

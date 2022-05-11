@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.1.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"yoursite.com","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="背景个人一直在从事某国际娱乐App的网络优化事项，最初的网络接口的形态相对比较涣散，为了能够更高效、稳定的进行网络优化，我们提出将App的网络进行组件化。经过进一步的讨论，我们提出了以下3个方面：  保持业务上层的使用不变，避免大面积的业务逻辑变动，从而给业务同学带来额外的使用成本 组件化抹平多网络库的上层稳定Api，提供稳定、可扩展的上层Api 在组件化中提供网络优化能力下沉，将网络优化能力在网">
+<meta property="og:type" content="article">
+<meta property="og:title" content="多网络库组件化sdk">
+<meta property="og:url" content="http://yoursite.com/2020/11/25/%E5%A4%9A%E7%BD%91%E7%BB%9C%E5%BA%93%E7%BB%84%E4%BB%B6%E5%8C%96sdk/index.html">
+<meta property="og:site_name" content="伍中联(Vanda)的博客">
+<meta property="og:description" content="背景个人一直在从事某国际娱乐App的网络优化事项，最初的网络接口的形态相对比较涣散，为了能够更高效、稳定的进行网络优化，我们提出将App的网络进行组件化。经过进一步的讨论，我们提出了以下3个方面：  保持业务上层的使用不变，避免大面积的业务逻辑变动，从而给业务同学带来额外的使用成本 组件化抹平多网络库的上层稳定Api，提供稳定、可扩展的上层Api 在组件化中提供网络优化能力下沉，将网络优化能力在网">
+<meta property="og:locale">
+<meta property="og:image" content="http://yoursite.com/2020/11/25/%E5%A4%9A%E7%BD%91%E7%BB%9C%E5%BA%93%E7%BB%84%E4%BB%B6%E5%8C%96sdk/%E4%BC%98%E5%8C%96%E5%89%8D%E7%9A%84%E7%BD%91%E7%BB%9C%E5%BD%A2%E6%80%81.png">
+<meta property="og:image" content="http://yoursite.com/2020/11/25/%E5%A4%9A%E7%BD%91%E7%BB%9C%E5%BA%93%E7%BB%84%E4%BB%B6%E5%8C%96sdk/%E4%BC%98%E5%8C%96%E5%90%8E%E7%9A%84%E7%BD%91%E7%BB%9C%E5%BD%A2%E6%80%81.png">
+<meta property="og:image" content="http://yoursite.com/2020/11/25/%E5%A4%9A%E7%BD%91%E7%BB%9C%E5%BA%93%E7%BB%84%E4%BB%B6%E5%8C%96sdk/%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82%E6%B5%81%E7%A8%8B.png">
+<meta property="og:image" content="http://yoursite.com/2020/11/25/%E5%A4%9A%E7%BD%91%E7%BB%9C%E5%BA%93%E7%BB%84%E4%BB%B6%E5%8C%96sdk/%E9%80%BB%E8%BE%91%E7%BB%93%E6%9E%84%E5%9B%BE.png">
+<meta property="article:published_time" content="2020-11-24T16:52:00.000Z">
+<meta property="article:modified_time" content="2022-05-11T03:44:19.688Z">
+<meta property="article:author" content="伍中联">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2020/11/25/%E5%A4%9A%E7%BD%91%E7%BB%9C%E5%BA%93%E7%BB%84%E4%BB%B6%E5%8C%96sdk/%E4%BC%98%E5%8C%96%E5%89%8D%E7%9A%84%E7%BD%91%E7%BB%9C%E5%BD%A2%E6%80%81.png">
+
+
+<link rel="canonical" href="http://yoursite.com/2020/11/25/%E5%A4%9A%E7%BD%91%E7%BB%9C%E5%BA%93%E7%BB%84%E4%BB%B6%E5%8C%96sdk/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"default","comments":true,"permalink":"http://yoursite.com/2020/11/25/%E5%A4%9A%E7%BD%91%E7%BB%9C%E5%BA%93%E7%BB%84%E4%BB%B6%E5%8C%96sdk/","path":"2020/11/25/多网络库组件化sdk/","title":"多网络库组件化sdk"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>多网络库组件化sdk | 伍中联(Vanda)的博客</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">伍中联(Vanda)的博客</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">当一切理所当然就没有你什么事了 当你说：“这个好麻烦，那么不要犹豫，主动出击”</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="user fa-fw"></i>About</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%98%E5%8C%96%E5%89%8D%E5%90%8E%E7%9A%84%E7%BD%91%E7%BB%9C%E5%BD%A2%E6%80%81%E5%AF%B9%E6%AF%94"><span class="nav-number">2.</span> <span class="nav-text">优化前后的网络形态对比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%AE%E5%89%8D%E7%8A%B6%E6%80%81"><span class="nav-number">3.</span> <span class="nav-text">目前状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%84%E4%BB%B6%E5%8C%96%E7%BD%91%E7%BB%9C%E5%BA%93%E7%9A%84%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1"><span class="nav-number">4.</span> <span class="nav-text">组件化网络库的架构设计</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%A7%E8%87%B4%E6%9E%B6%E6%9E%84%E7%9A%84%E7%BB%93%E6%9E%84%E5%9B%BE"><span class="nav-number">4.0.1.</span> <span class="nav-text">大致架构的结构图</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="伍中联"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">伍中联</p>
+  <div class="site-description" itemprop="description">珍惜在生命中遇到的每一个人</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">46</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/10045125" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;10045125" rel="noopener" target="_blank"><i class="fab zhonglian-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/zhonglian.wzl@gmail.com" title="E-Mail → zhonglian.wzl@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="default">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/11/25/%E5%A4%9A%E7%BD%91%E7%BB%9C%E5%BA%93%E7%BB%84%E4%BB%B6%E5%8C%96sdk/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="伍中联">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="伍中联(Vanda)的博客">
+      <meta itemprop="description" content="珍惜在生命中遇到的每一个人">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="多网络库组件化sdk | 伍中联(Vanda)的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          多网络库组件化sdk
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2020-11-25 00:52:00" itemprop="dateCreated datePublished" datetime="2020-11-25T00:52:00+08:00">2020-11-25</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2022-05-11 11:44:19" itemprop="dateModified" datetime="2022-05-11T11:44:19+08:00">2022-05-11</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>个人一直在从事某国际娱乐App的网络优化事项，最初的网络接口的形态相对比较涣散，为了能够更高效、稳定的进行网络优化，我们提出将App的网络进行组件化。经过进一步的讨论，我们提出了以下3个方面：</p>
+<ul>
+<li>保持业务上层的使用不变，避免大面积的业务逻辑变动，从而给业务同学带来额外的使用成本</li>
+<li>组件化抹平多网络库的上层稳定Api，提供稳定、可扩展的上层Api</li>
+<li>在组件化中提供网络优化能力下沉，将网络优化能力在网络组件中进行</li>
+</ul>
+<h2 id="优化前后的网络形态对比"><a href="#优化前后的网络形态对比" class="headerlink" title="优化前后的网络形态对比"></a>优化前后的网络形态对比</h2><p><img src="/2020/11/25/%E5%A4%9A%E7%BD%91%E7%BB%9C%E5%BA%93%E7%BB%84%E4%BB%B6%E5%8C%96sdk/%E4%BC%98%E5%8C%96%E5%89%8D%E7%9A%84%E7%BD%91%E7%BB%9C%E5%BD%A2%E6%80%81.png"></p>
+<p>没有优化时的网络形态</p>
+<ul>
+<li>基本上都是直接去实现对应模块的网络数据</li>
+<li>通用一些的就是使用已经封装好的utils来支撑</li>
+<li>各个模块非常的零散，这给优化也带来的挑战</li>
+</ul>
+<p><img src="/2020/11/25/%E5%A4%9A%E7%BD%91%E7%BB%9C%E5%BA%93%E7%BB%84%E4%BB%B6%E5%8C%96sdk/%E4%BC%98%E5%8C%96%E5%90%8E%E7%9A%84%E7%BD%91%E7%BB%9C%E5%BD%A2%E6%80%81.png"></p>
+<p>优化后的大概层次结构</p>
+<ul>
+<li>上层使用统一的Api</li>
+<li>网络组件中支持众多的扩展，更好的支撑来业务的可变性</li>
+<li>网络组件中抹平了不同网络库之间的差异，提供了口径统一的监控体系</li>
+<li>组件化网络中提供了Gson、Json、PB、文件下载（支持续传）、重试、网络库、域名的调度能力，能够进一步的提高容错能力</li>
+</ul>
+<h2 id="目前状态"><a href="#目前状态" class="headerlink" title="目前状态"></a>目前状态</h2><p>目前网络组件已经非常稳定，支撑了目前短链的所有请求。将使用和优化进行分离，业务同学不需要关系当前情况，而只需要简单的了解Api的使用，提高的业务开发对网络的复杂度。</p>
+<h2 id="组件化网络库的架构设计"><a href="#组件化网络库的架构设计" class="headerlink" title="组件化网络库的架构设计"></a>组件化网络库的架构设计</h2><p>我们先看看网络请求的流程结构图：</p>
+<p><img src="/2020/11/25/%E5%A4%9A%E7%BD%91%E7%BB%9C%E5%BA%93%E7%BB%84%E4%BB%B6%E5%8C%96sdk/%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82%E6%B5%81%E7%A8%8B.png"></p>
+<ul>
+<li>网络请求流程大体分为以上的流程，该流程不涉及具体的网络库中的处理细节，这里注重的是网络组件化的处理（面向业务）</li>
+</ul>
+<h4 id="大致架构的结构图"><a href="#大致架构的结构图" class="headerlink" title="大致架构的结构图"></a>大致架构的结构图</h4><p><img src="/2020/11/25/%E5%A4%9A%E7%BD%91%E7%BB%9C%E5%BA%93%E7%BB%84%E4%BB%B6%E5%8C%96sdk/%E9%80%BB%E8%BE%91%E7%BB%93%E6%9E%84%E5%9B%BE.png"></p>
+<ul>
+<li>网络组件化主要是面向业务，提供可扩展的业务能力，同时能够在组件化内完成网络优化细节</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/06/11/OkHttp-Sockettime-%E9%97%AE%E9%A2%98%E5%92%8C%E4%BC%98%E5%8C%96%E6%96%B9%E6%A1%88/" rel="prev" title="OkHttp Sockettimeout 问题和优化方案">
+                  <i class="fa fa-chevron-left"></i> OkHttp Sockettimeout 问题和优化方案
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/12/15/%E3%80%90%E9%9F%B3%E8%A7%86%E9%A2%91%E5%BC%80%E5%8F%91%E3%80%91%E8%A7%86%E9%A2%91%E6%95%B0%E6%8D%AE%E6%A0%BC%E5%BC%8F%E3%80%81Dash%E5%8D%8F%E8%AE%AE%E7%9A%84%E4%BA%86%E8%A7%A3/" rel="next" title="【音视频开发】视频数据格式、Dash协议的了解">
+                  【音视频开发】视频数据格式、Dash协议的了解 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">伍中联</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

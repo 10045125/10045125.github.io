@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.1.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"yoursite.com","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="最近一直在着手处理文件下载相关的东西，介于没有足够的精力重头开始写，github发现一个文件下载库，其设计还是非常不错的，这里就简要的分析下其结构构成。非常感谢这位小伙伴的开源精神，作者的Jacksgong github,博客Jacksgong blog 框架的模块构成一个下载框架主要需要包含以下几个模块： 网络请求和文件流模块 消息回调机制 跨进程间通信模块 信息存储模块 异常处理模块  以下是">
+<meta property="og:type" content="article">
+<meta property="og:title" content="开源库FileDownloader的简要原理分析">
+<meta property="og:url" content="http://yoursite.com/2016/06/21/%E5%BC%80%E6%BA%90%E5%BA%93FileDownloader%E7%9A%84%E7%AE%80%E8%A6%81%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90/index.html">
+<meta property="og:site_name" content="伍中联(Vanda)的博客">
+<meta property="og:description" content="最近一直在着手处理文件下载相关的东西，介于没有足够的精力重头开始写，github发现一个文件下载库，其设计还是非常不错的，这里就简要的分析下其结构构成。非常感谢这位小伙伴的开源精神，作者的Jacksgong github,博客Jacksgong blog 框架的模块构成一个下载框架主要需要包含以下几个模块： 网络请求和文件流模块 消息回调机制 跨进程间通信模块 信息存储模块 异常处理模块  以下是">
+<meta property="og:locale">
+<meta property="og:image" content="http://yoursite.com/2016/06/21/%E5%BC%80%E6%BA%90%E5%BA%93FileDownloader%E7%9A%84%E7%AE%80%E8%A6%81%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90/img/FileDownloader1.png">
+<meta property="og:image" content="http://yoursite.com/2016/06/21/%E5%BC%80%E6%BA%90%E5%BA%93FileDownloader%E7%9A%84%E7%AE%80%E8%A6%81%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90/img/FileDownloader2.png">
+<meta property="article:published_time" content="2016-06-21T09:34:42.000Z">
+<meta property="article:modified_time" content="2022-05-11T03:48:49.656Z">
+<meta property="article:author" content="伍中联">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2016/06/21/%E5%BC%80%E6%BA%90%E5%BA%93FileDownloader%E7%9A%84%E7%AE%80%E8%A6%81%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90/img/FileDownloader1.png">
+
+
+<link rel="canonical" href="http://yoursite.com/2016/06/21/%E5%BC%80%E6%BA%90%E5%BA%93FileDownloader%E7%9A%84%E7%AE%80%E8%A6%81%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"default","comments":true,"permalink":"http://yoursite.com/2016/06/21/%E5%BC%80%E6%BA%90%E5%BA%93FileDownloader%E7%9A%84%E7%AE%80%E8%A6%81%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90/","path":"2016/06/21/开源库FileDownloader的简要原理分析/","title":"开源库FileDownloader的简要原理分析"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>开源库FileDownloader的简要原理分析 | 伍中联(Vanda)的博客</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">伍中联(Vanda)的博客</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">当一切理所当然就没有你什么事了 当你说：“这个好麻烦，那么不要犹豫，主动出击”</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="user fa-fw"></i>About</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A1%86%E6%9E%B6%E7%9A%84%E6%A8%A1%E5%9D%97%E6%9E%84%E6%88%90"><span class="nav-number">1.</span> <span class="nav-text">框架的模块构成</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%80%E4%B8%AA%E4%B8%8B%E8%BD%BD%E6%A1%86%E6%9E%B6%E4%B8%BB%E8%A6%81%E9%9C%80%E8%A6%81%E5%8C%85%E5%90%AB%E4%BB%A5%E4%B8%8B%E5%87%A0%E4%B8%AA%E6%A8%A1%E5%9D%97%EF%BC%9A"><span class="nav-number">1.0.1.</span> <span class="nav-text">一个下载框架主要需要包含以下几个模块：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8A%E5%B1%82%E9%80%BB%E8%BE%91%E7%B1%BB%E5%9B%BE%E7%BB%93%E6%9E%84%E9%80%BB%E8%BE%91%E5%88%86%E6%9E%90"><span class="nav-number">2.</span> <span class="nav-text">上层逻辑类图结构逻辑分析</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="伍中联"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">伍中联</p>
+  <div class="site-description" itemprop="description">珍惜在生命中遇到的每一个人</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">46</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/10045125" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;10045125" rel="noopener" target="_blank"><i class="fab zhonglian-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/zhonglian.wzl@gmail.com" title="E-Mail → zhonglian.wzl@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="default">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/06/21/%E5%BC%80%E6%BA%90%E5%BA%93FileDownloader%E7%9A%84%E7%AE%80%E8%A6%81%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="伍中联">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="伍中联(Vanda)的博客">
+      <meta itemprop="description" content="珍惜在生命中遇到的每一个人">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="开源库FileDownloader的简要原理分析 | 伍中联(Vanda)的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          开源库FileDownloader的简要原理分析
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2016-06-21 17:34:42" itemprop="dateCreated datePublished" datetime="2016-06-21T17:34:42+08:00">2016-06-21</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2022-05-11 11:48:49" itemprop="dateModified" datetime="2022-05-11T11:48:49+08:00">2022-05-11</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>最近一直在着手处理文件下载相关的东西，介于没有足够的精力重头开始写，github发现一个文件下载库，其设计还是非常不错的，这里就简要的分析下其结构构成。非常感谢这位小伙伴的开源精神，作者的<a target="_blank" rel="noopener" href="https://github.com/lingochamp/FileDownloader">Jacksgong github</a>,博客<a target="_blank" rel="noopener" href="http://blog.dreamtobe.cn/">Jacksgong blog</a></p>
+<h2 id="框架的模块构成"><a href="#框架的模块构成" class="headerlink" title="框架的模块构成"></a>框架的模块构成</h2><h4 id="一个下载框架主要需要包含以下几个模块："><a href="#一个下载框架主要需要包含以下几个模块：" class="headerlink" title="一个下载框架主要需要包含以下几个模块："></a>一个下载框架主要需要包含以下几个模块：</h4><ol>
+<li>网络请求和文件流模块</li>
+<li>消息回调机制</li>
+<li>跨进程间通信模块</li>
+<li>信息存储模块</li>
+<li>异常处理模块</li>
+</ol>
+<p>以下是我对下载框架的一个类图结构分析，这部分主要涉及的是独立进程中文件下载需要处理的任务 和 提供远程接口端的类图，暂时没有涉及上层逻辑结构。</p>
+<p><img src="/2016/06/21/%E5%BC%80%E6%BA%90%E5%BA%93FileDownloader%E7%9A%84%E7%AE%80%E8%A6%81%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90/img/FileDownloader1.png"></p>
+<p>首先跨进程间的通信方式是采用：</p>
+<ol>
+<li>通过Binder来实现远程调用(IPC)：这种方式是Android的最大特色之一，让你调用远程Service的接口，就像调用本地对象一样，实现非常灵活，写起来也相对复杂。</li>
+<li>在FileDownloadService里面handler（IFileDownloadServiceHandler）持有实现一个IFileDownloadIPCService.Stub接口的Binder，并且在onBind()中返回此Binder对象</li>
+<li>同时在实现IFileDownloadServiceHandler接口的FDServiceSeparateHandler类中拥有了文件下载的远程消息的回调，同时在这个handler中封装了对文件下载管理操作类FileDownloadMgr，远程接口IFileDownloadIPCService中的实现都交由FileDownloadMgr来实现和管理，Service所有操作都委托交由FDServiceSeparateHandler来处理，FDServiceSeparateHandler也实现了MessageReceiver来处理进程间的消息回调，其真正处理回调处理是由IFileDownloadIPCCallback远程接口来实现。</li>
+<li>文件的下载中拥有文件下载的线程池FileDownloadThreadPool，线程池中的单个子单元是由一个Runnable构成，在FileDownloadRunnable中有下载文件的相关信息以及相关的操作，在这里我们可以看出，在执行Runnable的线程中是单个的，Runnable中涉及网络请求和数据流的传输都在Runnable中完成，文件的读写操作是堵塞的，Runnable中的文件下载的相关状态信息是通过MessageSnapshotFlow.getImpl().inflow(MessageSnapshotTaker.take(status, model, this))发出的，消息发出交由FDServiceSeparateHandler的receive(MessageSnapshot snapShot),随之RemoteCallbackList<IFileDownloadIPCCallback> callbackList将发起进程间回调通信，来完成通知下载状态的更新，通过以上的步骤来完成Service与其他进程的通信。</IFileDownloadIPCCallback></li>
+<li>文件的下载状态都会记录到指定的数据库中，以便支持完善的下载进度和断点续传功能。</li>
+</ol>
+<p>Service代理以及和Service所在进程的通信：</p>
+<ol>
+<li>FileDownloadServiceProxy实现了IFileDownloadServiceProxy接口，其接口真正的实现是由FileDownloadServiceUIGuard来处理，在FileDownloadServiceUIGuard中提供了进程间通信需要的CALLBACK和INTERFACE</li>
+<li>BaseFileServiceUIGuard抽象类中实现了ServiceConnection，在onServiceConnected中完成registerCallback，将registerCallback实现交给子类FileDownloadServiceUIGuard，在onServiceConnected中返回了IBinder</li>
+<li>通过IFileDownloadIPCService.Stub.asInterface取得远程接口对象，之后通过这个获取的远程接口实现注册相关的操作，同时通过这个远程的接口实现进程间的通信。</li>
+<li>在FileDownloadServiceUIGuard中提供了远程接口注册时需要的IFileDownloadIPCService.Stub接口的Binder。</li>
+<li>FileDownloadServiceUIGuard继承了BaseFileServiceUIGuard，所以FileDownloadServiceUIGuard必须实现FileDownloadServiceProxy接口。同时在BaseFileServiceUIGuard中已经拥有IFileDownloadIPCService的远程接口，<br>所以FileDownloadServiceProxy接口实现是通过获得的远程接口去实现的，同时这个就是我们说的跨进程通信的方式。</li>
+<li>那么现在还有一个比较重要的点，现在怎样把文件下载进度信息交给其他进程呢？不难发现我们注册了一个CallBack的Binder。client端与server不在一个进程，server是无法得知client解注册时传入的回调接口是哪一个（client调用解注册时，是通过binder传输到server端，所以解注册时的回调接口是新创建的，而不是注册时的回调接口）。为了解决这个问题，android提供了RemoteCallbackList这个类来专门管理remote回调的注册与解注册。</li>
+<li>通过上述分析，client和Service通信以及Service和client的通信，client和Service通信通过onServiceConnected中返回的IBinder，进而取得远程接口，实现client和Service通信。Service和client通信通过RemoteCallbackList，通过client获取的远程接口，同时通过这个远程接口回调注册，实现Service与client的通信。</li>
+<li>经过上述的分析，我们已经能够知道所有的连接通信逻辑都已经由FileDownloadServiceProxy委托代理。</li>
+</ol>
+<h2 id="上层逻辑类图结构逻辑分析"><a href="#上层逻辑类图结构逻辑分析" class="headerlink" title="上层逻辑类图结构逻辑分析"></a>上层逻辑类图结构逻辑分析</h2><p>上层的结构逻辑主要是对远程结构代理的封装，由外部组装必要的数据以及外部等待下载状态的更新。类图结构如下：</p>
+<p><img src="/2016/06/21/%E5%BC%80%E6%BA%90%E5%BA%93FileDownloader%E7%9A%84%E7%AE%80%E8%A6%81%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90/img/FileDownloader2.png"></p>
+<p>client的结构构成：</p>
+<ol>
+<li>每一个下载任务对应一个单独的FileDownloadTask，其和Service的跨进程通信通过FileDownloadServiceProxy进行关联</li>
+<li>Service和client的下载状态的回调是通过MessageReceiver接口来实现的，其正确的流程是Service进程中的Runnable下载文件状态   -&gt;  MessageSnapshotFlow.getImpl().inflow()(Service进程)   -&gt; FDServiceSeparateHandler(实现了MessageReceiver接口)   -&gt; FDServiceSeparateHandler的receive()调用RemoteCallbackList<IFileDownloadIPCCallback> callbackList来完成Service和client的通信。</IFileDownloadIPCCallback></li>
+<li>FileDownloader是统一收敛、数据组装、状态查询的直接外部入口类，其内部核心处理还是通过FileDownloadTask来构建任务、FileDownloadServiceProxy来处理跨进程数据通信。</li>
+</ol>
+<p>通过以上的分析介绍，我们能够知道，其下载其实主要就是通信模块的构建，也就是我们常说的外壳，外壳保证了通信逻辑，我们先构建出来通信外壳模块，将网络连接和文件下载抽象独立出来。外壳保证通信的准确性，下载内核保证了数据的准确性。<br>同时通过对以上框架的分析，我们需要做到将下载核抽象出来，这样能够更灵活的配置下载核，同时也给下载核更多的发挥空间。</p>
+<p>简单的创建demo任务：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">final BaseDownloadTask task = <span class="module-access"><span class="module"><span class="identifier">FileDownloader</span>.</span></span>get<span class="constructor">Impl()</span>.create(url)</span><br><span class="line">        .set<span class="constructor">Path(<span class="params">path</span>)</span></span><br><span class="line">        .set<span class="constructor">CallbackProgressTimes(100)</span></span><br><span class="line">        .set<span class="constructor">Listener(<span class="params">taskDownloadListener</span>)</span>;</span><br></pre></td></tr></table></figure>
+<p>这样就完成了一个任务下载，任务的状态信息回调在监听中处理就OK了。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2016/06/18/%E5%A6%82%E4%BD%95%E6%8A%8A%E4%B8%80%E4%BB%B6%E4%BA%8B%E6%83%85%E5%81%9A%E5%A5%BD/" rel="prev" title="如何把一件事情做好">
+                  <i class="fa fa-chevron-left"></i> 如何把一件事情做好
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2016/06/24/Android-Studio-no-debuggable-application/" rel="next" title="Android Studio no debuggable application">
+                  Android Studio no debuggable application <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">伍中联</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
