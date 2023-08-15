@@ -128,7 +128,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">46</span>
+          <span class="site-state-item-count">49</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -166,6 +166,253 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/19/%E5%85%B3%E4%BA%8EActivity%E4%BD%BF%E7%94%A8SingleTask%EF%BC%8C%E4%BB%8Ehome%E7%82%B9%E5%87%BB%E5%9B%BE%E6%A0%87%E5%90%8E%E6%B8%85%E7%A9%BA%E6%A0%88%E7%9A%84%E9%97%AE%E9%A2%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="伍中联">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="伍中联(Vanda)的博客">
+      <meta itemprop="description" content="珍惜在生命中遇到的每一个人">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 伍中联(Vanda)的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2019/08/19/%E5%85%B3%E4%BA%8EActivity%E4%BD%BF%E7%94%A8SingleTask%EF%BC%8C%E4%BB%8Ehome%E7%82%B9%E5%87%BB%E5%9B%BE%E6%A0%87%E5%90%8E%E6%B8%85%E7%A9%BA%E6%A0%88%E7%9A%84%E9%97%AE%E9%A2%98/" class="post-title-link" itemprop="url">关于Activity使用SingleTask，从home点击图标后清空栈的问题</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2019-08-19 11:14:54" itemprop="dateCreated datePublished" datetime="2019-08-19T11:14:54+08:00">2019-08-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2022-05-11 11:47:53" itemprop="dateModified" datetime="2022-05-11T11:47:53+08:00">2022-05-11</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="问题背景"><a href="#问题背景" class="headerlink" title="问题背景"></a>问题背景</h2><blockquote>
+<p>如果从桌面启动的MainActivity的launchMode&#x3D;SingleTask，那么当app调用其他的Activity时，用户回到home键回到桌面，再次进入App时，原来的界面会消失，直接显示在来MainActivity所在的页面</p>
+</blockquote>
+<h2 id="Activity的四种运行模式"><a href="#Activity的四种运行模式" class="headerlink" title="Activity的四种运行模式"></a>Activity的四种运行模式</h2><h3 id="Standard"><a href="#Standard" class="headerlink" title="Standard"></a>Standard</h3><ul>
+<li>默认模式，允许多个Activity实例</li>
+</ul>
+<h3 id="SingleTop"><a href="#SingleTop" class="headerlink" title="SingleTop"></a>SingleTop</h3><ul>
+<li>相比于<code>standard</code>，有新的启动请求时，只有在目标<code>Activity</code>处于当前栈顶时，才会调用<code>onNewIntent()</code>而不创建新实例，其他情况都和<code>standard</code>一致</li>
+</ul>
+<h3 id="SingleTask"><a href="#SingleTask" class="headerlink" title="SingleTask"></a>SingleTask</h3><ul>
+<li>设置了<code>singleTask</code>启动模式的<code>Activity</code>，它在启动的时候，会先在系统中查找属性值<code>affinity</code>等于它的属性值<code>taskAffinity</code>的任务存在；如果存在这样的任务，它就会在这个任务中启动，否则就会在新任务中启动。因此，如果我们想要设置了<code>singleTask</code>启动模式的<code>Activity</code>在新的任务中启动，就要为它设置一个独立的<code>taskAffinity</code>属性值。如果设置了<code>singleTask</code>启动模式的<code>Activity</code>不是在新的任务中启动时，它会在已有的任务中查看是否已经存在相应的<code>Activity</code>实例，如果存在，就会把位于这个<code>Activity</code>实例上面的<code>Activity</code>全部结束掉，即最终这个<code>Activity</code>实例会位于任务的堆栈顶端中。</li>
+</ul>
+<h3 id="SingleInstance"><a href="#SingleInstance" class="headerlink" title="SingleInstance"></a>SingleInstance</h3><ul>
+<li>和<code>singleTask</code>相比，不同点在于<code>singleInstance activity</code>所在的<code>task</code>只会有这一个<code>activity</code></li>
+</ul>
+<h2 id="原理分析"><a href="#原理分析" class="headerlink" title="原理分析"></a>原理分析</h2><p><img src="/2019/08/19/%E5%85%B3%E4%BA%8EActivity%E4%BD%BF%E7%94%A8SingleTask%EF%BC%8C%E4%BB%8Ehome%E7%82%B9%E5%87%BB%E5%9B%BE%E6%A0%87%E5%90%8E%E6%B8%85%E7%A9%BA%E6%A0%88%E7%9A%84%E9%97%AE%E9%A2%98/img/SingleTask.png"></p>
+<p>按照我们应用的启动流程，首先进入的是MainActivity，这个时候再次进入一个其他的Activity，那么我们回到用户桌面，再次进入App，这个流程图大致是：</p>
+<blockquote>
+<p>start MainActivity -&gt; 首页 -&gt; 进入另外一个XActivity，从桌面进入App -&gt; MainActivity</p>
+</blockquote>
+<ul>
+<li>那么这个时候XActivity和MainActivity在同一个任务栈并且XActivity是在MainActivity之上</li>
+<li>当我们再次从桌面进入App的时候，这个时候系统会调用Launch属性的MainActivity，<code>由于MainActivity是SingleTask</code>会进行清除在其之上的Activity，将自己置于栈顶</li>
+</ul>
+<p>所以我们再次进入App后，原先进入的Activity页面不见了而显示了首页，就是因为MainActivity的SingleTask会进行清除其之上的Activity</p>
+<h2 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h2><h3 id="双Activity"><a href="#双Activity" class="headerlink" title="双Activity"></a>双Activity</h3><ul>
+<li>将LaunchActivity用做桥梁的作用，启动后将自己finish，每次启动App的时候LaunchActivity都是处于栈顶，而不是直接startMainActivity</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/07/10/ADB-Dump-%E5%86%85%E5%AD%98%EF%BC%8CMat%E5%88%86%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="伍中联">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="伍中联(Vanda)的博客">
+      <meta itemprop="description" content="珍惜在生命中遇到的每一个人">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 伍中联(Vanda)的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2019/07/10/ADB-Dump-%E5%86%85%E5%AD%98%EF%BC%8CMat%E5%88%86%E6%9E%90/" class="post-title-link" itemprop="url">ADB Dump 内存，Mat分析</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2019-07-10 15:02:33 / Modified: 15:11:33" itemprop="dateCreated datePublished" datetime="2019-07-10T15:02:33+08:00">2019-07-10</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>ADB 命令DUMP内存，一般我自己的操作是，先通过adb命令dump内存信息到data&#x2F;local&#x2F;tmp&#x2F; 目录下，具体的操作是：</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb shell am dumpheap com.yy.hiyo <span class="regexp">/data/</span>local<span class="regexp">/tmp/</span>xxx.hprof</span><br></pre></td></tr></table></figure>
+
+<p>这样就在文件目录生成了对应的dump文件，然后通过AndroidStudio的DeviceFileExplorer来导出对应的文件，导出后要通过hprof-conv来转换</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hprof-conv source.hprof <span class="keyword">target</span>.hprof</span><br></pre></td></tr></table></figure>
+
+<p>然后通过MAT打开就可以了</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/06/10/%E5%AF%B9Flutter%E7%9A%84%E4%B8%80%E4%BA%9B%E4%BA%86%E8%A7%A3%E5%92%8C%E7%9C%8B%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="伍中联">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="伍中联(Vanda)的博客">
+      <meta itemprop="description" content="珍惜在生命中遇到的每一个人">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 伍中联(Vanda)的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2019/06/10/%E5%AF%B9Flutter%E7%9A%84%E4%B8%80%E4%BA%9B%E4%BA%86%E8%A7%A3%E5%92%8C%E7%9C%8B%E6%B3%95/" class="post-title-link" itemprop="url">对Flutter的一些了解和看法</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2019-06-10 23:40:58" itemprop="dateCreated datePublished" datetime="2019-06-10T23:40:58+08:00">2019-06-10</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -857,329 +1104,6 @@ $ ninja -C out/Release cronet_package
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/13/%E5%8D%8A%E5%B9%B4%E6%9D%A5%E7%9A%84%E4%B8%80%E4%BA%9B%E6%80%BB%E7%BB%93/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="伍中联">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="伍中联(Vanda)的博客">
-      <meta itemprop="description" content="珍惜在生命中遇到的每一个人">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 伍中联(Vanda)的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2018/12/13/%E5%8D%8A%E5%B9%B4%E6%9D%A5%E7%9A%84%E4%B8%80%E4%BA%9B%E6%80%BB%E7%BB%93/" class="post-title-link" itemprop="url">半年来的一些总结</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-      
-
-      <time title="Created: 2018-12-13 11:39:12 / Modified: 23:35:09" itemprop="dateCreated datePublished" datetime="2018-12-13T11:39:12+08:00">2018-12-13</time>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h4 id="时间线"><a href="#时间线" class="headerlink" title="时间线"></a>时间线</h4><p>6.15 正式从给我成长、对我帮助最大的阿里巴巴手淘离职，从UC浏览器到夸克浏览器再到总部的手淘，经历了不同部门不同风格的团队。非常感恩我遇到的这几个部门的老大，让我至今仍然热爱、回味在阿里的这段时光。</p>
-<h4 id="为什么离开"><a href="#为什么离开" class="headerlink" title="为什么离开"></a>为什么离开</h4><p>   在很多人眼中，进入阿里巴巴集团总部淘宝技术部是很多人的梦想，说真的我也非常高兴能够去到总部，那时起我也没有想过要离开，我甚至把社保公积金都全部转移到杭州，确实是打算在杭州定居。<br>   去到杭州的这段时间，遇到很多事情，把宝宝接到身边、购买了人生中的第一辆轿车、遇到了一群牛逼轰轰的人、当然我也遇到很难过的事情，17年是我最努力的一年，以3.75的S1绩效转岗到手淘，但年终绩效的回报却是我在阿里最不理想的一次（最终绩效并不是手淘评的），但17年的努力让我快速成长，在功能设计、SDK、抽象、内聚、架构等等都有很大的提高，非常感谢志明老大，充分的信任和指导。那时候发了一个朋友圈，然后很多猎头朋友找，我也就试试看的态度，我也慢慢的在思考自己方向。</p>
-<h4 id="常问问自己想要什么"><a href="#常问问自己想要什么" class="headerlink" title="常问问自己想要什么"></a>常问问自己想要什么</h4><p>我们往往不知道自己想要什么，或者不知道想要成为什么样的人，所以我们就会迷惘。<br>离开时景宝老大约我一起吃了个饭，意味深长的和我说有没有想清楚自己想要什么。</p>
-<p>非常感谢景宝老大，教会我思考问题的方式。人啊，其实就是追逐着自己想要什么。</p>
-<h4 id="新的机会-–-面向国外市场的游戏社交"><a href="#新的机会-–-面向国外市场的游戏社交" class="headerlink" title="新的机会 – 面向国外市场的游戏社交"></a>新的机会 – 面向国外市场的游戏社交</h4><p>经历了过亿级的UC浏览器和手淘，从0-1参与夸克浏览器的开发，独立完成夸克浏览的核心功能，这些过程经历让我成长，从充满压力到满满的收获，最后才会发现自己原来也能够做好以及能够做的更好。</p>
-<p>相对印尼的这些国家的情况，我觉得游戏社交是一个蛮不错的东西，自己也爱玩游戏，早些年自己也爱玩一些小游戏，加上社交的属性，我个人比较看好这个，所以就过来这边做技术相关的工作</p>
-<h4 id="转变"><a href="#转变" class="headerlink" title="转变"></a>转变</h4><p>以前都喜欢去专研技术，但现在担任了技术负责人，慢慢的发现自己没有那么多的精力去亲力亲为，所以我这个时候就会花时间帮助组内同学提高技术、用自己的经验和数据来驱动、找技术应用场景来实施落地，多和组内同学沟通，听取他们的观点和想法。</p>
-<h4 id="功能应用周期"><a href="#功能应用周期" class="headerlink" title="功能应用周期"></a>功能应用周期</h4><p>在这段时间里，我慢慢理解，不同的同学特性都是不一样的，没必要要求每个人都一样，相互学习和借鉴都需要一个过程，好的东西大家慢慢适应使用就会知道这些东西好在哪里。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/06/%E6%80%BB%E6%83%B3%E5%86%99%E7%82%B9%E5%95%A5/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="伍中联">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="伍中联(Vanda)的博客">
-      <meta itemprop="description" content="珍惜在生命中遇到的每一个人">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 伍中联(Vanda)的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2018/12/06/%E6%80%BB%E6%83%B3%E5%86%99%E7%82%B9%E5%95%A5/" class="post-title-link" itemprop="url">如何提高Android Studio编译速度</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-
-      <time title="Created: 2018-12-06 15:43:59" itemprop="dateCreated datePublished" datetime="2018-12-06T15:43:59+08:00">2018-12-06</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2022-05-11 14:35:00" itemprop="dateModified" datetime="2022-05-11T14:35:00+08:00">2022-05-11</time>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h3 id="优化后的成果"><a href="#优化后的成果" class="headerlink" title="优化后的成果"></a>优化后的成果</h3><p>总体来说效果还是不错的</p>
-<ol>
-<li>全量编译从原来的2-3分钟，优化后再1分钟以内</li>
-<li>增量编译从原来的1分钟，优化后在13s, 甚至更快</li>
-</ol>
-<h5 id="优化前的clean后的全量编译时间（2m40s）："><a href="#优化前的clean后的全量编译时间（2m40s）：" class="headerlink" title="优化前的clean后的全量编译时间（2m40s）："></a>优化前的clean后的全量编译时间（2m40s）：</h5><p><img src="/2018/12/06/%E6%80%BB%E6%83%B3%E5%86%99%E7%82%B9%E5%95%A5/img/clean_before.png"></p>
-<h5 id="优化前的增量编译时间（49s）："><a href="#优化前的增量编译时间（49s）：" class="headerlink" title="优化前的增量编译时间（49s）："></a>优化前的增量编译时间（49s）：</h5><p><img src="/2018/12/06/%E6%80%BB%E6%83%B3%E5%86%99%E7%82%B9%E5%95%A5/img/before_incrment.png"></p>
-<h5 id="代码已经执行"><a href="#代码已经执行" class="headerlink" title="代码已经执行"></a>代码已经执行</h5><p><img src="/2018/12/06/%E6%80%BB%E6%83%B3%E5%86%99%E7%82%B9%E5%95%A5/img/before_incrment_test.png"></p>
-<h5 id="优化后的clean后的全量编译时间（47s）："><a href="#优化后的clean后的全量编译时间（47s）：" class="headerlink" title="优化后的clean后的全量编译时间（47s）："></a>优化后的clean后的全量编译时间（47s）：</h5><p><img src="/2018/12/06/%E6%80%BB%E6%83%B3%E5%86%99%E7%82%B9%E5%95%A5/img/clean_build.png"></p>
-<h5 id="优化后的增量编译时间（6s）："><a href="#优化后的增量编译时间（6s）：" class="headerlink" title="优化后的增量编译时间（6s）："></a>优化后的增量编译时间（6s）：</h5><p><img src="/2018/12/06/%E6%80%BB%E6%83%B3%E5%86%99%E7%82%B9%E5%95%A5/img/increment.png"></p>
-<h5 id="代码已经执行-1"><a href="#代码已经执行-1" class="headerlink" title="代码已经执行"></a>代码已经执行</h5><p><img src="/2018/12/06/%E6%80%BB%E6%83%B3%E5%86%99%E7%82%B9%E5%95%A5/img/incrment_already.png"></p>
-<h3 id="优化手段"><a href="#优化手段" class="headerlink" title="优化手段"></a>优化手段</h3><p>优化的目的并不是改造原有的编译流程，而是遵循Google的本身的构建流程，方便Google的后续功能优化的升级我们能够快速的相应</p>
-<h3 id="耗时点分布"><a href="#耗时点分布" class="headerlink" title="耗时点分布"></a>耗时点分布</h3><p>不同App使用的工具不同，也可能存在分化，大体的解决思路是一致的，在遵循Google的原则上，我们需要针对本身App的特性进行优化。保持AS原本的功能不变的原则。</p>
-<p>我们可以通过执行命令来分析不同的task的耗时情况</p>
-<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">./gradlew</span> assembleDebug <span class="params">--profile</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p><img src="/2018/12/06/%E6%80%BB%E6%83%B3%E5%86%99%E7%82%B9%E5%95%A5/img/before_task_time.png"></p>
-<p>通过这个可以查看任务的耗时情况，其实AS的build中也能够查看相关的任务耗时信息。</p>
-<p>工程耗时原因：</p>
-<ol>
-<li>注解使用，编译时动态生成和插入代码，导致使用的地方每次都会进行代码插入，从而导致进行Multidex 消耗大量时间</li>
-<li>工程中model数据激增，目前有31个model</li>
-<li>优化配置没有进行合理的配置，比如针对本地开发可以简化一些配置</li>
-</ol>
-<h3 id="升级Gradle"><a href="#升级Gradle" class="headerlink" title="升级Gradle"></a>升级Gradle</h3><p>目前我们gradle 升级到了3.2.1</p>
-<h3 id="注解进行增量"><a href="#注解进行增量" class="headerlink" title="注解进行增量"></a>注解进行增量</h3><p>Gradle 4.7 已经支持了注解的增量，目前需要注解框架已经在陆续支持增量，所有找到问题，去解决这个并不是难事。</p>
-<h3 id="优化配置"><a href="#优化配置" class="headerlink" title="优化配置"></a>优化配置</h3><p>目前工程中都是遵循Gradle的本身的编译原则，为了解决本地编译耗时的问题，我们本地编译和线上打包编译是不同的规则，线上打包就是标准的Gradle的流程。本地编译进行了相关的改造</p>
-<p>AS本身的配置，把内存使用等各个功能都配置上，比如：</p>
-<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 编译时使用守护进程</span></span><br><span class="line"><span class="attr">org.gradle.daemon</span>=<span class="literal">true</span></span><br><span class="line"><span class="comment">#JVM最大允许分配的堆内存，按需分配</span></span><br><span class="line"><span class="attr">org.gradle.jvmargs</span>=-Xmx8192m -XX:MaxPermSize=<span class="number">2048</span>m  -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-<span class="number">8</span></span><br><span class="line"><span class="comment">#使用并行编译</span></span><br><span class="line"><span class="attr">org.gradle.parallel</span>=<span class="literal">true</span></span><br><span class="line"><span class="attr">org.gradle.configureondemand</span>=<span class="literal">true</span></span><br><span class="line"><span class="comment"># 缓存的是javacompiler编译生成的 class，没有cache transform插入的代码，暂时先关闭 cache，后续再研究优化</span></span><br><span class="line"><span class="attr">org.gradle.caching</span>=<span class="literal">true</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>本地编译时，主工程的build.gradle 增加一个api21的Flavors</p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">if</span> (isLocalBuild()) &#123;</span><br><span class="line">      <span class="section">aaptOptions</span> &#123;</span><br><span class="line">          <span class="attribute">cruncherEnabled</span> = <span class="literal">false</span></span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  dexOptions &#123;</span><br><span class="line">      <span class="attribute">javaMaxHeapSize</span> <span class="string">&quot;2g&quot;</span></span><br><span class="line">      jumboMode <span class="literal">true</span></span><br><span class="line">      incremental <span class="literal">true</span></span><br><span class="line">      preDexLibraries <span class="literal">true</span></span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  if (isLocalBuild()) &#123;</span><br><span class="line">      <span class="attribute">flavorDimensions</span> <span class="string">&quot;api&quot;</span></span><br><span class="line">      productFlavors &#123;</span><br><span class="line">          <span class="section">minApi21</span> &#123;</span><br><span class="line">              <span class="attribute">minSdkVersion</span> <span class="string">&#x27;21&#x27;</span></span><br><span class="line">              dimension <span class="string">&quot;api&quot;</span></span><br><span class="line">          &#125;</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="本地动态的aar工程"><a href="#本地动态的aar工程" class="headerlink" title="本地动态的aar工程"></a>本地动态的aar工程</h3><p>基本思路是，将本地的model全部通过脚本来生成aar供本地编译来使用，减少重复编译aar的时间。工程中只保留一个main工程，不同的业务开发同学在动态生成的配置文件中配置需要开发开启的model</p>
-<h3 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h3><p>目前将项目工程中只保留了main的代码工程模块，其他的model都以本地Maven的形式存在</p>
-<h3 id="首次运行工程"><a href="#首次运行工程" class="headerlink" title="首次运行工程"></a>首次运行工程</h3><ol>
-<li>本地编译默认是采用本地maven仓库的形式，需要执行项目脚本生成 本地arr文件，执行 .&#x2F;bmaList.sh</li>
-<li>针对自身所在的model进行业务开发，这个需要开启对应的业务开发model，在文件 aar_configs.properties 中的</li>
-</ol>
-<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">open_model_name</span> = framework-base,framework-ui  </span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>填写自身对应的model，注意没有双引号</p>
-<h3 id="将model发布成对应的本地maven-arr的形式，操作步骤"><a href="#将model发布成对应的本地maven-arr的形式，操作步骤" class="headerlink" title="将model发布成对应的本地maven arr的形式，操作步骤"></a>将model发布成对应的本地maven arr的形式，操作步骤</h3><ol>
-<li>首先需要在settings.gradle 中 projectList 中的，移动到 aarList</li>
-<li>在需要发布的model的build.gradle 中添加maven插件</li>
-</ol>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apply <span class="selector-tag">from</span>: rootProject.<span class="built_in">getProjectDir</span>().<span class="built_in">getAbsolutePath</span>() + <span class="string">&#x27;/publish.gradle&#x27;</span></span><br></pre></td></tr></table></figure>
-<ol start="3">
-<li>需要在bmaList.sh 中添加，注意添加的顺序，需要在本身model依赖的其他aar对应的model的后面进行添加</li>
-</ol>
-<h3 id="单独model的aar发布"><a href="#单独model的aar发布" class="headerlink" title="单独model的aar发布"></a>单独model的aar发布</h3><p>项目中提供了单独的model的arr的发布脚本 bma.sh</p>
-<ol>
-<li>执行 .&#x2F;bma.sh model_name</li>
-</ol>
-<h3 id="发布完成后-进行gradle同步"><a href="#发布完成后-进行gradle同步" class="headerlink" title="发布完成后 进行gradle同步"></a>发布完成后 进行gradle同步</h3><h3 id="开启所有的model"><a href="#开启所有的model" class="headerlink" title="开启所有的model"></a>开启所有的model</h3><p>目前为了方便大家的开发，存在需要开启所有model的情况，这种情况我们进行了简易的支持</p>
-<p>在 aar_configs.properties 中配置 open_model_name &#x3D; –all</p>
-<p>然后同步工程</p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>本次的编译速度的优化，是一次尝试。在实际操作过程中，很多同学不习惯去使用，比如开启对应的model，要生成aar等操作相对会繁琐一些。</p>
-<p>所以后续我们提供了开启所有的model的配置，尽量做到最大化的适应，对于目前不习惯的同学可以开启所有的model，相应的就是增量编译速度慢一些。</p>
-<p>对于熟悉、已经适应的同学可以开启相应的model来开发，提高自己的开发效率。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/26/Kotlin-%E5%B8%B8%E8%A7%81%E7%9A%84%E4%B8%80%E4%BA%9B%E7%AC%A6%E5%8F%B7%E4%BD%9C%E7%94%A8/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="伍中联">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="伍中联(Vanda)的博客">
-      <meta itemprop="description" content="珍惜在生命中遇到的每一个人">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 伍中联(Vanda)的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2018/09/26/Kotlin-%E5%B8%B8%E8%A7%81%E7%9A%84%E4%B8%80%E4%BA%9B%E7%AC%A6%E5%8F%B7%E4%BD%9C%E7%94%A8/" class="post-title-link" itemprop="url">Kotlin 常见的一些符号作用</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-
-      <time title="Created: 2018-09-26 15:56:53" itemprop="dateCreated datePublished" datetime="2018-09-26T15:56:53+08:00">2018-09-26</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2018-09-27 18:04:31" itemprop="dateModified" datetime="2018-09-27T18:04:31+08:00">2018-09-27</time>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>总结下在kotlin常使用的一些东西和含义</p>
-<h4 id="val与var"><a href="#val与var" class="headerlink" title="val与var"></a>val与var</h4><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> 是常量</span><br><span class="line"><span class="keyword">var</span> 是变量</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h4 id="？"><a href="#？" class="headerlink" title="？"></a>？</h4><p>我们经常能够遇到这个，kotlin提供了很好的编译检查功能，其中 ？ 有一些常用的地方</p>
-<figure class="highlight delphi"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">var</span> <span class="keyword">name</span>: <span class="keyword">String</span>? = null</span><br></pre></td></tr></table></figure>
-
-<p>这个表示 变量 name 能够为空值</p>
-<figure class="highlight gcode"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">val video = Video.create<span class="comment">()</span></span><br><span class="line">video?.play<span class="comment">()</span></span><br></pre></td></tr></table></figure>
-
-<p>这个说明如果video 不为空，那么就会调用play方法</p>
-<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">name</span><span class="params">(name:<span class="type">String</span>?)</span></span> &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这里面告诉使用者，name有可能是一个空值</p>
-<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">name</span><span class="params">(name:<span class="type">String</span>?)</span></span>：String? &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这里面告诉使用者，name方法返回可能是一个空值</p>
-<h4 id><a href="#" class="headerlink" title="!!"></a>!!</h4><p>使用的过程中也经常遇到</p>
-<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">val <span class="selector-tag">video</span> = Video<span class="selector-class">.create</span>()</span><br><span class="line">video!!<span class="selector-class">.play</span>()</span><br></pre></td></tr></table></figure>
-<p>我们可以写 video!! ，这会返回一个非空的video b 值 或者如果 video 为空，就会抛出一个 NPE 异常</p>
-<h4 id="-1"><a href="#-1" class="headerlink" title="::"></a>::</h4><figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">startActivity</span>(Intent(this<span class="variable">@KotlinActivity</span>, <span class="attribute">MainActivity</span>::class.java))</span><br></pre></td></tr></table></figure>
-
-<p>得到类的Class对象</p>
-<h4 id="-2"><a href="#-2" class="headerlink" title="?:"></a>?:</h4><p>一般存在2中写法，</p>
-<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">val <span class="selector-tag">a</span>: Int = <span class="keyword">if</span> (<span class="selector-tag">b</span> != null) <span class="selector-tag">b</span><span class="selector-class">.length</span> <span class="keyword">else</span> -<span class="number">1</span> </span><br></pre></td></tr></table></figure>
-<p>在kotlin中 条件表达式具备返回值，上面的写法我们可以用Elvis操作符（?:）来简写</p>
-<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> a: <span class="built_in">Int</span> = b?.length ?: -<span class="number">1</span> </span><br></pre></td></tr></table></figure>
-<p>这样是不是简单了很多呢</p>
-<h4 id="x3D-x3D-与-x3D-x3D-x3D"><a href="#x3D-x3D-与-x3D-x3D-x3D" class="headerlink" title="&#x3D;&#x3D; 与 &#x3D;&#x3D;&#x3D;"></a>&#x3D;&#x3D; 与 &#x3D;&#x3D;&#x3D;</h4><p>&#x3D;&#x3D;       判断值是否相等。<br>&#x3D;&#x3D;&#x3D;      判断值及引用是否完全相等。</p>
-<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> num = <span class="number">128</span></span><br><span class="line"><span class="keyword">val</span> a:<span class="built_in">Int</span>? = num</span><br><span class="line"><span class="keyword">val</span> b:<span class="built_in">Int</span>? = num</span><br><span class="line">println(<span class="string">&quot;a == b   = <span class="subst">$&#123;a == b&#125;</span> \n a === b = <span class="subst">$&#123;a === b&#125;</span>&quot;</span>)</span><br></pre></td></tr></table></figure>
-
-<p>a &#x3D;&#x3D; b   &#x3D; true<br>a &#x3D;&#x3D;&#x3D; b  &#x3D; false</p>
-<p>a 和 b 都是一个常量，引用的地址当然是不一样的</p>
-<h4 id="-3"><a href="#-3" class="headerlink" title="_"></a>_</h4><p>这个一般是选择忽略返回值</p>
-<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">data <span class="keyword">class</span> <span class="symbol">Book</span>(<span class="symbol">var</span> <span class="symbol">id: <span class="symbol">Int</span>, <span class="symbol">var</span></span> <span class="symbol">name: <span class="symbol">String</span></span>)</span><br><span class="line"><span class="symbol">val</span> <span class="symbol">book</span> = <span class="symbol">Book</span>(<span class="symbol">0, </span>&quot;<span class="symbol">vanda</span>&quot;)</span><br><span class="line"><span class="symbol">val</span> (<span class="symbol">id, <span class="symbol">_</span></span>) = <span class="symbol">book</span></span><br></pre></td></tr></table></figure>
-
-
-
-
-
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
     <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
   </nav>
@@ -1193,7 +1117,7 @@ $ ninja -C out/Release cronet_package
 
 <div class="copyright">
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

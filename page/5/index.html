@@ -128,7 +128,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">46</span>
+          <span class="site-state-item-count">49</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -166,6 +166,452 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/17/%E7%A0%94%E7%A9%B6Notification/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="伍中联">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="伍中联(Vanda)的博客">
+      <meta itemprop="description" content="珍惜在生命中遇到的每一个人">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 伍中联(Vanda)的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2017/03/17/%E7%A0%94%E7%A9%B6Notification/" class="post-title-link" itemprop="url">研究Notification时想知道的进程间通信Binder机制在应用程序框架层的Java接口源代码分析</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2017-03-17 15:20:55" itemprop="dateCreated datePublished" datetime="2017-03-17T15:20:55+08:00">2017-03-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2022-05-11 14:35:00" itemprop="dateModified" datetime="2022-05-11T14:35:00+08:00">2022-05-11</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h4 id="问题来源"><a href="#问题来源" class="headerlink" title="问题来源"></a>问题来源</h4><p>在调研notification时，这里涉及多个进程间的通信。并且在调研push通知开关状态时，涉及到framework的源码分析。所有，对系统想做一个系统的分析学习。</p>
+<p>在framework&#x2F;services&#x2F;java&#x2F;com&#x2F;android&#x2F;server&#x2F;SystemServer.java中</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line">public <span class="keyword">class</span> SystemServer &#123;<span class="operator"></span></span><br><span class="line"><span class="operator"> </span></span><br><span class="line"><span class="operator"> </span></span><br><span class="line"><span class="operator">...</span></span><br><span class="line"><span class="operator"></span>...</span><br><span class="line">    <span class="keyword">private</span> static native void native<span class="constructor">Init()</span>;</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">    public static void main(String<span class="literal">[]</span> args) &#123;</span><br><span class="line"> </span><br><span class="line">        <span class="module-access"><span class="module"><span class="identifier">SystemProperties</span>.</span></span>set(<span class="string">&quot;persist.sys.dalvik.vm.lib&quot;</span>,</span><br><span class="line"> </span><br><span class="line">                             <span class="module-access"><span class="module"><span class="identifier">VMRuntime</span>.</span></span>get<span class="constructor">Runtime()</span>.vm<span class="constructor">Library()</span>);</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">if</span> (<span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>current<span class="constructor">TimeMillis()</span> &lt; EARLIEST_SUPPORTED_TIME) &#123;</span><br><span class="line"> </span><br><span class="line">            <span class="module-access"><span class="module"><span class="identifier">Slog</span>.</span></span>w(TAG, <span class="string">&quot;System clock is before 1970; setting to 1970.&quot;</span>);</span><br><span class="line"> </span><br><span class="line">            <span class="module-access"><span class="module"><span class="identifier">SystemClock</span>.</span></span>set<span class="constructor">CurrentTimeMillis(EARLIEST_SUPPORTED_TIME)</span>;</span><br><span class="line"> </span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">if</span> (<span class="module-access"><span class="module"><span class="identifier">SamplingProfilerIntegration</span>.</span></span>is<span class="constructor">Enabled()</span>) &#123;</span><br><span class="line"> </span><br><span class="line">            <span class="module-access"><span class="module"><span class="identifier">SamplingProfilerIntegration</span>.</span></span>start<span class="literal">()</span>;</span><br><span class="line"> </span><br><span class="line">            timer = <span class="keyword">new</span> <span class="constructor">Timer()</span>;</span><br><span class="line"> </span><br><span class="line">            timer.schedule(<span class="keyword">new</span> <span class="constructor">TimerTask()</span> &#123;</span><br><span class="line"> </span><br><span class="line">                @Override</span><br><span class="line"> </span><br><span class="line">                public void run<span class="literal">()</span> &#123;</span><br><span class="line"> </span><br><span class="line">                    <span class="module-access"><span class="module"><span class="identifier">SamplingProfilerIntegration</span>.</span></span>write<span class="constructor">Snapshot(<span class="string">&quot;system_server&quot;</span>, <span class="params">null</span>)</span>;</span><br><span class="line"> </span><br><span class="line">                &#125;</span><br><span class="line"> </span><br><span class="line">            &#125;, SNAPSHOT_INTERVAL, SNAPSHOT_INTERVAL);</span><br><span class="line"> </span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        <span class="comment">// Mmmmmm... more memory!</span></span><br><span class="line"> </span><br><span class="line">        dalvik.system.<span class="module-access"><span class="module"><span class="identifier">VMRuntime</span>.</span></span>get<span class="constructor">Runtime()</span>.clear<span class="constructor">GrowthLimit()</span>;</span><br><span class="line"> </span><br><span class="line">        <span class="comment">// The system server has to run all of the time, so it needs to be</span></span><br><span class="line"> </span><br><span class="line">        <span class="comment">// as efficient as possible with its memory usage.</span></span><br><span class="line"> </span><br><span class="line">        <span class="module-access"><span class="module"><span class="identifier">VMRuntime</span>.</span></span>get<span class="constructor">Runtime()</span>.set<span class="constructor">TargetHeapUtilization(0.8f)</span>;</span><br><span class="line"> </span><br><span class="line">        <span class="module-access"><span class="module"><span class="identifier">Environment</span>.</span></span>set<span class="constructor">UserRequired(<span class="params">true</span>)</span>;</span><br><span class="line"> </span><br><span class="line">        <span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>load<span class="constructor">Library(<span class="string">&quot;android_servers&quot;</span>)</span>;</span><br><span class="line"> </span><br><span class="line">        <span class="module-access"><span class="module"><span class="identifier">Slog</span>.</span></span>i(TAG, <span class="string">&quot;Entered the Android system server!&quot;</span>);</span><br><span class="line"> </span><br><span class="line">        <span class="comment">// Initialize native services.</span></span><br><span class="line"> </span><br><span class="line">        native<span class="constructor">Init()</span>;</span><br><span class="line">        <span class="comment">// This used to be its own separate thread, but now it is</span></span><br><span class="line"> </span><br><span class="line">        <span class="comment">// just the loop we run on the main thread.</span></span><br><span class="line"> </span><br><span class="line">        ServerThread thr = <span class="keyword">new</span> <span class="constructor">ServerThread()</span>;</span><br><span class="line"> </span><br><span class="line">        thr.init<span class="constructor">AndLoop()</span>;</span><br><span class="line"> </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>这里存在一个java的main函数的入口，这个是初始化应用层相关服务的，我们分析initAndLoop，这个方法里面包含初始化各种系统的Service，而这些都是通过ServiceManager去做的。</p>
+<p>我们需要获取的ServiceManager的Java远程接口是一个ServiceManagerProxy对象的IServiceManager接口。ServiceManagerProxy类图结构：</p>
+<p><img src="/2017/03/17/%E7%A0%94%E7%A9%B6Notification/img/ClassDiagram1.png"></p>
+<p>从上图可以知道ServiceManagerProxy类实现了IServiceManager接口，IServiceManager提供了getService和addService两个成员方法来管理系统中的Service。在ServiceManagerProxy类的构造函数可以得知需要一个BinderProxy对象的IBinder接口来作为参数。因此，要获取ServiceManager的Java远程接口ServiceManagerProxy，首先要有一个BinderProxy对象。BinderProxy对象是如何获得的？</p>
+<p>我们先看看ServiceManager里面做了些什么</p>
+<p><img src="/2017/03/17/%E7%A0%94%E7%A9%B6Notification/img/Main.png"></p>
+<p>我想知道这些Service是如何去通信的，我们看下在ServiceManager中的代码</p>
+<figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** @hide */</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">class</span> <span class="title class_">ServiceManager</span> &#123;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="built_in">String</span> TAG = <span class="string">&quot;ServiceManager&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> IServiceManager sServiceManager;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="built_in">HashMap</span>&lt;<span class="built_in">String</span>, IBinder&gt; sCache = <span class="keyword">new </span><span class="class title_">HashMap</span>&lt;<span class="built_in">String</span>, IBinder&gt;();</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> IServiceManager <span class="title function_">getIServiceManager</span>() &#123;</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">if</span> (sServiceManager != <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> sServiceManager;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// Find the service manager</span></span><br><span class="line">        sServiceManager = ServiceManagerNative.<span class="property">asInterface</span>(BinderInternal.<span class="property">getContextObject</span>());</span><br><span class="line">        <span class="keyword">return</span> sServiceManager;</span><br><span class="line"> </span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上面贴出了ServiceManager的一个静态方法<br>getIServiceManager<br>这个方法是获取Java远程接口，getIServiceManager内部是通过方法<br>ServiceManagerNative.asInterface(BinderInternal.getContextObject())<br>去获取远程接口。在调用ServiceManagerNative.asInterface方法之前是需要传入一个参数，这个参数是<br>BinderInternal.getContextObject()返回的值。我们看下这个方法到底是什么鬼：</p>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> </span></span><br><span class="line"><span class="comment"> * Private and debugging Binder APIs.</span></span><br><span class="line"><span class="comment"> </span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> </span></span><br><span class="line"><span class="comment"> * @see IBinder</span></span><br><span class="line"><span class="comment"> </span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">BinderInternal</span> &#123;</span><br><span class="line">  </span><br><span class="line">...</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> </span></span><br><span class="line"><span class="comment">     * Return the global &quot;context object&quot; of the system.  This is usually</span></span><br><span class="line"><span class="comment"> </span></span><br><span class="line"><span class="comment">     * an implementation of IServiceManager, which you can use to find</span></span><br><span class="line"><span class="comment"> </span></span><br><span class="line"><span class="comment">     * other services.</span></span><br><span class="line"><span class="comment"> </span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line"> </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">native</span> IBinder getContextObject();</span><br><span class="line">  </span><br><span class="line">...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>BinderInternal.getContextObject是一个JNI方法，返回的值是IBinder类型，在framework搜索这个方法的JNI实现</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">static jobject android<span class="constructor">_os_BinderInternal_getContextObject(JNIEnv<span class="operator">*</span> <span class="params">env</span>, <span class="params">jobject</span> <span class="params">clazz</span>)</span></span><br><span class="line"> </span><br><span class="line">&#123;</span><br><span class="line"> </span><br><span class="line">    sp&lt;IBinder&gt; b = ProcessState::self<span class="literal">()</span>-&gt;get<span class="constructor">ContextObject(NULL)</span>;</span><br><span class="line"> </span><br><span class="line">    return java<span class="constructor">ObjectForIBinder(<span class="params">env</span>, <span class="params">b</span>)</span>;</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>首先是调用ProcessState::self函数，self函数是ProcessState的静态成员函数，它的作用是返回一个全局唯一的ProcessState实例变量，就是单例模式了，这个变量名为gProcess。如果gProcess尚未创建，就会执行创建操作，在ProcessState的构造函数中，会通过open文件操作函数打开设备文件&#x2F;dev&#x2F;binder，并且返回来的设备文件描述符保存在成员变量mDriverFD中。<br>接着调用gProcess-&gt;getContextObject函数来获得一个句柄值为0的Binder引用，即BpBinder了,相似的代码：</p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sp&lt;IBinder&gt; b <span class="operator">=</span> new BpBinder(<span class="number">0</span>)<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+
+<p>我们在看看ServiceManagerNative.asInterface里面的代码</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> </span></span><br><span class="line"><span class="comment"> * Native implementation of the service manager.  Most clients will only</span></span><br><span class="line"><span class="comment"> </span></span><br><span class="line"><span class="comment"> * care about getDefault() and possibly asInterface().</span></span><br><span class="line"><span class="comment"> </span></span><br><span class="line"><span class="comment"> * @hide</span></span><br><span class="line"><span class="comment"> </span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"> </span><br><span class="line">public <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">ServiceManagerNative</span> <span class="keyword">extends</span> <span class="title">Binder</span> <span class="title">implements</span> <span class="title">IServiceManager</span></span></span><br><span class="line"> </span><br><span class="line">&#123;</span><br><span class="line"> </span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> </span></span><br><span class="line"><span class="comment">     * Cast a Binder object into a service manager interface, generating</span></span><br><span class="line"><span class="comment"> </span></span><br><span class="line"><span class="comment">     * a proxy if needed.</span></span><br><span class="line"><span class="comment"> </span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line"> </span><br><span class="line">    static public <span class="type">IServiceManager</span> asInterface(<span class="type">IBinder</span> obj)</span><br><span class="line"> </span><br><span class="line">    &#123;</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">if</span> (obj == <span class="literal">null</span>) &#123;</span><br><span class="line"> </span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line"> </span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        <span class="type">IServiceManager</span> in = (<span class="type">IServiceManager</span>)obj.queryLocalInterface(descriptor);</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">if</span> (in != <span class="literal">null</span>) &#123;</span><br><span class="line"> </span><br><span class="line">            <span class="keyword">return</span> in;</span><br><span class="line"> </span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="type">ServiceManagerProxy</span>(obj);</span><br><span class="line"> </span><br><span class="line">    &#125;</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在静态方法asInterface里面需要一个IBinder的参数，就是一个代理对象，如果当地不存在描述的IServiceManager那么就通过这个BinderProxy去创建一个。</p>
+<p>那我们在创建AIDL文件时，系统到底做了什么？</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/16/%E4%B8%8B%E8%BD%BD%E6%A8%A1%E5%9D%97%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%AE%9E%E7%8E%B0%E4%B9%8B%E8%B7%AF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="伍中联">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="伍中联(Vanda)的博客">
+      <meta itemprop="description" content="珍惜在生命中遇到的每一个人">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 伍中联(Vanda)的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2017/02/16/%E4%B8%8B%E8%BD%BD%E6%A8%A1%E5%9D%97%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%AE%9E%E7%8E%B0%E4%B9%8B%E8%B7%AF/" class="post-title-link" itemprop="url">下载模块多线程实现之路</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2017-02-16 16:22:10" itemprop="dateCreated datePublished" datetime="2017-02-16T16:22:10+08:00">2017-02-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2022-05-11 14:35:00" itemprop="dateModified" datetime="2022-05-11T14:35:00+08:00">2022-05-11</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>  春节过后，渐渐进入了工作的状态。在这些天中，主动提出要优化公司产品的下载模块多线程，目前产品是多任务单线程下载模式，这样一旦网络不行的情况下，下载会变的异常或者缓慢。加入文件的多线程下载是每个下载模块的标配了，之前也没有接触这块，所以也算是给自己一个挑战吧。</p>
+<h4 id="对下载模块的Api使用"><a href="#对下载模块的Api使用" class="headerlink" title="对下载模块的Api使用"></a>对下载模块的Api使用</h4><ol>
+<li>一个模块简单易用是最基本的要求</li>
+<li>配置简单</li>
+</ol>
+<h4 id="分析梳理现有的模块和思路"><a href="#分析梳理现有的模块和思路" class="headerlink" title="分析梳理现有的模块和思路"></a>分析梳理现有的模块和思路</h4><p>大致的任务启动分析路径</p>
+<p>![](.&#x2F;%E4%B8%8B%E8%BD%BD%E6%A8%A1%E5%9D%97%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%AE%9E%E7%8E%B0%E4%B9%8B%E8%B7%AF&#x2F;img&#x2F;FlowchartDiagram下载模块流程图.png %}</p>
+<h4 id="多线程下载原理"><a href="#多线程下载原理" class="headerlink" title="多线程下载原理"></a>多线程下载原理</h4><ol>
+<li>多线程下载是将文件分成多段，然后从分割段开始下载，多线程需要服务器支持断点续传特性。</li>
+<li>文件存储和IO，关于文件存储写入的问题也有很多方案，目前采用的方案是预创建整个文件大小，然后利用文件的seek找到对应指针的位置。</li>
+<li>对于每个任务我们会有一张表记录每个任务中的线程下载记录，然后同步数据从而实现多线程的文件下载，每个任务ID对应其任务的线程。</li>
+<li>多线程不可避免会出现线程同步问题，基本做法是当前线程需要知道兄弟线程下载的状态，我们定义了一组线程间状态读取接口，同步线程数组锁，询问兄弟线程isCompleteForOthers</li>
+<li>为了更好的承接上层业务我们封装了业务层，使接入成本降低</li>
+</ol>
+<p>实现多线程核心类图构成：</p>
+<p><img src="/2017/02/16/%E4%B8%8B%E8%BD%BD%E6%A8%A1%E5%9D%97%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%AE%9E%E7%8E%B0%E4%B9%8B%E8%B7%AF/img/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%B1%BB%E5%9B%BE.png"></p>
+<h4 id="文件IO"><a href="#文件IO" class="headerlink" title="文件IO"></a>文件IO</h4><p>对于文件IO这块，我们使用了Okio做为文件IO的底层工具，使用RandomAccessFile来实现文件的seek，从而实现文件的断点操作。为了最大化的加快文件的写入操作，我们加入了文件的预创建过程。</p>
+<p><img src="/2017/02/16/%E4%B8%8B%E8%BD%BD%E6%A8%A1%E5%9D%97%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%AE%9E%E7%8E%B0%E4%B9%8B%E8%B7%AF/img/Thread-write.png"></p>
+<h4 id="IO性能测试"><a href="#IO性能测试" class="headerlink" title="IO性能测试"></a>IO性能测试</h4><p>这里的测试数据是将内存中的10MB的数据写入到磁盘的平均时间</p>
+<table>
+<thead>
+<tr>
+<th>FileOutputStream</th>
+<th>BufferedOutputStream</th>
+<th>RandomAccessFile</th>
+<th>BufferedSink</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>2983</td>
+<td>2461</td>
+<td>2369</td>
+<td>2369</td>
+</tr>
+<tr>
+<td>2493</td>
+<td>5073</td>
+<td>2430</td>
+<td>2393</td>
+</tr>
+<tr>
+<td>2780</td>
+<td>2460</td>
+<td>2421</td>
+<td>2389</td>
+</tr>
+<tr>
+<td>2492</td>
+<td>2966</td>
+<td>2427</td>
+<td>2361</td>
+</tr>
+<tr>
+<td>2870</td>
+<td>2501</td>
+<td>2570</td>
+<td>2365</td>
+</tr>
+<tr>
+<td>2490</td>
+<td>3011</td>
+<td>2430</td>
+<td>2372</td>
+</tr>
+<tr>
+<td>2963</td>
+<td>2559</td>
+<td>2400</td>
+<td>2361</td>
+</tr>
+<tr>
+<td>2493</td>
+<td>2446</td>
+<td>2438</td>
+<td>2346</td>
+</tr>
+<tr>
+<td>2615</td>
+<td>4811</td>
+<td>2400</td>
+<td>2367</td>
+</tr>
+<tr>
+<td>2518</td>
+<td>3010</td>
+<td>2398</td>
+<td>2344</td>
+</tr>
+</tbody></table>
+<p>平均值：</p>
+<table>
+<thead>
+<tr>
+<th>2669.7</th>
+<th>3129.8</th>
+<th>2428.3</th>
+<th>2366.7</th>
+</tr>
+</thead>
+</table>
+<p>这里的测试环境是有一个文件输入流，一个文件的输出流，然后每次读取相同的BUFFER_SIZE &#x3D; 1024 * 8       来测试IO性能</p>
+<table>
+<thead>
+<tr>
+<th>FileOutputStream</th>
+<th>BufferedOutputStream</th>
+<th>RandomAccessFile</th>
+<th>BufferedSink</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>2144</td>
+<td>2162</td>
+<td>2265</td>
+<td>2313</td>
+</tr>
+<tr>
+<td>2447</td>
+<td>3991</td>
+<td>2205</td>
+<td>2313</td>
+</tr>
+<tr>
+<td>2211</td>
+<td>2241</td>
+<td>2196</td>
+<td>2309</td>
+</tr>
+<tr>
+<td>2474</td>
+<td>2276</td>
+<td>2191</td>
+<td>2293</td>
+</tr>
+<tr>
+<td>2230</td>
+<td>2446</td>
+<td>2184</td>
+<td>2338</td>
+</tr>
+<tr>
+<td>3305</td>
+<td>2305</td>
+<td>2201</td>
+<td>2329</td>
+</tr>
+<tr>
+<td>4772</td>
+<td>2191</td>
+<td>2827</td>
+<td>2271</td>
+</tr>
+<tr>
+<td>2418</td>
+<td>2304</td>
+<td>2795</td>
+<td>2294</td>
+</tr>
+<tr>
+<td>2319</td>
+<td>2204</td>
+<td>2166</td>
+<td>2279</td>
+</tr>
+<tr>
+<td>2316</td>
+<td>2261</td>
+<td>2797</td>
+<td>2244</td>
+</tr>
+</tbody></table>
+<p>平均值：</p>
+<table>
+<thead>
+<tr>
+<th>2663.6</th>
+<th>2438.1</th>
+<th>2382.7</th>
+<th>2298.3</th>
+</tr>
+</thead>
+</table>
+<p>可以从上面的数据看出，使用Okio文件写入非常稳定。</p>
+<h4 id="预创建文件"><a href="#预创建文件" class="headerlink" title="预创建文件"></a>预创建文件</h4><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">long</span> KBSIZE = <span class="number">1024</span>;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">long</span> MBSIZE1 = <span class="number">1024</span> * <span class="number">1024</span>;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">long</span> MBSIZE10 = <span class="number">1024</span>L * <span class="number">1024</span> * <span class="number">10</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> createFile(<span class="keyword">File</span> <span class="keyword">file</span>, <span class="keyword">long</span> fileLength, <span class="keyword">final</span> ValueCallback valueCallback) &#123;</span><br><span class="line">    FileOutputStream fos = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (!<span class="keyword">file</span>.exists()) &#123;</span><br><span class="line">            <span class="keyword">boolean</span> ret = <span class="keyword">file</span>.createNewFile();</span><br><span class="line">            <span class="keyword">if</span> (!ret) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">long</span> batchSize = <span class="number">0</span>;</span><br><span class="line">        batchSize = fileLength;</span><br><span class="line">        <span class="keyword">if</span> (fileLength &gt; KBSIZE) &#123;</span><br><span class="line">            batchSize = KBSIZE;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (fileLength &gt; MBSIZE1) &#123;</span><br><span class="line">            batchSize = MBSIZE1;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (fileLength &gt; MBSIZE10) &#123;</span><br><span class="line">            batchSize = MBSIZE10;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">long</span> <span class="keyword">count</span> = fileLength / batchSize;</span><br><span class="line">        <span class="keyword">long</span> last = fileLength % batchSize;</span><br><span class="line"></span><br><span class="line">        fos = <span class="keyword">new</span> FileOutputStream(<span class="keyword">file</span>);</span><br><span class="line">        FileChannel fileChannel = fos.getChannel();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">long</span> i = <span class="number">0</span>; i &lt; <span class="keyword">count</span>; i++) &#123;</span><br><span class="line">            ByteBuffer buffer = ByteBuffer.allocate((<span class="keyword">int</span>) batchSize);</span><br><span class="line">            fileChannel.<span class="keyword">write</span>(buffer);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (i % <span class="number">3</span> == <span class="number">0</span> &amp;&amp; valueCallback != <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">float</span> x = i;</span><br><span class="line">                <span class="keyword">float</span> y = <span class="keyword">count</span>;</span><br><span class="line">                <span class="keyword">int</span> progress = (<span class="keyword">int</span>) ((x / y) * <span class="number">100</span>);</span><br><span class="line">                valueCallback.onReceiveValue(progress);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        ByteBuffer buffer = ByteBuffer.allocate((<span class="keyword">int</span>) last);</span><br><span class="line">        fileChannel.<span class="keyword">write</span>(buffer);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (valueCallback != <span class="keyword">null</span>) &#123;</span><br><span class="line">            valueCallback.onReceiveValue(<span class="number">100</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line"></span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (fos != <span class="keyword">null</span>) &#123;</span><br><span class="line">                fos.close();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<h4 id="测试用例图"><a href="#测试用例图" class="headerlink" title="测试用例图"></a>测试用例图</h4><p><img src="/2017/02/16/%E4%B8%8B%E8%BD%BD%E6%A8%A1%E5%9D%97%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%AE%9E%E7%8E%B0%E4%B9%8B%E8%B7%AF/img/%E4%B8%8B%E8%BD%BD%E6%A8%A1%E5%9D%97Test.png"></p>
+<p>开始一个任务，上层任务保留了文件的基本特性，使用方式：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> void start<span class="constructor">Task(String <span class="params">url</span>, String <span class="params">contentDisposition</span>, String <span class="params">mimetype</span>)</span> &#123;</span><br><span class="line">        String mT = <span class="module-access"><span class="module"><span class="identifier">MimeUtils</span>.</span></span>guess<span class="constructor">MimeTypeFromExtension(MimeUtils.<span class="params">getFileExtensionFromFileName</span>(MimeUtils.<span class="params">guessFileName</span>(<span class="params">url</span>, <span class="params">contentDisposition</span>, <span class="params">mimetype</span>)</span>));</span><br><span class="line">        ProDownloadRequest request = <span class="keyword">new</span> ProDownloadRequest.<span class="constructor">Builder()</span></span><br><span class="line">                .url(url)</span><br><span class="line">                .title(<span class="module-access"><span class="module"><span class="identifier">MimeUtils</span>.</span></span>guess<span class="constructor">FileName(<span class="params">url</span>, <span class="params">contentDisposition</span>, <span class="params">mimetype</span>)</span>)</span><br><span class="line">                .<span class="built_in">ref</span><span class="constructor">Url(<span class="params">url</span>)</span></span><br><span class="line">                .mime<span class="constructor">Type(StringUtils.<span class="params">isEmpty</span>(<span class="params">mT</span>)</span> ? mimetype : mT)</span><br><span class="line">                .build<span class="literal">()</span>;</span><br><span class="line"></span><br><span class="line">        <span class="module-access"><span class="module"><span class="identifier">ProDownloadManager</span>.</span></span>get<span class="constructor">Instance()</span>.create<span class="constructor">Task(<span class="params">request</span>)</span>.add<span class="constructor">OnStateChangeListener(<span class="params">new</span> OnStateChangeListener()</span> &#123;</span><br><span class="line">            @Override</span><br><span class="line">            public void on<span class="constructor">StateChange(ProDownloadTask <span class="params">task</span>, <span class="params">int</span> <span class="params">status</span>, <span class="params">long</span> <span class="params">sofar</span>, <span class="params">long</span> <span class="params">total</span>)</span> &#123;</span><br><span class="line">                <span class="comment">//your code</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;).start<span class="literal">()</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/08/2017%E6%88%91%E7%9A%84%E8%AE%A1%E5%88%92%EF%BC%8C%E8%87%AA%E6%88%91%E6%88%90%E9%95%BF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="伍中联">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="伍中联(Vanda)的博客">
+      <meta itemprop="description" content="珍惜在生命中遇到的每一个人">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 伍中联(Vanda)的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2017/02/08/2017%E6%88%91%E7%9A%84%E8%AE%A1%E5%88%92%EF%BC%8C%E8%87%AA%E6%88%91%E6%88%90%E9%95%BF/" class="post-title-link" itemprop="url">2017我的计划，自我成长</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2017-02-08 15:00:46" itemprop="dateCreated datePublished" datetime="2017-02-08T15:00:46+08:00">2017-02-08</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2017-08-23 15:55:16" itemprop="dateModified" datetime="2017-08-23T15:55:16+08:00">2017-08-23</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>去年浪费了许多时间，很多自己想要做的事情偷懒没有做，或者总因为工作忙的原因而搁置。我是一个不甘安逸、不服输的人。2017刚开始，我需要有一个自己的目标，这个目标并不是要在工作中有多少突破，而是我希望自己更好的规划自己的时间，留出一部分时间做自己想要去做的事情。       </p>
+<h4 id="几天的一个人的日子"><a href="#几天的一个人的日子" class="headerlink" title="几天的一个人的日子"></a>几天的一个人的日子</h4><p>   初八回广州，一个人，第一次感觉到了孤单，什么也不想做，什么也不去想。甚至我陪一直着一只流浪猫玩。经过几天的，我开始想起自己当初想要的日子，人生需要计划，需要去实践，更需要恒心。</p>
+<h4 id="多写写自己的博客"><a href="#多写写自己的博客" class="headerlink" title="多写写自己的博客"></a>多写写自己的博客</h4><p>   在工作中，很多东西都没能仔细深探究，总是徘徊在完成任务。现在自己逐渐突破了这个，对于一个项目我都会去查看其细节，然后写自己的分析，记录下来。</p>
+<h4 id="多花时间看书"><a href="#多花时间看书" class="headerlink" title="多花时间看书"></a>多花时间看书</h4><p>   之前的工作习惯，都会不定时看书，现在看书的频率很低。这里给自己一个定一个目标，看完一本一位博主写的Android开发总结，并自己也写下自己的分析理解。</p>
+<h4 id="少玩游戏，最好不玩"><a href="#少玩游戏，最好不玩" class="headerlink" title="少玩游戏，最好不玩"></a>少玩游戏，最好不玩</h4><p>   我自己比较贪玩，经常会玩游戏而忘记一切，不服输的态度让我一晚就停不下来，现在自己玩游戏也渐渐很少了。多用这些时间看看电影，出去和朋友聊聊天。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -774,7 +1220,7 @@
 
 <div class="copyright">
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
