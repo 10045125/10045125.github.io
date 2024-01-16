@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width">
-<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.1.0">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
 
 
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
@@ -128,7 +128,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">49</span>
+          <span class="site-state-item-count">50</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -166,6 +166,136 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/22/Build-Chromium-Net-For-Android/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="伍中联">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="伍中联(Vanda)的博客">
+      <meta itemprop="description" content="珍惜在生命中遇到的每一个人">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 伍中联(Vanda)的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2019/01/22/Build-Chromium-Net-For-Android/" class="post-title-link" itemprop="url">Build Chromium Net For Android</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2019-01-22 15:18:20" itemprop="dateCreated datePublished" datetime="2019-01-22T15:18:20+08:00">2019-01-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2019-01-25 15:13:08" itemprop="dateModified" datetime="2019-01-25T15:13:08+08:00">2019-01-25</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>##前言</p>
+<p>由于项目中需要使用验证QUIC协议，针对目前的QUIC协议的客户端支持，唯一的选择就是Chromium的Net库，所以方便后续的功能定制开发，就花了大部分时间来进行Net模块的编译和开发。</p>
+<h2 id="一些坑的感受"><a href="#一些坑的感受" class="headerlink" title="一些坑的感受"></a>一些坑的感受</h2><p>Chromium作为一个庞大的工程，其文档和工具应该都非常完善，所以需要开发Chromium最好的就是Chromium本身提供的说明文档。</p>
+<p>Chromium工程和依赖非常大，我这边去到了25GB之多，这还是不包括系统本身的依赖。</p>
+<p>Chromium本身不支持Mac下的编译，所以我选择了使用Ubuntu来进行编译开发</p>
+<h2 id="Chromium"><a href="#Chromium" class="headerlink" title="Chromium"></a>Chromium</h2><p>站点：<a target="_blank" rel="noopener" href="https://www.chromium.org/Home">Chromium</a></p>
+<p>代码搜索功能：<a target="_blank" rel="noopener" href="https://cs.chromium.org/">代码搜索</a></p>
+<p>代码的搜索功能是非常有用的功能，能够快速的找到相关的代码引用，当然如果自己去搭建也是可以的（目前我已经编译出Ubuntu的Chromium和Android的Chromium，能够顺利的进行debug，后续文章介绍如果操作）</p>
+<h2 id="针对Android的代码获取"><a href="#针对Android的代码获取" class="headerlink" title="针对Android的代码获取"></a>针对Android的代码获取</h2><p>这里面有详细的操作流程</p>
+<p><a target="_blank" rel="noopener" href="https://chromium.googlesource.com/chromium/src/+/master/docs/android_build_instructions.md">获取代码</a></p>
+<p>获取代码需要能够访问Google的网络，由于不具备续传，所以断了就GG了。</p>
+<h2 id="Install-depot-tools"><a href="#Install-depot-tools" class="headerlink" title="Install depot_tools"></a>Install depot_tools</h2><p>获取depot_tools repository:</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https:<span class="regexp">//</span>chromium.googlesource.com<span class="regexp">/chromium/</span>tools/depot_tools.git</span><br></pre></td></tr></table></figure>
+
+<p>添加depot_tools到PATH</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> <span class="attribute">PATH</span>=<span class="string">&quot;<span class="variable">$PATH</span>:/path/to/depot_tools&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="获取代码"><a href="#获取代码" class="headerlink" title="获取代码"></a>获取代码</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> ~/chromium &amp;&amp; <span class="built_in">cd</span> ~/chromium</span><br><span class="line">fetch --no-history android</span><br></pre></td></tr></table></figure>
+
+<p>这样会快一点，另外这样的是最新的版本，如果需要切换到指定的版本，</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">git</span> fetch origin tag <span class="number">73</span>.<span class="number">0</span>.<span class="number">3657</span>.<span class="number">0</span></span><br></pre></td></tr></table></figure>
+
+<p>这个步骤会比较漫长，耐心等待吧。。。</p>
+<p>之后就参考官方的说明就可以了。</p>
+<h2 id="编译Cronet模块"><a href="#编译Cronet模块" class="headerlink" title="编译Cronet模块"></a>编译Cronet模块</h2><p>Chromium 采用 gn + ninja来构建的，通过一些配置选项来支持构建的。<br>如果clone下代码后并且已经安装好依赖后，Cronet模块位于 </p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">src<span class="regexp">/components/</span>cronet</span><br></pre></td></tr></table></figure>
+<p>这个是针对Android和iOS提供了net模块的支持，android文件夹里面有jni模块和Java层的api方法，jni不需要自己手动去编译，Chromium是通过注解来自动生成的。</p>
+<p>需要编译这个也很简单，在这个目录中有一个编译介绍的文档，我这边贴出来, 很详细了吧</p>
+<h1 id="Cronet-build-instructions"><a href="#Cronet-build-instructions" class="headerlink" title="Cronet build instructions"></a>Cronet build instructions</h1><p>[TOC]</p>
+<h2 id="Checking-out-the-code"><a href="#Checking-out-the-code" class="headerlink" title="Checking out the code"></a>Checking out the code</h2><p>Follow all the<br><a target="_blank" rel="noopener" href="https://www.chromium.org/developers/how-tos/get-the-code">Get the Code</a><br>instructions for your target platform up to and including running hooks.</p>
+<h2 id="Building-Cronet-for-development-and-debugging"><a href="#Building-Cronet-for-development-and-debugging" class="headerlink" title="Building Cronet for development and debugging"></a>Building Cronet for development and debugging</h2><p>To build Cronet for development and debugging purposes:</p>
+<p>First, <code>gn</code> is used to create ninja files targeting the intended platform, then<br><code>ninja</code> executes the ninja files to run the build.</p>
+<h3 id="Android-x2F-iOS-builds"><a href="#Android-x2F-iOS-builds" class="headerlink" title="Android &#x2F; iOS builds"></a>Android &#x2F; iOS builds</h3><pre><code class="shell">$ ./components/cronet/tools/cr_cronet.py gn --out_dir=out/Cronet
+</code></pre>
+<p>If the build host is Linux, Android binaries will be built. If the build host is<br>macOS, iOS binaries will be built.</p>
+<p>Note: these commands clobber output of previously executed gn commands in<br><code>out/Cronet</code>. If <code>--out_dir</code> is left out, the output directory defaults to<br><code>out/Debug</code> for debug builds and <code>out/Release</code> for release builds (see below).</p>
+<p>If <code>--x86</code> option is specified, then a native library is built for Intel x86<br>architecture, and the output directory defaults to <code>out/Debug-x86</code> if<br>unspecified. This can be useful for running on mobile emulators.</p>
+<h3 id="Desktop-builds-targets-the-current-OS"><a href="#Desktop-builds-targets-the-current-OS" class="headerlink" title="Desktop builds (targets the current OS)"></a>Desktop builds (targets the current OS)</h3><p>TODO(caraitto): Specify how to target Chrome OS and Fuchsia.</p>
+<pre><code class="shell">gn gen out/Cronet
+</code></pre>
+<h3 id="Running-the-ninja-files"><a href="#Running-the-ninja-files" class="headerlink" title="Running the ninja files"></a>Running the ninja files</h3><p>Now, use the generated ninja files to execute the build against the<br><code>cronet_package</code> build target:</p>
+<pre><code class="shell">$ ninja -C out/Cronet cronet_package
+</code></pre>
+<h2 id="Building-Cronet-mobile-for-releases"><a href="#Building-Cronet-mobile-for-releases" class="headerlink" title="Building Cronet mobile for releases"></a>Building Cronet mobile for releases</h2><p>To build Cronet with optimizations and with debug information stripped out:</p>
+<pre><code class="shell">$ ./components/cronet/tools/cr_cronet.py gn --release
+$ ninja -C out/Release cronet_package
+</code></pre>
+<p>Note: these commands clobber output of previously executed gn commands in<br><code>out/Release</code>.</p>
+<h2 id="Building-for-other-architectures"><a href="#Building-for-other-architectures" class="headerlink" title="Building for other architectures"></a>Building for other architectures</h2><p>By default ARMv7 32-bit executables are generated. To generate executables<br>targeting other architectures modify <a href="tools/cr_cronet.py">cr_cronet.py</a>‘s<br><code>gn_args</code> variable to include:</p>
+<ul>
+<li>For ARMv8 64-bit: <code>target_cpu=&quot;arm64&quot;</code></li>
+<li>For x86 32-bit: <code>target_cpu=&quot;x86&quot;</code></li>
+<li>For x86 64-bit: <code>target_cpu=&quot;x64&quot;</code></li>
+</ul>
+<p>Alternatively you can run <code>gn args &#123;out_dir&#125;</code> and modify arguments in the editor<br>that comes up. This has advantage of not changing <code>cr_cronet.py</code>.</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -988,76 +1118,6 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/24/2018-%E5%B9%BF%E5%B7%9E%E5%88%B0%E6%9D%AD%E5%B7%9E/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="伍中联">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="伍中联(Vanda)的博客">
-      <meta itemprop="description" content="珍惜在生命中遇到的每一个人">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 伍中联(Vanda)的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2018/02/24/2018-%E5%B9%BF%E5%B7%9E%E5%88%B0%E6%9D%AD%E5%B7%9E/" class="post-title-link" itemprop="url">2018 广州到杭州</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-      
-
-      <time title="Created: 2018-02-24 10:23:10 / Modified: 10:50:55" itemprop="dateCreated datePublished" datetime="2018-02-24T10:23:10+08:00">2018-02-24</time>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h4 id="带着不舍离开"><a href="#带着不舍离开" class="headerlink" title="带着不舍离开"></a>带着不舍离开</h4><p>2018春节刚过，从广州到杭州，之间有考虑了多次，换城市是一件非常麻烦的事情，其实伴着也很无奈，</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
     <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
   </nav>
@@ -1071,7 +1131,7 @@
 
 <div class="copyright">
   &copy; 
-  <span itemprop="copyrightYear">2023</span>
+  <span itemprop="copyrightYear">2024</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

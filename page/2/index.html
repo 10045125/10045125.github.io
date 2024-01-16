@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width">
-<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.1.0">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
 
 
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
@@ -128,7 +128,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">49</span>
+          <span class="site-state-item-count">50</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -166,6 +166,121 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/22/Cronet%E5%90%8C%E6%AD%A5%E6%A8%A1%E5%9E%8B%E5%BC%82%E6%AD%A5%E8%AF%B7%E6%B1%82%E5%88%86%E6%9E%90%E4%B8%8E%E5%AE%8C%E5%96%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="伍中联">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="伍中联(Vanda)的博客">
+      <meta itemprop="description" content="珍惜在生命中遇到的每一个人">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | 伍中联(Vanda)的博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2019/12/22/Cronet%E5%90%8C%E6%AD%A5%E6%A8%A1%E5%9E%8B%E5%BC%82%E6%AD%A5%E8%AF%B7%E6%B1%82%E5%88%86%E6%9E%90%E4%B8%8E%E5%AE%8C%E5%96%84/" class="post-title-link" itemprop="url">Cronet同步模型异步请求分析与完善</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2019-12-22 15:59:08" itemprop="dateCreated datePublished" datetime="2019-12-22T15:59:08+08:00">2019-12-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2022-05-11 14:21:54" itemprop="dateModified" datetime="2022-05-11T14:21:54+08:00">2022-05-11</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h3 id="1-背景"><a href="#1-背景" class="headerlink" title="1. 背景"></a>1. 背景</h3><p>在通过数据分析的过程中，发现我们在统计上无法统计到404的场景，透过数据去查问题，由于我们App使用OkHttp、Cronet的混合，通过动态调度来进行切换，这里主要是记录使用cronet遇到的问题。</p>
+<h3 id="2-Cronet使用模型"><a href="#2-Cronet使用模型" class="headerlink" title="2. Cronet使用模型"></a>2. Cronet使用模型</h3><p>Android Cronet是异步网络库（Java封装层），请求是异步，结果通过回调的方式；但是官方基于异步模型封装了一个同步请求的，接下来我们来介绍这2种方式。</p>
+<h3 id="2-1-异步方式请求Cronet"><a href="#2-1-异步方式请求Cronet" class="headerlink" title="2.1 异步方式请求Cronet"></a>2.1 异步方式请求Cronet</h3><p>先看下大致的异步请求代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">private</span> CronetEngine <span class="title function_">getCronetEngine</span><span class="params">(Context context)</span> &#123;</span><br><span class="line">        <span class="comment">// Enable caching of HTTP data and</span></span><br><span class="line">        <span class="comment">// other information like QUIC server information, HTTP/2 protocol and QUIC protocol.</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">CronetEngine</span>.Builder(context)</span><br><span class="line">                .enableHttpCache(CronetEngine.Builder.HTTP_CACHE_IN_MEMORY, <span class="number">100</span> * <span class="number">1024</span>)</span><br><span class="line">                .enableHttp2(<span class="literal">true</span>)</span><br><span class="line">                .enableQuic(<span class="literal">true</span>)</span><br><span class="line">                .build();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">request</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="comment">// Create an executor to execute the request</span></span><br><span class="line">        <span class="type">Executor</span> <span class="variable">executor</span> <span class="operator">=</span> Executors.newSingleThreadExecutor();</span><br><span class="line">        UrlRequest.<span class="type">Callback</span> <span class="variable">callback</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SimpleUrlRequestCallback</span>();</span><br><span class="line">        <span class="comment">// 实际上CronetEngine不这样用，需要全局的</span></span><br><span class="line">        UrlRequest.<span class="type">Builder</span> <span class="variable">builder</span> <span class="operator">=</span> getCronetEngine().newUrlRequestBuilder(</span><br><span class="line">                url, callback, executor);</span><br><span class="line">        <span class="comment">// Start the request</span></span><br><span class="line">        builder.setRequestFinishedListener(<span class="built_in">this</span>)</span><br><span class="line">        .build().start();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">class</span> <span class="title class_">SimpleUrlRequestCallback</span> <span class="keyword">extends</span> <span class="title class_">UrlRequest</span>.Callback &#123;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onRedirectReceived</span><span class="params">(</span></span><br><span class="line"><span class="params">                UrlRequest request, UrlResponseInfo info, String newLocationUrl)</span> &#123;</span><br><span class="line">            request.followRedirect();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onResponseStarted</span><span class="params">(UrlRequest request, UrlResponseInfo info)</span> &#123;</span><br><span class="line">            <span class="comment">// 响应开始，比如一个请求需要判断是否是http层的成功（httpcode == 200）</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onReadCompleted</span><span class="params">(</span></span><br><span class="line"><span class="params">                UrlRequest request, UrlResponseInfo info, ByteBuffer byteBuffer)</span> &#123;           </span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onSucceeded</span><span class="params">(UrlRequest request, UrlResponseInfo info)</span> &#123;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onFailed</span><span class="params">(UrlRequest var1, UrlResponseInfo var2, CronetException var3)</span> &#123;</span><br><span class="line">                   &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br></pre></td></tr></table></figure>
+
+<p>以上代码就是cronet请求的样子，发起请求时，需要提供一个callback，这个callback，但是这个callback的触发不完全是被动，需要进行某些操作才能够触发。异步请求个人在实践过程中发现一个问题，这个问题就是在请求响应回来时，我们会对code进行判断，判断是否是http层成功（code&#x3D;&#x3D;200），如果不是http层成功，比如4xx、5xx，那么我们就会回调一个error给上层的业务。</p>
+<p>如下时序图：</p>
+<p><img src="/2019/12/22/Cronet%E5%90%8C%E6%AD%A5%E6%A8%A1%E5%9E%8B%E5%BC%82%E6%AD%A5%E8%AF%B7%E6%B1%82%E5%88%86%E6%9E%90%E4%B8%8E%E5%AE%8C%E5%96%84/img/Cronet%E5%BC%82%E6%AD%A5%E6%97%B6%E5%BA%8F%E5%9B%BE.png"></p>
+<p>有如下的说明：</p>
+<ul>
+<li>时序图中，onResponseStarted方法是已经响应处理的地方，如果这个时候判断code非成功（成功是200&#x3D;&lt;code&lt;300）,直接return，cronet底层的metric监控将不会回调</li>
+<li>只有进行数据的读取操作，才会调用onReadCompleted、onSucceeded</li>
+<li>连接、ssl、数据读取会产生异常</li>
+<li>触发Metric监控的回调cronet内部产生了异常、进行了读取数据（成功、失败）、上层调用cancel</li>
+<li>Cronet面向Android的Java层api，没有提供close接口，只有cancel</li>
+</ul>
+<p>网络底层统计逻辑，面对各种各样的请求，我们不能在面向业务回调的地方进行埋点，Cronet提供了一套完整的监控回调体系，如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">Listener</span> &#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">final</span> Executor mExecutor;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="title function_">Listener</span><span class="params">(Executor executor)</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (executor == <span class="literal">null</span>) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalStateException</span>(<span class="string">&quot;Executor must not be null&quot;</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="built_in">this</span>.mExecutor = executor;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title function_">onRequestFinished</span><span class="params">(RequestFinishedInfo var1)</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> Executor <span class="title function_">getExecutor</span><span class="params">()</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="built_in">this</span>.mExecutor;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>提供了一个抽象的类，来进行数据的收集，在上面的请求中的<code>setRequestFinishedListener</code>，我们可以针对每个请求加上监听回调。</p>
+<p>所以在底层通过RequestFinishedListener来监听获取请求网络数据，需要解决异步回调处理非 200 响应code的问题，比如如下处理：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onResponseStarted</span><span class="params">(UrlRequest urlRequest, UrlResponseInfo urlResponseInfo)</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (!isSuccessful(urlResponseInfo.getHttpStatusCode())) &#123;</span><br><span class="line">                handleFail(urlResponseInfo,</span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">CronetExceptionImpl</span>(<span class="string">&quot;onResponseStarted code error &quot;</span> +</span><br><span class="line">                                urlResponseInfo.getHttpStatusCode(),</span><br><span class="line">                                <span class="keyword">new</span> <span class="title class_">Exception</span>(<span class="string">&quot;code is &quot;</span> + urlResponseInfo.getHttpStatusCode())</span><br><span class="line">                        ));</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            urlRequest.read(ByteBuffer.allocateDirect(CAPACITY));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>判断code是否是成功的http响应，不是的话就直接return，这样就会导致底层的监听没有回调，为啥没有回调？</p>
+<ul>
+<li>能回调onResponseStarted方法，说明网络层tcp层是成功的，由于没有进行数据的读取，所以不会驱动onReadCompleted、onSucceeded的回调，所以也就没有回调Metric监听器</li>
+</ul>
+<p>目前底层Metric监控的状态回调中有三种状态：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">SUCCEEDED</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">FAILED</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">CANCELED</span> <span class="operator">=</span> <span class="number">2</span>;</span><br><span class="line">    </span><br></pre></td></tr></table></figure>
+
+<p>如果在这里判断http code来决定是否读取数据，会导致监控数据缺失，所以这处应该要调用release</p>
+<p>或者 close 接口，但cronet 在java层并没有提供。</p>
+<h3 id="2-2-添加close接口"><a href="#2-2-添加close接口" class="headerlink" title="2.2 添加close接口"></a>2.2 添加close接口</h3><p>由于连接、ssl这块如果出现问题，会回调onFail，也会到底层Metric接口中，所有close只需要处理以下2种场景</p>
+<ul>
+<li>http层非成功的响应码（4xx、5xx这些）</li>
+<li>同步请求中，读超时（http code 200）</li>
+</ul>
+<h2 id="3-同步请求"><a href="#3-同步请求" class="headerlink" title="3 同步请求"></a>3 同步请求</h2><p>同步请求是使用UrlHttpConnection的接口来封装的，也就是同步调用的异步网络请求方式。</p>
+<p>比如下载场景的，同步接口调用的时序图：</p>
+<p><img src="/2019/12/22/Cronet%E5%90%8C%E6%AD%A5%E6%A8%A1%E5%9E%8B%E5%BC%82%E6%AD%A5%E8%AF%B7%E6%B1%82%E5%88%86%E6%9E%90%E4%B8%8E%E5%AE%8C%E5%96%84/img/Cronet%E5%90%8C%E6%AD%A5%E6%97%B6%E5%BA%8F%E5%9B%BE.png"></p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -974,136 +1089,6 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/22/Build-Chromium-Net-For-Android/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="伍中联">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="伍中联(Vanda)的博客">
-      <meta itemprop="description" content="珍惜在生命中遇到的每一个人">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | 伍中联(Vanda)的博客">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2019/01/22/Build-Chromium-Net-For-Android/" class="post-title-link" itemprop="url">Build Chromium Net For Android</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-
-      <time title="Created: 2019-01-22 15:18:20" itemprop="dateCreated datePublished" datetime="2019-01-22T15:18:20+08:00">2019-01-22</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2019-01-25 15:13:08" itemprop="dateModified" datetime="2019-01-25T15:13:08+08:00">2019-01-25</time>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>##前言</p>
-<p>由于项目中需要使用验证QUIC协议，针对目前的QUIC协议的客户端支持，唯一的选择就是Chromium的Net库，所以方便后续的功能定制开发，就花了大部分时间来进行Net模块的编译和开发。</p>
-<h2 id="一些坑的感受"><a href="#一些坑的感受" class="headerlink" title="一些坑的感受"></a>一些坑的感受</h2><p>Chromium作为一个庞大的工程，其文档和工具应该都非常完善，所以需要开发Chromium最好的就是Chromium本身提供的说明文档。</p>
-<p>Chromium工程和依赖非常大，我这边去到了25GB之多，这还是不包括系统本身的依赖。</p>
-<p>Chromium本身不支持Mac下的编译，所以我选择了使用Ubuntu来进行编译开发</p>
-<h2 id="Chromium"><a href="#Chromium" class="headerlink" title="Chromium"></a>Chromium</h2><p>站点：<a target="_blank" rel="noopener" href="https://www.chromium.org/Home">Chromium</a></p>
-<p>代码搜索功能：<a target="_blank" rel="noopener" href="https://cs.chromium.org/">代码搜索</a></p>
-<p>代码的搜索功能是非常有用的功能，能够快速的找到相关的代码引用，当然如果自己去搭建也是可以的（目前我已经编译出Ubuntu的Chromium和Android的Chromium，能够顺利的进行debug，后续文章介绍如果操作）</p>
-<h2 id="针对Android的代码获取"><a href="#针对Android的代码获取" class="headerlink" title="针对Android的代码获取"></a>针对Android的代码获取</h2><p>这里面有详细的操作流程</p>
-<p><a target="_blank" rel="noopener" href="https://chromium.googlesource.com/chromium/src/+/master/docs/android_build_instructions.md">获取代码</a></p>
-<p>获取代码需要能够访问Google的网络，由于不具备续传，所以断了就GG了。</p>
-<h2 id="Install-depot-tools"><a href="#Install-depot-tools" class="headerlink" title="Install depot_tools"></a>Install depot_tools</h2><p>获取depot_tools repository:</p>
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https:<span class="regexp">//</span>chromium.googlesource.com<span class="regexp">/chromium/</span>tools/depot_tools.git</span><br></pre></td></tr></table></figure>
-
-<p>添加depot_tools到PATH</p>
-<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> <span class="attribute">PATH</span>=<span class="string">&quot;<span class="variable">$PATH</span>:/path/to/depot_tools&quot;</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="获取代码"><a href="#获取代码" class="headerlink" title="获取代码"></a>获取代码</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> ~/chromium &amp;&amp; <span class="built_in">cd</span> ~/chromium</span><br><span class="line">fetch --no-history android</span><br></pre></td></tr></table></figure>
-
-<p>这样会快一点，另外这样的是最新的版本，如果需要切换到指定的版本，</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">git</span> fetch origin tag <span class="number">73</span>.<span class="number">0</span>.<span class="number">3657</span>.<span class="number">0</span></span><br></pre></td></tr></table></figure>
-
-<p>这个步骤会比较漫长，耐心等待吧。。。</p>
-<p>之后就参考官方的说明就可以了。</p>
-<h2 id="编译Cronet模块"><a href="#编译Cronet模块" class="headerlink" title="编译Cronet模块"></a>编译Cronet模块</h2><p>Chromium 采用 gn + ninja来构建的，通过一些配置选项来支持构建的。<br>如果clone下代码后并且已经安装好依赖后，Cronet模块位于 </p>
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">src<span class="regexp">/components/</span>cronet</span><br></pre></td></tr></table></figure>
-<p>这个是针对Android和iOS提供了net模块的支持，android文件夹里面有jni模块和Java层的api方法，jni不需要自己手动去编译，Chromium是通过注解来自动生成的。</p>
-<p>需要编译这个也很简单，在这个目录中有一个编译介绍的文档，我这边贴出来, 很详细了吧</p>
-<h1 id="Cronet-build-instructions"><a href="#Cronet-build-instructions" class="headerlink" title="Cronet build instructions"></a>Cronet build instructions</h1><p>[TOC]</p>
-<h2 id="Checking-out-the-code"><a href="#Checking-out-the-code" class="headerlink" title="Checking out the code"></a>Checking out the code</h2><p>Follow all the<br><a target="_blank" rel="noopener" href="https://www.chromium.org/developers/how-tos/get-the-code">Get the Code</a><br>instructions for your target platform up to and including running hooks.</p>
-<h2 id="Building-Cronet-for-development-and-debugging"><a href="#Building-Cronet-for-development-and-debugging" class="headerlink" title="Building Cronet for development and debugging"></a>Building Cronet for development and debugging</h2><p>To build Cronet for development and debugging purposes:</p>
-<p>First, <code>gn</code> is used to create ninja files targeting the intended platform, then<br><code>ninja</code> executes the ninja files to run the build.</p>
-<h3 id="Android-x2F-iOS-builds"><a href="#Android-x2F-iOS-builds" class="headerlink" title="Android &#x2F; iOS builds"></a>Android &#x2F; iOS builds</h3><pre><code class="shell">$ ./components/cronet/tools/cr_cronet.py gn --out_dir=out/Cronet
-</code></pre>
-<p>If the build host is Linux, Android binaries will be built. If the build host is<br>macOS, iOS binaries will be built.</p>
-<p>Note: these commands clobber output of previously executed gn commands in<br><code>out/Cronet</code>. If <code>--out_dir</code> is left out, the output directory defaults to<br><code>out/Debug</code> for debug builds and <code>out/Release</code> for release builds (see below).</p>
-<p>If <code>--x86</code> option is specified, then a native library is built for Intel x86<br>architecture, and the output directory defaults to <code>out/Debug-x86</code> if<br>unspecified. This can be useful for running on mobile emulators.</p>
-<h3 id="Desktop-builds-targets-the-current-OS"><a href="#Desktop-builds-targets-the-current-OS" class="headerlink" title="Desktop builds (targets the current OS)"></a>Desktop builds (targets the current OS)</h3><p>TODO(caraitto): Specify how to target Chrome OS and Fuchsia.</p>
-<pre><code class="shell">gn gen out/Cronet
-</code></pre>
-<h3 id="Running-the-ninja-files"><a href="#Running-the-ninja-files" class="headerlink" title="Running the ninja files"></a>Running the ninja files</h3><p>Now, use the generated ninja files to execute the build against the<br><code>cronet_package</code> build target:</p>
-<pre><code class="shell">$ ninja -C out/Cronet cronet_package
-</code></pre>
-<h2 id="Building-Cronet-mobile-for-releases"><a href="#Building-Cronet-mobile-for-releases" class="headerlink" title="Building Cronet mobile for releases"></a>Building Cronet mobile for releases</h2><p>To build Cronet with optimizations and with debug information stripped out:</p>
-<pre><code class="shell">$ ./components/cronet/tools/cr_cronet.py gn --release
-$ ninja -C out/Release cronet_package
-</code></pre>
-<p>Note: these commands clobber output of previously executed gn commands in<br><code>out/Release</code>.</p>
-<h2 id="Building-for-other-architectures"><a href="#Building-for-other-architectures" class="headerlink" title="Building for other architectures"></a>Building for other architectures</h2><p>By default ARMv7 32-bit executables are generated. To generate executables<br>targeting other architectures modify <a href="tools/cr_cronet.py">cr_cronet.py</a>‘s<br><code>gn_args</code> variable to include:</p>
-<ul>
-<li>For ARMv8 64-bit: <code>target_cpu=&quot;arm64&quot;</code></li>
-<li>For x86 32-bit: <code>target_cpu=&quot;x86&quot;</code></li>
-<li>For x86 64-bit: <code>target_cpu=&quot;x64&quot;</code></li>
-</ul>
-<p>Alternatively you can run <code>gn args &#123;out_dir&#125;</code> and modify arguments in the editor<br>that comes up. This has advantage of not changing <code>cr_cronet.py</code>.</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
     <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
   </nav>
@@ -1117,7 +1102,7 @@ $ ninja -C out/Release cronet_package
 
 <div class="copyright">
   &copy; 
-  <span itemprop="copyrightYear">2023</span>
+  <span itemprop="copyrightYear">2024</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
